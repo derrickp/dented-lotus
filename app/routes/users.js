@@ -1,5 +1,4 @@
 'use strict';
-var bcrypt_1 = require("bcrypt");
 var Boom = require("boom");
 var User_1 = require("../models/User");
 var createUser_1 = require("../utilities/createUser");
@@ -8,62 +7,7 @@ var authenticateUserSchema_1 = require("../utilities/authenticateUserSchema");
 var token_1 = require("../utilities/token");
 var sqliteUtilities_1 = require("../utilities/sqliteUtilities");
 var base64url = require('base64-url');
-function hashPassword(password, cb) {
-    // Generate a salt at level 10 strength
-    bcrypt_1.genSalt(10, function (err, salt) {
-        bcrypt_1.hash(password, salt, function (err, hash) {
-            return cb(err, hash);
-        });
-    });
-}
 exports.userRoutes = [
-    {
-        method: 'PUT',
-        path: '/users/{key}/updatePassword',
-        config: {
-            cors: true,
-            handler: function (req, res) {
-                var credentials = req.auth.credentials;
-                var isAdmin = credentials.scope.indexOf('admin') >= 0;
-                var key = req.params["key"];
-                // If someone tries to save info for a different user, don't allow it, unless the person saving is an admin
-                if (key !== credentials.key && !isAdmin) {
-                    res(Boom.badRequest("cannot change password for a different user"));
-                    return;
-                }
-                var newPassword = req.payload.newPassword;
-                hashPassword(newPassword, function (err, hashedPassword) {
-                    if (err) {
-                        res(Boom.badRequest(err));
-                        return;
-                    }
-                    // Get the existing user out of the database.
-                    sqliteUtilities_1.getFullUsers(key).then(function (users) {
-                        var existingUser = users[0];
-                        if (!existingUser) {
-                            res(Boom.badRequest("user key provided was not found"));
-                            return;
-                        }
-                        // Create a new user object that will hold the password and the user's key
-                        var newUser = new User_1.User();
-                        newUser.password = hashedPassword;
-                        newUser.key = key;
-                        sqliteUtilities_1.updateUser(newUser).then(function (updatedUser) {
-                            res(updatedUser);
-                            return;
-                        }).catch(function (error) {
-                            console.log(error);
-                            res(Boom.badRequest(error));
-                        });
-                    });
-                });
-            },
-            auth: {
-                strategies: ['jwt'],
-                scope: ['user']
-            }
-        }
-    },
     {
         method: 'PUT',
         path: '/users/{key}',
@@ -127,25 +71,27 @@ exports.userRoutes = [
                 user.key = base64url.encode(user.email);
                 user.firstName = req.payload.firstName;
                 user.lastName = req.payload.lastName;
-                hashPassword(req.payload.password, function (err, hash) {
-                    if (err) {
-                        throw Boom.badRequest(err);
-                    }
-                    user.password = hash;
-                    sqliteUtilities_1.saveUser(user).then(function (success) {
-                        if (success) {
-                            res({
-                                id_token: token_1.createToken(user),
-                                key: user.key
-                            }).code(201);
-                        }
-                        else {
-                            res(Boom.badRequest("unable to save user"));
-                        }
-                    }).catch(function (error) {
-                        res(Boom.badRequest(error));
-                    });
-                });
+                // !TODO! - We need to do something else to push new users into the db.
+                // Not storing passwords anymore.
+                // hashPassword(req.payload.password, (err, hash) => {
+                //     if (err) {
+                //         throw Boom.badRequest(err);
+                //     }
+                //     user.password = hash;
+                //     saveUser(user).then(success => {
+                //         if (success) {
+                //             res({
+                //                 id_token: createToken(user),
+                //                 key: user.key
+                //             }).code(201);
+                //         }
+                //         else {
+                //             res(Boom.badRequest("unable to save user"));
+                //         }
+                //     }).catch(error => {
+                //         res(Boom.badRequest(error));
+                //     });
+                // });
             },
             // Validate the payload against the Joi schema
             validate: {

@@ -1,6 +1,5 @@
 'use strict';
 var Boom = require("boom");
-var bcrypt_1 = require("bcrypt");
 var sqliteUtilities_1 = require("./sqliteUtilities");
 function verifyUniqueUser(req, res) {
     // Find an entry from the database that
@@ -29,17 +28,8 @@ function verifyCredentials(req, res) {
         if (users && users.length > 0) {
             var user = users[0];
             if (user) {
-                bcrypt_1.compare(password, user.pass, function (err, isValid) {
-                    if (isValid) {
-                        user.password = null;
-                        res(user);
-                        return;
-                    }
-                    else {
-                        res(Boom.badRequest('Incorrect password!'));
-                        return;
-                    }
-                });
+                // !TODO! - Do a new compare with the id_token or something here. No storing passwords
+                res(user);
             }
             else {
                 res(Boom.badRequest('Incorrect username or email!'));
