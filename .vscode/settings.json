@@ -1,0 +1,18 @@
+{
+    "typescript.tsdk": "./node_modules/typescript/lib",
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/*.jsx":true,
+        "compiled":true,
+        "dist":true,
+        "node_modules":true,
+        "config":true,
+        "app/**/*.js": true,
+        "src/**/*.js": true
+    }
+
+
+}

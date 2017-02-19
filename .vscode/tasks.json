@@ -1,0 +1,36 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "0.1.0",
+    "command": "npm",
+    "isShellCommand": true, 
+    "suppressTaskName": true,
+    "tasks": [
+        {
+            "taskName": "compile",
+            "args": [ "run", "build" ],
+    "showOutput": "silent",
+            "isBuildCommand": true
+        },
+        {
+            "taskName": "compile-less",
+            "args": [ "run", "compile-less" ]
+        },
+        {
+            "taskName": "copy-static",
+            "args": [ "run", "copy-static-files" ]
+        },
+        {
+            "taskName": "webpack",
+            "args": [ "run", "webpack" ]
+        },
+        {
+            "taskName": "update",
+            "args": ["update"]
+        },
+        {
+            "taskName": "start-dev",
+            "args": ["run", "start-dev"]
+        }
+    ]
+}

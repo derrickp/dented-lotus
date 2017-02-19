@@ -1,0 +1,394 @@
+@darkPrimaryColor:   #455A64;
+@primaryColor:       #607D8B;
+@lightPrimaryColor:  #f2f2f2;
+@textPrimaryColor:   #FFFFFF;
+@accentColor:        #4CAF50;
+@primaryTextColor:   #212121;
+@secondaryTextColor: #757575;
+@dividerColor:       #BDBDBD;
+@panelColor: #828081;
+
+@headerFont: 'Orbitron', Georgia, Times, serif;  
+@textFont: 'Arimo', Helvetica, Arial, sans-serif;
+
+@bannerHeight: 2rem;
+@borderRadius: 3px;
+
+.gradient {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#4c4c4c+0,2b2b2b+80,595959+100 */
+    background: #4c4c4c; /* Old browsers */
+    background: -moz-linear-gradient(top,  #4c4c4c 0%, #2b2b2b 80%, #595959 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #4c4c4c 0%,#2b2b2b 80%,#595959 100%); /* Chrome10-25,Safari5.1-6 */  
+    background: linear-gradient(to bottom,  #4c4c4c 0%,#2b2b2b 80%,#595959 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', endColorstr='#595959',GradientType=0 ); /* IE6-9 */  
+
+}
+
+body, html{
+    padding:0;
+    margin: 0;
+        color:@lightPrimaryColor;
+    background-color: @lightPrimaryColor;
+    background-image: url("../images/brushed.png");     
+    font-family: @textFont;
+    box-sizing:border-box;    
+    overflow-x: hidden;
+.wrapper{
+    
+    max-width:960px;
+    margin: auto;
+}
+ .background{
+    width:100%;  
+    background-repeat: no-repeat;
+    background-position: right top;
+}
+h1 {
+    font-family: @headerFont;
+    text-shadow: 2px 2px #0e0e0e;
+    margin:0;
+    padding:0;
+}
+li {
+    list-style: none; 
+}
+.panel{
+        border: 1px solid lighten(@panelColor,20%);
+        box-shadow: 0 2px 1px fade(@panelColor,20%);
+        border-radius:@borderRadius; 
+        background-color: @panelColor; 
+}
+.blog-posts{
+    padding: 0;
+    .blog-entry{
+        .panel;
+        max-width:60em;  
+        margin-bottom:1em;
+        padding:1em; 
+        box-sizing:border-box;      
+        .date{
+            width:100%;  
+        } 
+        .title{
+            font-size: 32px;
+        }
+    }
+}
+.race-countdown{
+    display:inline-block;  
+    height:2.5rem;
+    line-height:2.5rem; 
+    padding-left:1em;
+    .panel;
+    .timer{
+        margin-right:1rem;
+    }
+}
+.button{
+    background-color:@accentColor; 
+    border-left: 1px solid lighten(@accentColor,20%);
+    height:2.5rem;
+    line-height:2.5rem; 
+    border-bottom-right-radius: @borderRadius;
+    border-top-right-radius: @borderRadius;
+    display:inline-block;
+    padding: 0 0.4rem;
+    &:hover{
+        cursor: pointer; 
+        animation: MoveUpDown .2s linear;  
+    }
+    &:active{
+        border:inset 1px lighten(@accentColor,20%);
+    }
+}
+.banner{ 
+    .gradient;
+    margin-top: 0;
+    display: block;
+    height: @bannerHeight;
+    width: 100%; 
+    
+    h1{
+        color: @textPrimaryColor;
+        display: inline-block;
+        width: 25%; 
+        font-size: 1.2rem;
+        margin-left: 1em;
+        line-height: 2rem;
+    }
+    
+    .login,.logout{
+        height: 100%; 
+        width:8.333333333333%;
+        line-height: @bannerHeight;
+        box-sizing: border-box;
+        background: @accentColor;
+        text-align: center;
+        float: right; 
+        
+    } .logout{
+        width: 4em;
+    }
+    .login>span{ 
+    height:100%;
+    display: block;
+    width: 100%; 
+    }
+    .menu{ 
+
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 25%;
+        float: right;
+        li{
+            height: 100%;
+            line-height: 2rem;  
+            width: 33.333333333333333333%; 
+            display: inline-block;
+            text-align: center;
+        }
+        li:hover{
+            background:@accentColor;
+            cursor: pointer;
+        }
+    }
+    .login:hover,.logout:hover{
+        cursor:pointer;
+    }
+}
+.header-section {
+    height: 20em;
+    border: 1px solid silver;
+    margin-bottom: 4rem;
+    width: 100%;
+    background-image: url("../images/honda.jpg");  
+    background-size: cover;
+    background-position: center;
+
+}
+
+.small-user { 
+    height: 6em;
+    width: 100%;
+    display: block;
+    box-sizing: border-box;
+    padding: 1em;
+    text-align: left;
+    border-bottom: 1px dashed #656565;
+    span{
+    vertical-align: baseline;
+        display: inline-block;
+        /* vertical-align: bottom; */
+        margin-left: 1em;
+        font-size: x-large;
+    }
+    img.round {
+        height: 100%;
+        line-height: 100%;
+        border-radius: 6em;
+        /* margin-top: 5%; */
+        vertical-align: middle;
+        text-align: left;
+        display: inline-block;
+        /* margin-right: 1em; */
+    }
+}
+@keyframes MoveUpDown {
+  0% {
+      position:relative;
+    bottom: 0;
+  }
+  50% {
+      position:relative;
+    bottom: 1px;
+  }
+  100% {
+    bottom: 0;
+      position:relative;
+  }
+}
+}
+
+
+
+
+/* -- container -- */
+.rodal,
+.rodal-mask {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+}
+
+.rodal {
+    position: fixed;
+}
+
+/* -- mask -- */
+.rodal-mask {
+    position: absolute;
+    background: rgba(0, 0, 0, .3);
+}
+
+/* -- dialog -- */
+.rodal-dialog {
+    position: absolute;
+    top: ~"calc(50% - 120px)";
+    left: ~"calc(50% - 200px)";
+    z-index: 101;
+    padding: 15px;
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+}
+
+/* -- close button -- */
+.rodal-close {
+    position: absolute;
+    cursor: pointer;
+    top: 16px;
+    right: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.rodal-close:before,
+.rodal-close:after {
+    position: absolute;
+    content: '';
+    height: 2px;
+    width: 100%;
+    top: 50%;
+    left: 0;
+    margin-top: -1px;
+    background: #999;
+    border-radius: 100%;
+    -webkit-transition: background .2s;
+    transition: background .2s;
+}
+
+.rodal-close:before {
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.rodal-close:after {
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+.rodal-close:hover:before,
+.rodal-close:hover:after {
+    background: #333;
+} 
+
+/* -- zoom -- */
+@-webkit-keyframes rodal-zoom-enter {
+    from {
+        -webkit-transform: scale3d(.3, .3, .3);
+        transform: scale3d(.3, .3, .3);
+    }
+}
+
+@keyframes rodal-zoom-enter {
+    from {
+        -webkit-transform: scale3d(.3, .3, .3);
+        transform: scale3d(.3, .3, .3);
+    }
+}
+
+.rodal-zoom-enter {
+    -webkit-animation: rodal-zoom-enter both cubic-bezier(0.4, 0, 0, 1.5);
+    animation: rodal-zoom-enter both cubic-bezier(0.4, 0, 0, 1.5);
+}
+
+@-webkit-keyframes rodal-zoom-leave {
+    to {
+        -webkit-transform: scale3d(.3, .3, .3);
+        transform: scale3d(.3, .3, .3);
+    }
+}
+
+@keyframes rodal-zoom-leave {
+    to {
+        -webkit-transform: scale3d(.3, .3, .3);
+        transform: scale3d(.3, .3, .3);
+    }
+}
+
+.rodal-zoom-leave {
+    -webkit-animation: rodal-zoom-leave both;
+    animation: rodal-zoom-leave both;
+}
+
+/* Position and sizing of burger button */
+.bm-burger-button {
+  position: fixed;
+  width: 36px;
+  height: 30px;
+  left: 36px;
+  top: 36px;
+}
+
+/* Color/shape of burger icon bars */
+.bm-burger-bars {
+  background: #373a47;
+}
+
+/* Position and sizing of clickable cross button */
+.bm-cross-button {
+  height: 24px;
+  width: 24px;
+}
+
+/* Color/shape of close button cross */
+.bm-cross {
+  background: #bdc3c7;
+}
+
+/* General sidebar styles */
+.bm-menu {
+    .gradient;
+  padding: @bannerHeight 0 0;
+  height:100%;
+  width:100%;
+  box-sizing: border-box;
+  overflow:hidden; 
+  overflow-x:hidden;
+}
+
+.bm-menu-wrap {  
+    border-left: 1px solid silver;
+}
+
+/* Morph shape necessary with bubble or elastic */
+.bm-morph-shape {
+  fill: #373a47;
+}
+
+/* Wrapper for item list */
+.bm-item-list {
+  color: #b8b7ad; 
+    height: 70% !important;
+    a{
+        font-family: @headerFont;
+        color: inherit;
+        text-decoration: none;
+        font-size: large;
+        width:100%;
+        height:3em;
+        line-height: 3em;
+
+    }
+    a:hover{
+        background-color: @accentColor;
+    }
+}
+
+/* Styling of overlay */
+.bm-overlay {
+  background: rgba(0, 0, 0, 0.3); 
+}
