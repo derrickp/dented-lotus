@@ -1,6 +1,5 @@
 'use strict';
 import * as Boom from "boom";
-import { compare } from "bcrypt";
 import { getUsers } from "./sqliteUtilities";
 
 export function verifyUniqueUser(req, res) {
@@ -32,17 +31,19 @@ export function verifyCredentials(req, res) {
         if (users && users.length > 0) {
             var user = users[0];
             if (user) {
-                compare(password, user.pass, (err, isValid) => {
-                    if (isValid) {
-                        user.password = null;
-                        res(user);
-                        return;
-                    }
-                    else {
-                        res(Boom.badRequest('Incorrect password!'));
-                        return;
-                    }
-                });
+                // !TODO! - Do a new compare with the id_token or something here. No storing passwords
+                res(user);
+                // compare(password, user.pass, (err, isValid) => {
+                //     if (isValid) {
+                //         user.password = null;
+                //         res(user);
+                //         return;
+                //     }
+                //     else {
+                //         res(Boom.badRequest('Incorrect password!'));
+                //         return;
+                //     }
+                // });
             }
             else {
                 res(Boom.badRequest('Incorrect username or email!'));

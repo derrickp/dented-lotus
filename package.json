@@ -7,7 +7,6 @@
   "license": "MIT",
   "dependencies": {
     "base64-url": "^1.2.2",
-    "bcrypt": "^0.8.6",
     "bluebird": "^3.4.0",
     "boom": "^3.2.1",
     "bootstrap": "^3.2.0",
@@ -27,7 +26,6 @@
     "sqlite3": "^3.1.4"
   },
   "devDependencies": {
-    "@types/bcrypt": "^1.0.0",
     "@types/boom": "0.0.33",
     "@types/fb": "0.0.22",
     "@types/gapi": "0.0.30",
