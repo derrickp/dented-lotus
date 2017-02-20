@@ -4,6 +4,7 @@ import { Blog } from "./models/Blog";
 import { Promise } from "bluebird";
 import { User, GoogleUser, FacebookUser } from "./models/User";
 import { Race, races } from "./models/Race";
+import { Track, tracks } from "./models/Track";
 
 declare var FB: FBSDK;
 export class StateManager {
@@ -28,8 +29,12 @@ export class StateManager {
         date: "March 26, 2017"
     };
 
-    get races() {
+    get races(): Race[] {
         return races;
+    }
+
+    get tracks(): Track[] {
+        return tracks;
     }
 
     currentUser: User = new User();
@@ -82,8 +87,7 @@ export class StateManager {
         return Promise.resolve(this.blogs.sort((a: Blog, b: Blog) => { return b.date.localeCompare(a.date) }));
     }
 
-
-    getNextRace(): Promise<{}> {
+    getNextRace(): Promise<Race> {
         return Promise.resolve(this.nextRace);
     }
     /**

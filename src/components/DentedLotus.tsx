@@ -7,14 +7,22 @@ import { StateManager } from "../StateManager";
 import { BlogComponent } from "./BlogComponent";
 import { HeaderSection } from "./HeaderSection";
 import { RaceCountdown } from "./widgets/RaceCountdown";
-import { RacePage, AllRaces } from "./Pages";
+import { RacePage, AllRaces, TrackPage, Tracks } from "./Pages";
+import { Race } from "../models/Race";
 import { PropsBase } from "../utilities/ComponentUtilities";
 import { getUrlParameters } from "../utilities/PageUtilities"
 
 export interface DentedLotusProps extends PropsBase {
 
 }
-export class DentedLotus extends React.Component<DentedLotusProps, any>{
+
+export interface DentedLotusState {
+    parameters: any;
+    sidebarOpen: boolean;
+    race: Promise<Race>;
+}
+
+export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusState>{
     sidebarStyle = {
         root: {
             position: 'absolute',
@@ -70,7 +78,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, any>{
         super(props);
         const parameters = getUrlParameters();
         this.stateManager = props.stateManager;
-        this.state = { parameters: parameters, sidebarOpen: false };
+        this.state = { race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
     }
 
     onMenuClicked() {
@@ -87,6 +95,12 @@ export class DentedLotus extends React.Component<DentedLotusProps, any>{
         this.setState({ parameters: parameters, race: this.stateManager.getNextRace() });
     }
 
+    onPageChange(page: string) {
+        const parameters = this.state.parameters;
+        parameters.page = page;
+        this.setState({ parameters: parameters });
+    }
+
     getCurrentView() {
         switch (this.state.parameters.page) {
             case "race":
@@ -95,21 +109,23 @@ export class DentedLotus extends React.Component<DentedLotusProps, any>{
                 return <div>User!!!!</div>;
             case "all-races":
                 return <AllRaces races={this.stateManager.races} />;
+            case "tracks":
+                return <Tracks tracks={this.stateManager.tracks} />;
             default:
                 return this.getHomePage();
         }
     }
 
-    getHomePage(){
+    getHomePage() {
         return <div>
-                    <RaceCountdown onclick={this.launchRacePicks.bind(this)} stateManager={this.stateManager} displayName={this.stateManager.nextRace.displayName} cutoffDate={this.stateManager.nextRace.date} />
-                    <BlogComponent stateManager={this.stateManager} />
-                </div>;
+            <RaceCountdown onclick={this.launchRacePicks.bind(this)} stateManager={this.stateManager} displayName={this.stateManager.nextRace.displayName} cutoffDate={this.stateManager.nextRace.date} />
+            <BlogComponent stateManager={this.stateManager} />
+        </div>;
     }
 
     render() {
         return <div>
-            <Banner stateManager={this.stateManager} title="Project Dented Lotus" onMenuClicked={this.onMenuClicked} />
+            <Banner onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" onMenuClicked={this.onMenuClicked} />
             <HeaderSection stateManager={this.stateManager} />
             <div className="wrapper">
                 {this.getCurrentView()}

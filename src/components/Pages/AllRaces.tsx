@@ -16,7 +16,7 @@ export class AllRaces extends React.Component<AllRacesProps, any> {
 
     render() {
         const entries = this.props.races.map(race => {
-            return <li className="panel"><RacePage key={race.id} race={Promise.resolve(race)} small={true}/></li>
+            return <li key={race.id} className="panel"><RacePage key={race.id} race={Promise.resolve(race)} small={true}/></li>
         });
         return <ul>{entries}</ul>
     }

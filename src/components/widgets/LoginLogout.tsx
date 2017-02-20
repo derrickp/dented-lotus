@@ -19,11 +19,13 @@ export interface LoginLogoutProps extends PropsBase {
     onLogin: (User) => void;
     onLogout: () => void;
     onMenuClicked: () => void;
+    onPageChange: (page: string) => void;
 }
 export class LoginLogout extends React.Component<LoginLogoutProps, any>{
     onLogin: (User) => void;
     onLogout: () => void;
     onMenuClicked: () => void;
+    onPageChange: (page: string) => void;
     stateManager: StateManager;
     /**
      *
@@ -37,6 +39,7 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
         this.onLogin = props.onLogin;
         this.onLogout = props.onLogout;
         this.onMenuClicked = props.onMenuClicked;
+        this.onPageChange = props.onPageChange;
     }
 
 
@@ -76,9 +79,11 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
             return <div className="logout" onClick={this.onMenuClicked.bind(this)}>
                 <Menu width={270} customBurgerIcon={false} pageWrapId={"page-wrap"} isOpen={this.state.sidebarOpen} right>
                     <UserComponent small  stateManager={this.props.stateManager}/>
-                    <a id="home" className="menu-item" href="/">Home</a>
-                    <a id="about" className="menu-item" href="/about">About</a>
-                    <a id="contact" className="menu-item" href="/contact">Contact</a>
+                    <a id="home" className="menu-item" href="#home" onClick={() => this.onPageChange("home")}>Home</a>
+                    <a id="races" className="menu-item" href="#page=all-races" onClick={() => this.onPageChange("all-races")}>Races</a>
+                    <a id="tracks" className="menu-item" href="#page=tracks" onClick={() => this.onPageChange("tracks")}>Tracks</a>
+                    <a id="about" className="menu-item" href="#about" onClick={() => this.onPageChange("about")}>About</a>
+                    <a id="contact" className="menu-item" href="#contact" onClick={() => this.onPageChange("contact")}>Contact</a>
                 </Menu>
             </div>
         } else {

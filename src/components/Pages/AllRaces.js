@@ -13,7 +13,7 @@ var AllRaces = (function (_super) {
     }
     AllRaces.prototype.render = function () {
         var entries = this.props.races.map(function (race) {
-            return React.createElement("li", { className: "panel" },
+            return React.createElement("li", { key: race.id, className: "panel" },
                 React.createElement(Pages_1.RacePage, { key: race.id, race: Promise.resolve(race), small: true }));
         });
         return React.createElement("ul", null, entries);

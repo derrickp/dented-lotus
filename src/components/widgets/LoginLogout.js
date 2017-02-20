@@ -25,6 +25,7 @@ var LoginLogout = (function (_super) {
         _this.onLogin = props.onLogin;
         _this.onLogout = props.onLogout;
         _this.onMenuClicked = props.onMenuClicked;
+        _this.onPageChange = props.onPageChange;
         return _this;
     }
     LoginLogout.prototype.componentDidMount = function () {
@@ -53,14 +54,17 @@ var LoginLogout = (function (_super) {
     LoginLogout.prototype.loginFailed = function (args) {
     };
     LoginLogout.prototype.render = function () {
+        var _this = this;
         var sidebarContent = "<b>Sidebar content</b>";
         if (this.state.loggedIn) {
             return React.createElement("div", { className: "logout", onClick: this.onMenuClicked.bind(this) },
                 React.createElement(Menu, { width: 270, customBurgerIcon: false, pageWrapId: "page-wrap", isOpen: this.state.sidebarOpen, right: true },
                     React.createElement(User_2.UserComponent, { small: true, stateManager: this.props.stateManager }),
-                    React.createElement("a", { id: "home", className: "menu-item", href: "/" }, "Home"),
-                    React.createElement("a", { id: "about", className: "menu-item", href: "/about" }, "About"),
-                    React.createElement("a", { id: "contact", className: "menu-item", href: "/contact" }, "Contact")));
+                    React.createElement("a", { id: "home", className: "menu-item", href: "#home", onClick: function () { return _this.onPageChange("home"); } }, "Home"),
+                    React.createElement("a", { id: "races", className: "menu-item", href: "#page=all-races", onClick: function () { return _this.onPageChange("all-races"); } }, "Races"),
+                    React.createElement("a", { id: "tracks", className: "menu-item", href: "#page=tracks", onClick: function () { return _this.onPageChange("tracks"); } }, "Tracks"),
+                    React.createElement("a", { id: "about", className: "menu-item", href: "#about", onClick: function () { return _this.onPageChange("about"); } }, "About"),
+                    React.createElement("a", { id: "contact", className: "menu-item", href: "#contact", onClick: function () { return _this.onPageChange("contact"); } }, "Contact")));
         }
         else {
             var content = React.createElement("div", { className: "login-modal" },

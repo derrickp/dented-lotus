@@ -67,7 +67,7 @@ var DentedLotus = (function (_super) {
         };
         var parameters = PageUtilities_1.getUrlParameters();
         _this.stateManager = props.stateManager;
-        _this.state = { parameters: parameters, sidebarOpen: false };
+        _this.state = { race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
         return _this;
     }
     DentedLotus.prototype.onMenuClicked = function () {
@@ -81,6 +81,11 @@ var DentedLotus = (function (_super) {
         parameters.page = "race";
         this.setState({ parameters: parameters, race: this.stateManager.getNextRace() });
     };
+    DentedLotus.prototype.onPageChange = function (page) {
+        var parameters = this.state.parameters;
+        parameters.page = page;
+        this.setState({ parameters: parameters });
+    };
     DentedLotus.prototype.getCurrentView = function () {
         switch (this.state.parameters.page) {
             case "race":
@@ -89,6 +94,8 @@ var DentedLotus = (function (_super) {
                 return React.createElement("div", null, "User!!!!");
             case "all-races":
                 return React.createElement(Pages_1.AllRaces, { races: this.stateManager.races });
+            case "tracks":
+                return React.createElement(Pages_1.Tracks, { tracks: this.stateManager.tracks });
             default:
                 return this.getHomePage();
         }
@@ -100,7 +107,7 @@ var DentedLotus = (function (_super) {
     };
     DentedLotus.prototype.render = function () {
         return React.createElement("div", null,
-            React.createElement(Banner_1.Banner, { stateManager: this.stateManager, title: "Project Dented Lotus", onMenuClicked: this.onMenuClicked }),
+            React.createElement(Banner_1.Banner, { onPageChange: this.onPageChange.bind(this), stateManager: this.stateManager, title: "Project Dented Lotus", onMenuClicked: this.onMenuClicked }),
             React.createElement(HeaderSection_1.HeaderSection, { stateManager: this.stateManager }),
             React.createElement("div", { className: "wrapper" }, this.getCurrentView()));
     };

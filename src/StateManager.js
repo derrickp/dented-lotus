@@ -2,6 +2,7 @@
 var bluebird_1 = require("bluebird");
 var User_1 = require("./models/User");
 var Race_1 = require("./models/Race");
+var Track_1 = require("./models/Track");
 var StateManager = (function () {
     function StateManager() {
         this.modalVisible = false;
@@ -30,6 +31,13 @@ var StateManager = (function () {
     Object.defineProperty(StateManager.prototype, "races", {
         get: function () {
             return Race_1.races;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StateManager.prototype, "tracks", {
+        get: function () {
+            return Track_1.tracks;
         },
         enumerable: true,
         configurable: true
