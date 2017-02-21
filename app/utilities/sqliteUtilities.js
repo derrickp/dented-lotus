@@ -5,6 +5,7 @@ var db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 var allChallengesSelect = "SELECT * from challenges";
 var driverSelect = "SELECT drivers.key, drivers.active, drivers.name, drivers.points, drivers.teamkey as teamKey, teams.name as teamName FROM drivers inner join teams on drivers.teamKey == teams.key";
 var raceSelect = "select r.*, s.cutoff, s.racedate as raceDate, s.scored from races as r inner join seasons as s on r.key == s.racekey";
+var trackSelect = "select * from tracks_vw";
 var challengeSelect = "select c.*, ac.racekey as raceKey from challenges as c inner join activechallenges as ac on c.key == ac.challengekey";
 var basicUserSelect = "select users.displayname as displayName, users.firstname as firstName, users.key, users.points from users";
 var userSelectNoPass = "select users.displayname as displayName, users.email, users.firstname as firstName, users.key, users.lastname as lastName, users.role, users.points from users";
@@ -27,6 +28,19 @@ function getLatestRadioMessage() {
     });
 }
 exports.getLatestRadioMessage = getLatestRadioMessage;
+function getTracks(key) {
+    return new Promise(function (resolve, reject) {
+        var statement = trackSelect;
+        db.all(statement, function (err, rows) {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(rows);
+        });
+    });
+}
+exports.getTracks = getTracks;
 function addNewRadioMessage(newMessage) {
     return new Promise(function (resolve, reject) {
         try {

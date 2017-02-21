@@ -10,7 +10,10 @@ import { RaceCountdown } from "./widgets/RaceCountdown";
 import { RacePage, AllRaces, TrackPage, Tracks } from "./Pages";
 import { Race } from "../models/Race";
 import { PropsBase } from "../utilities/ComponentUtilities";
-import { getUrlParameters } from "../utilities/PageUtilities"
+import { getUrlParameters } from "../utilities/PageUtilities";
+import { GoogleUser } from "../models/User";
+
+import { GoogleLoginResponse } from "react-google-login";
 
 export interface DentedLotusProps extends PropsBase {
 
@@ -20,6 +23,7 @@ export interface DentedLotusState {
     parameters: any;
     sidebarOpen: boolean;
     race: Promise<Race>;
+    loggedIn: boolean;
 }
 
 export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusState>{
@@ -78,7 +82,16 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         super(props);
         const parameters = getUrlParameters();
         this.stateManager = props.stateManager;
-        this.state = { race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
+        this.state = { loggedIn: false, race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
+    }
+
+     onGoogleLogin(args: GoogleLoginResponse) {
+        console.log("Ongooglesignedin!");
+        debugger;
+        // this.hide();
+        this.stateManager.setUser(new GoogleUser(args));
+        this.setState({loggedIn: this.stateManager.isLoggedIn});
+        // this.setState({ loggedIn: true });
     }
 
     onMenuClicked() {
@@ -125,7 +138,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     render() {
         return <div>
-            <Banner onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" onMenuClicked={this.onMenuClicked} />
+            <Banner loggedIn={this.stateManager.isLoggedIn} onGoogleLogin={this.onGoogleLogin.bind(this)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" onMenuClicked={this.onMenuClicked} />
             <HeaderSection stateManager={this.stateManager} />
             <div className="wrapper">
                 {this.getCurrentView()}

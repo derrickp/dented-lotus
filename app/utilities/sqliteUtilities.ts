@@ -1,6 +1,7 @@
 'use strict';
 
 import * as sqlite3 from "sqlite3";
+import { Track } from "../models/Track";
 
 const formatString = require('format-string');
 const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
@@ -9,6 +10,7 @@ const allChallengesSelect = "SELECT * from challenges";
 
 const driverSelect = "SELECT drivers.key, drivers.active, drivers.name, drivers.points, drivers.teamkey as teamKey, teams.name as teamName FROM drivers inner join teams on drivers.teamKey == teams.key";
 const raceSelect = "select r.*, s.cutoff, s.racedate as raceDate, s.scored from races as r inner join seasons as s on r.key == s.racekey";
+const trackSelect = "select * from tracks_vw";
 const challengeSelect = "select c.*, ac.racekey as raceKey from challenges as c inner join activechallenges as ac on c.key == ac.challengekey";
 const basicUserSelect = "select users.displayname as displayName, users.firstname as firstName, users.key, users.points from users";
 const userSelectNoPass = "select users.displayname as displayName, users.email, users.firstname as firstName, users.key, users.lastname as lastName, users.role, users.points from users";
@@ -30,6 +32,19 @@ export function getLatestRadioMessage(): Promise<string> {
             }
             resolve(rows[0]);
         });
+    });
+}
+
+export function getTracks(key: number): Promise<Track[]> {
+    return new Promise<Track[]>((resolve, reject) => {
+        let statement = trackSelect;
+        db.all(statement, (err, rows: Track[]) => {
+           if (err) {
+               reject(err);
+               return;
+           }
+           resolve(rows);
+        }); 
     });
 }
 

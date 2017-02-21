@@ -4,7 +4,8 @@ import { Blog } from "./models/Blog";
 import { Promise } from "bluebird";
 import { User, GoogleUser, FacebookUser } from "./models/User";
 import { Race, races } from "./models/Race";
-import { Track, tracks } from "./models/Track";
+import { Track } from "./models/Track";
+import { getAllTracks } from "./Utilities/ServerUtils"
 
 declare var FB: FBSDK;
 export class StateManager {
@@ -29,15 +30,22 @@ export class StateManager {
         date: "March 26, 2017"
     };
 
+    private _tracks: Promise<Track[]>;
+
     get races(): Race[] {
         return races;
     }
 
-    get tracks(): Track[] {
-        return tracks;
+    get tracks(): Promise<Track[]> {
+        this._tracks = this._tracks ? this._tracks : getAllTracks();
+        return this._tracks;
     }
 
-    currentUser: User = new User();
+    get isLoggedIn(): boolean {
+        return this.currentUser != null;
+    }
+
+    currentUser: User = null;
 
     constructor() {
         this._initGoogle();

@@ -2,7 +2,7 @@
 var bluebird_1 = require("bluebird");
 var User_1 = require("./models/User");
 var Race_1 = require("./models/Race");
-var Track_1 = require("./models/Track");
+var ServerUtils_1 = require("./Utilities/ServerUtils");
 var StateManager = (function () {
     function StateManager() {
         this.modalVisible = false;
@@ -24,7 +24,7 @@ var StateManager = (function () {
             displayName: "Australian GP",
             date: "March 26, 2017"
         };
-        this.currentUser = new User_1.User();
+        this.currentUser = null;
         this._initGoogle();
         this._initFacebook();
     }
@@ -37,7 +37,15 @@ var StateManager = (function () {
     });
     Object.defineProperty(StateManager.prototype, "tracks", {
         get: function () {
-            return Track_1.tracks;
+            this._tracks = this._tracks ? this._tracks : ServerUtils_1.getAllTracks();
+            return this._tracks;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StateManager.prototype, "isLoggedIn", {
+        get: function () {
+            return this.currentUser != null;
         },
         enumerable: true,
         configurable: true

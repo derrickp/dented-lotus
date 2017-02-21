@@ -73,7 +73,7 @@
 	var bluebird_1 = __webpack_require__(4);
 	var User_1 = __webpack_require__(8);
 	var Race_1 = __webpack_require__(9);
-	var Track_1 = __webpack_require__(10);
+	var ServerUtils_1 = __webpack_require__(10);
 	var StateManager = (function () {
 	    function StateManager() {
 	        this.modalVisible = false;
@@ -95,7 +95,7 @@
 	            displayName: "Australian GP",
 	            date: "March 26, 2017"
 	        };
-	        this.currentUser = new User_1.User();
+	        this.currentUser = null;
 	        this._initGoogle();
 	        this._initFacebook();
 	    }
@@ -108,7 +108,15 @@
 	    });
 	    Object.defineProperty(StateManager.prototype, "tracks", {
 	        get: function () {
-	            return Track_1.tracks;
+	            this._tracks = this._tracks ? this._tracks : ServerUtils_1.getAllTracks();
+	            return this._tracks;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(StateManager.prototype, "isLoggedIn", {
+	        get: function () {
+	            return this.currentUser != null;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -6311,21 +6319,17 @@
 /***/ function(module, exports) {
 
 	"use strict";
-	var Track = (function () {
-	    function Track() {
-	    }
-	    return Track;
-	}());
-	exports.Track = Track;
-	exports.tracks = [
-	    {
-	        id: "monaco",
-	        name: "Monaco",
-	        country: "Richville",
-	        length: 1000,
-	        laps: 500
-	    }
-	];
+	var baseUrl = window.location.origin;
+	function getAllTracks() {
+	    return new Promise(function (resolve, reject) {
+	        return fetch(baseUrl + "/tracks").then(function (response) {
+	            return response.json().then(function (tracks) {
+	                resolve(tracks);
+	            });
+	        });
+	    });
+	}
+	exports.getAllTracks = getAllTracks;
 
 
 /***/ },
@@ -6345,6 +6349,7 @@
 	var RaceCountdown_1 = __webpack_require__(99);
 	var Pages_1 = __webpack_require__(177);
 	var PageUtilities_1 = __webpack_require__(182);
+	var User_1 = __webpack_require__(8);
 	var DentedLotus = (function (_super) {
 	    __extends(DentedLotus, _super);
 	    /**
@@ -6401,9 +6406,17 @@
 	        };
 	        var parameters = PageUtilities_1.getUrlParameters();
 	        _this.stateManager = props.stateManager;
-	        _this.state = { race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
+	        _this.state = { loggedIn: false, race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
 	        return _this;
 	    }
+	    DentedLotus.prototype.onGoogleLogin = function (args) {
+	        console.log("Ongooglesignedin!");
+	        debugger;
+	        // this.hide();
+	        this.stateManager.setUser(new User_1.GoogleUser(args));
+	        this.setState({ loggedIn: this.stateManager.isLoggedIn });
+	        // this.setState({ loggedIn: true });
+	    };
 	    DentedLotus.prototype.onMenuClicked = function () {
 	        this.setState({ sidebarOpen: true });
 	    };
@@ -6441,7 +6454,7 @@
 	    };
 	    DentedLotus.prototype.render = function () {
 	        return React.createElement("div", null,
-	            React.createElement(Banner_1.Banner, { onPageChange: this.onPageChange.bind(this), stateManager: this.stateManager, title: "Project Dented Lotus", onMenuClicked: this.onMenuClicked }),
+	            React.createElement(Banner_1.Banner, { loggedIn: this.stateManager.isLoggedIn, onGoogleLogin: this.onGoogleLogin.bind(this), onPageChange: this.onPageChange.bind(this), stateManager: this.stateManager, title: "Project Dented Lotus", onMenuClicked: this.onMenuClicked }),
 	            React.createElement(HeaderSection_1.HeaderSection, { stateManager: this.stateManager }),
 	            React.createElement("div", { className: "wrapper" }, this.getCurrentView()));
 	    };
@@ -6473,12 +6486,13 @@
 	        _this.stateManager = props.stateManager;
 	        _this.onMenuClicked = props.onMenuClicked;
 	        _this.onPageChange = props.onPageChange;
+	        _this.onGoogleLogin = props.onGoogleLogin;
 	        return _this;
 	    }
 	    Banner.prototype.render = function () {
 	        return React.createElement("div", { className: "banner" },
 	            React.createElement("h1", null, this.props.title),
-	            React.createElement(LoginLogout_1.LoginLogout, { onPageChange: this.onPageChange, onLogin: this.props.stateManager.setUser.bind(this.stateManager), onLogout: this.props.stateManager.signOut, stateManager: this.stateManager, onMenuClicked: this.onMenuClicked }));
+	            React.createElement(LoginLogout_1.LoginLogout, { loggedIn: this.props.loggedIn, onGoogleLogin: this.onGoogleLogin, onPageChange: this.onPageChange, onLogin: this.props.stateManager.setUser.bind(this.stateManager), onLogout: this.props.stateManager.signOut, stateManager: this.stateManager, onMenuClicked: this.onMenuClicked }));
 	    };
 	    return Banner;
 	}(React.Component));
@@ -6496,8 +6510,7 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var React = __webpack_require__(1);
-	var User_1 = __webpack_require__(8);
-	var User_2 = __webpack_require__(14);
+	var User_1 = __webpack_require__(14);
 	var react_google_login_1 = __webpack_require__(15);
 	var Modal_1 = __webpack_require__(16);
 	var burger = __webpack_require__(18);
@@ -6517,6 +6530,7 @@
 	        _this.onLogout = props.onLogout;
 	        _this.onMenuClicked = props.onMenuClicked;
 	        _this.onPageChange = props.onPageChange;
+	        _this.onGoogleLogin = props.onGoogleLogin;
 	        return _this;
 	    }
 	    LoginLogout.prototype.componentDidMount = function () {
@@ -6533,10 +6547,8 @@
 	        this.setState({ modalVisible: false });
 	    };
 	    LoginLogout.prototype.googleSignedIn = function (args) {
-	        console.log("Ongooglesignedin!");
 	        this.hide();
-	        this.onLogin(new User_1.GoogleUser(args));
-	        this.setState({ loggedIn: true });
+	        this.onGoogleLogin(args);
 	    };
 	    LoginLogout.prototype.facebookSignedIn = function (args) {
 	        alert("facebookLoggedIn");
@@ -6547,10 +6559,10 @@
 	    LoginLogout.prototype.render = function () {
 	        var _this = this;
 	        var sidebarContent = "<b>Sidebar content</b>";
-	        if (this.state.loggedIn) {
+	        if (this.props.loggedIn) {
 	            return React.createElement("div", { className: "logout", onClick: this.onMenuClicked.bind(this) },
 	                React.createElement(Menu, { width: 270, customBurgerIcon: false, pageWrapId: "page-wrap", isOpen: this.state.sidebarOpen, right: true },
-	                    React.createElement(User_2.UserComponent, { small: true, stateManager: this.props.stateManager }),
+	                    React.createElement(User_1.UserComponent, { small: true, stateManager: this.props.stateManager }),
 	                    React.createElement("a", { id: "home", className: "menu-item", href: "#home", onClick: function () { return _this.onPageChange("home"); } }, "Home"),
 	                    React.createElement("a", { id: "races", className: "menu-item", href: "#page=all-races", onClick: function () { return _this.onPageChange("all-races"); } }, "Races"),
 	                    React.createElement("a", { id: "tracks", className: "menu-item", href: "#page=tracks", onClick: function () { return _this.onPageChange("tracks"); } }, "Tracks"),
@@ -6562,7 +6574,7 @@
 	                React.createElement("div", { className: "modal-header" }, "Header"),
 	                React.createElement(react_google_login_1.default, { clientId: "1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com", buttonText: "Login", onSuccess: this.googleSignedIn.bind(this), onFailure: this.loginFailed.bind(this) }));
 	            return React.createElement("div", { className: "login" },
-	                React.createElement("span", { onClick: this.login }, "Log  In"),
+	                React.createElement("span", { onClick: this.login }, "Log In"),
 	                React.createElement(Modal_1.Modal, { content: content, isOpen: this.state.modalVisible, stateManager: this.stateManager, onClose: this.hide.bind(this) }));
 	        }
 	    };
@@ -29933,12 +29945,9 @@
 	    function TrackPage(props) {
 	        var _this = _super.call(this, props) || this;
 	        _this.state = {
-	            track: null,
+	            track: props.track,
 	            small: _this.props.small
 	        };
-	        props.track.then(function (track) {
-	            _this.setState({ track: track });
-	        });
 	        return _this;
 	    }
 	    TrackPage.prototype.toggleSize = function () {
@@ -29990,12 +29999,31 @@
 	var Tracks = (function (_super) {
 	    __extends(Tracks, _super);
 	    function Tracks(props) {
-	        return _super.call(this, props) || this;
+	        var _this = _super.call(this, props) || this;
+	        _this.state = {
+	            tracks: []
+	        };
+	        _this.props.tracks.then(function (tracks) {
+	            tracks.sort(function (track1, track2) {
+	                if (track1.name < track2.name) {
+	                    return -1;
+	                }
+	                if (track1.name > track2.name) {
+	                    return 1;
+	                }
+	                return 0;
+	            });
+	            _this.setState({ tracks: tracks });
+	        });
+	        return _this;
 	    }
 	    Tracks.prototype.render = function () {
-	        var entries = this.props.tracks.map(function (track) {
-	            return React.createElement("li", { key: track.id, className: "panel" },
-	                React.createElement(TrackPage_1.TrackPage, { key: track.id, track: Promise.resolve(track), small: true }));
+	        if (!this.state.tracks.length) {
+	            return React.createElement("div", null, "Loading...");
+	        }
+	        var entries = this.state.tracks.map(function (track) {
+	            return React.createElement("li", { key: track.key, className: "panel" },
+	                React.createElement(TrackPage_1.TrackPage, { key: track.key, track: track, small: true }));
 	        });
 	        return React.createElement("ul", null, entries);
 	    };

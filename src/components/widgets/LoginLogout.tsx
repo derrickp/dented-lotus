@@ -13,19 +13,20 @@ import { Modal } from "./Modal"
 import * as burger from "react-burger-menu";
 var Menu = burger.slide;
 
-
-
 export interface LoginLogoutProps extends PropsBase {
     onLogin: (User) => void;
     onLogout: () => void;
     onMenuClicked: () => void;
     onPageChange: (page: string) => void;
+    onGoogleLogin: (args) => void;
+    loggedIn: boolean;
 }
 export class LoginLogout extends React.Component<LoginLogoutProps, any>{
     onLogin: (User) => void;
     onLogout: () => void;
     onMenuClicked: () => void;
     onPageChange: (page: string) => void;
+    onGoogleLogin: (args) => void;
     stateManager: StateManager;
     /**
      *
@@ -40,6 +41,7 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
         this.onLogout = props.onLogout;
         this.onMenuClicked = props.onMenuClicked;
         this.onPageChange = props.onPageChange;
+        this.onGoogleLogin = props.onGoogleLogin;
     }
 
 
@@ -59,10 +61,8 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
     }
 
     googleSignedIn(args: GoogleLoginResponse) {
-        console.log("Ongooglesignedin!");
         this.hide();
-        this.onLogin(new GoogleUser(args));
-        this.setState({ loggedIn: true });
+        this.onGoogleLogin(args);
     }
 
     facebookSignedIn(args) {
@@ -75,7 +75,7 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
 
     render() {
         let sidebarContent = "<b>Sidebar content</b>";
-        if (this.state.loggedIn) {
+        if (this.props.loggedIn) {
             return <div className="logout" onClick={this.onMenuClicked.bind(this)}>
                 <Menu width={270} customBurgerIcon={false} pageWrapId={"page-wrap"} isOpen={this.state.sidebarOpen} right>
                     <UserComponent small  stateManager={this.props.stateManager}/>
@@ -93,7 +93,7 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
                 {/*<FacebookLogin appId="1088597931155576" autoLoad={true} fields="name,email,picture" callback={(a) => { }} cssClass="my-facebook-button-class" icon="fa-facebook" />*/}
                 {/*<div className="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" data-onsuccess={this.facebookSignedIn.bind(this)}></div>*/}
             </div>
-            return <div className="login"><span onClick={this.login}>Log  In</span>
+            return <div className="login"><span onClick={this.login}>Log In</span>
                 <Modal content={content} isOpen={this.state.modalVisible} stateManager={this.stateManager} onClose={this.hide.bind(this)} />
             </div>
         }

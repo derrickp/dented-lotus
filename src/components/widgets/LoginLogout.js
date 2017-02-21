@@ -5,8 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var React = require("react");
-var User_1 = require("../../models/User");
-var User_2 = require("../User");
+var User_1 = require("../User");
 var react_google_login_1 = require("react-google-login");
 var Modal_1 = require("./Modal");
 var burger = require("react-burger-menu");
@@ -26,6 +25,7 @@ var LoginLogout = (function (_super) {
         _this.onLogout = props.onLogout;
         _this.onMenuClicked = props.onMenuClicked;
         _this.onPageChange = props.onPageChange;
+        _this.onGoogleLogin = props.onGoogleLogin;
         return _this;
     }
     LoginLogout.prototype.componentDidMount = function () {
@@ -42,10 +42,8 @@ var LoginLogout = (function (_super) {
         this.setState({ modalVisible: false });
     };
     LoginLogout.prototype.googleSignedIn = function (args) {
-        console.log("Ongooglesignedin!");
         this.hide();
-        this.onLogin(new User_1.GoogleUser(args));
-        this.setState({ loggedIn: true });
+        this.onGoogleLogin(args);
     };
     LoginLogout.prototype.facebookSignedIn = function (args) {
         alert("facebookLoggedIn");
@@ -56,10 +54,10 @@ var LoginLogout = (function (_super) {
     LoginLogout.prototype.render = function () {
         var _this = this;
         var sidebarContent = "<b>Sidebar content</b>";
-        if (this.state.loggedIn) {
+        if (this.props.loggedIn) {
             return React.createElement("div", { className: "logout", onClick: this.onMenuClicked.bind(this) },
                 React.createElement(Menu, { width: 270, customBurgerIcon: false, pageWrapId: "page-wrap", isOpen: this.state.sidebarOpen, right: true },
-                    React.createElement(User_2.UserComponent, { small: true, stateManager: this.props.stateManager }),
+                    React.createElement(User_1.UserComponent, { small: true, stateManager: this.props.stateManager }),
                     React.createElement("a", { id: "home", className: "menu-item", href: "#home", onClick: function () { return _this.onPageChange("home"); } }, "Home"),
                     React.createElement("a", { id: "races", className: "menu-item", href: "#page=all-races", onClick: function () { return _this.onPageChange("all-races"); } }, "Races"),
                     React.createElement("a", { id: "tracks", className: "menu-item", href: "#page=tracks", onClick: function () { return _this.onPageChange("tracks"); } }, "Tracks"),
@@ -71,7 +69,7 @@ var LoginLogout = (function (_super) {
                 React.createElement("div", { className: "modal-header" }, "Header"),
                 React.createElement(react_google_login_1.default, { clientId: "1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com", buttonText: "Login", onSuccess: this.googleSignedIn.bind(this), onFailure: this.loginFailed.bind(this) }));
             return React.createElement("div", { className: "login" },
-                React.createElement("span", { onClick: this.login }, "Log  In"),
+                React.createElement("span", { onClick: this.login }, "Log In"),
                 React.createElement(Modal_1.Modal, { content: content, isOpen: this.state.modalVisible, stateManager: this.stateManager, onClose: this.hide.bind(this) }));
         }
     };

@@ -12,6 +12,7 @@ var challenges_1 = require("./app/routes/challenges");
 var drivers_1 = require("./app/routes/drivers");
 var users_1 = require("./app/routes/users");
 var blogs_1 = require("./app/routes/blogs");
+var tracks_1 = require("./app/routes/tracks");
 // Start the server
 var PORT = process.env.PORT || 8080;
 var server = new hapi_1.Server();
@@ -36,6 +37,7 @@ server.route(challenges_1.challengesRoutes);
 server.route(drivers_1.driverRoutes);
 server.route(users_1.userRoutes);
 server.route(blogs_1.blogRoutes);
+server.route(tracks_1.trackRoutes);
 server.route({
     method: 'GET',
     path: '/{param*}',
