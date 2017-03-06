@@ -52,12 +52,16 @@ export function getDrivers(active, key?: string): Promise<any[]> {
                 reject(err);
                 return;
             }
-            rows.forEach(row => {
+            
+            rows.forEach((row) => {
                 if (row.active) {
                     row.active = true;
                 }
                 else {
                     row.active = false;
+                }
+                if (row.trivia) {
+                    row.trivia = JSON.parse(row.trivia);
                 }
             });
             resolve(rows);

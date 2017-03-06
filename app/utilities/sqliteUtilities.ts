@@ -4,12 +4,10 @@ import * as sqlite3 from "sqlite3";
 import { Track } from "../models/Track";
 import { getDrivers } from "./data/drivers";
 
-const formatString = require('format-string');
 const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 
 const allChallengesSelect = "SELECT * from challenges";
 
-const driverSelect = "SELECT drivers.key, drivers.active, drivers.name, drivers.points, drivers.teamkey as teamKey, teams.name as teamName FROM drivers inner join teams on drivers.teamKey == teams.key";
 const raceSelect = "select r.*, s.cutoff, s.racedate as raceDate, s.scored from races as r inner join seasons as s on r.key == s.racekey";
 const trackSelect = "select * from tracks_vw";
 const challengeSelect = "select c.*, ac.racekey as raceKey from challenges as c inner join activechallenges as ac on c.key == ac.challengekey";
@@ -33,19 +31,6 @@ export function getLatestRadioMessage(): Promise<string> {
             }
             resolve(rows[0]);
         });
-    });
-}
-
-export function getTracks(key: number): Promise<Track[]> {
-    return new Promise<Track[]>((resolve, reject) => {
-        let statement = trackSelect;
-        db.all(statement, (err, rows: Track[]) => {
-           if (err) {
-               reject(err);
-               return;
-           }
-           resolve(rows);
-        }); 
     });
 }
 
