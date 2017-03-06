@@ -16,7 +16,7 @@ export class User {
         return this.firstName + " " + this.lastName.substr(0, 1) + ".";
     }
     logOut() {
-
+        console.log("Not Implemented");
     }
 
     logIn() {
@@ -25,8 +25,7 @@ export class User {
 }
 
 export class GoogleUser extends User {
-    constructor(googleUser) {
-        console.log("New Google User", googleUser)
+    constructor(googleUser) { 
         super();
         const profile = googleUser.getBasicProfile();
         this.email = profile.getEmail();
@@ -39,7 +38,7 @@ export class GoogleUser extends User {
         window["googleLogOut"] = this.logOut; 
     }
 
-    logOut() {
+    logOut() { 
         var auth2 = gapi.auth2.getAuthInstance();
         
         auth2.signOut().then(function () {

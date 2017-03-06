@@ -82,10 +82,12 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         const parameters = getUrlParameters();
         this.stateManager = props.stateManager;
         this.state = { loggedIn: false, race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
+        
         window.addEventListener("google-login-success", (args: CustomEvent) => {
-            this.onGoogleLogin(args.detail);
+            this.onGoogleLogin(args.detail); 
         });
     }
+    
 
     onGoogleLogin(args: GoogleLoginResponse) {
         // this.hide();
@@ -125,7 +127,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             case Pages.TRACKS:
                 return <Tracks tracks={this.stateManager.tracks} />;
             case Pages.DRIVERS:
-                return <Drivers drivers={this.stateManager.drivers} />
+                return <Drivers drivers={this.stateManager.drivers} userIsAdmin={true} />
             default:
                 return this.getHomePage();
         }
@@ -140,7 +142,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     render() {
         return <div>
-            <Banner loggedIn={this.stateManager.isLoggedIn} onGoogleLogin={this.onGoogleLogin.bind(this)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
+            <Banner loggedIn={this.state.loggedIn} onGoogleLogin={this.onGoogleLogin.bind(this)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
             <div className="wrapper">
                 {this.getCurrentView()}
             </div>

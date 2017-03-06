@@ -26,7 +26,7 @@ export class Banner extends React.Component<BannerProps, any>{
     render() {
         return <div className="banner">
             <h1>{this.props.title}</h1>
-            <LoginLogout loggedIn={this.props.loggedIn} onGoogleLogin={this.onGoogleLogin} onPageChange={this.onPageChange} onLogin={this.props.stateManager.setUser.bind(this.stateManager)} onLogout={this.props.stateManager.signOut} stateManager={this.stateManager} /> 
+            <LoginLogout loggedIn={this.props.loggedIn} onGoogleLogin={this.onGoogleLogin} onPageChange={this.onPageChange} onLogin={this.props.stateManager.setUser.bind(this.stateManager)} stateManager={this.stateManager} /> 
         </div>;
     }
 }

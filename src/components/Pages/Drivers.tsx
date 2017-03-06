@@ -8,17 +8,20 @@ import {DriverComponent} from "../widgets/DriverComponent"
 
 export interface DriverProps {
     drivers: Promise<DriverModel[]>;
+    userIsAdmin:boolean;
 } 
 
 export interface DriverState{
     drivers:DriverModel[];
+    userIsAdmin:boolean;
 }
 
 export class Drivers extends React.Component<DriverProps, DriverState> {
     constructor(props: DriverProps) {
         super(props);
         this.state = {
-            drivers: []
+            drivers: [],
+            userIsAdmin:props.userIsAdmin
         };
         this.props.drivers.then(drivers => {
             drivers.sort((driver1, driver2) => {
@@ -39,7 +42,7 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
             return <div>Loading...</div>;
         }
         const entries = this.state.drivers.map(driver => {
-            return <li key={driver.abbreviation} className="panel"><DriverComponent key={driver.abbreviation} driver={driver} small={true}/></li>
+            return <li key={driver.abbreviation} className="panel"><DriverComponent userIsAdmin={this.state.userIsAdmin} key={driver.abbreviation} driver={driver} small={true}/></li>
         });
         return <ul>{entries}</ul>
     }

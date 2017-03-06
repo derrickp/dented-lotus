@@ -11,6 +11,7 @@ import { getAllTracks, getAllDrivers } from "./Utilities/ServerUtils"
 declare var FB: FBSDK;
 export class StateManager {
     modalVisible = false;
+    onLogIn:()=>void;
     blogs: Blog[] = [
         {
             author: "Craig",
@@ -44,7 +45,7 @@ export class StateManager {
     }
 
     get isLoggedIn(): boolean {
-        return this.currentUser != null;
+        return this.currentUser != null && this.currentUser.isLoggedIn();
     }
 
     get drivers():Promise<DriverModel[]>{ 
@@ -114,6 +115,9 @@ export class StateManager {
 
     setUser(user:User): void{
         this.currentUser = user;
+        if (this.onLogIn){
+            this.onLogIn();
+        }
     }
 
     signOut():void{
