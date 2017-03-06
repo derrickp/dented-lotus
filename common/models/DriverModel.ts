@@ -6,11 +6,11 @@ export class DriverModel{
     /**URL for flag image */
     flag:string;
     points:number;
-    age:number;
+    birthdate:string;
     number:number;
     abbreviation:string;
     team:TeamModel;
-
+    wins:number;
     /**
      *
      */
@@ -19,7 +19,7 @@ export class DriverModel{
         this.lastName = driverResponse.lastName;
         this.nationality = driverResponse.nationality;
         this.flag = driverResponse.flag;
-        this.age = driverResponse.age;
+        this.birthdate = driverResponse.birthdate;
         this.number = driverResponse.number;
         this.abbreviation = driverResponse.abbreviation;
         // TeamModel.getTeamByAbbreviation(driverResponse.team).then((team)=>{
@@ -54,15 +54,18 @@ export interface Driver {
 }
 
 export interface DriverResponse{
-        firstName:string;
+    key:string;
+    trivia:string[];
+    firstName:string;
     lastName:string;
     nationality:string;
     flag:string;
     points:number;
-    age:number;
+    birthdate:string;
     number:number;
     abbreviation:string;
     /**Abbreviation for the team */
     team:string;
+    wins:number;
 
 }
