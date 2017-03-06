@@ -12,4 +12,4 @@ var TeamModel = (function () {
     };
     return TeamModel;
 }());
-exports.TeamModel = TeamModel;
+exports.TeamModel = TeamModel; 

@@ -42,6 +42,14 @@ export class DriverModel{
  
 }
 
+export interface Driver {
+    key: string;
+    name: string;
+    active: boolean;
+    teamKey: string;
+    trivia: string[];
+}
+
 export interface DriverResponse{
         firstName:string;
     lastName:string;

@@ -27,4 +27,4 @@ var DriverModel = (function () {
     };
     return DriverModel;
 }());
-exports.DriverModel = DriverModel;
+exports.DriverModel = DriverModel; 
