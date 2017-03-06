@@ -48,11 +48,22 @@ exports.saveTracks = saveTracks;
 function getTracks(key) {
     return new Promise(function (resolve, reject) {
         var statement = trackSelect;
+        if (key) {
+            statement = statement + (" where key = '" + key + "'");
+        }
         db.all(statement, function (err, rows) {
             if (err) {
                 reject(err);
                 return;
             }
+            rows.forEach(function (row) {
+                if (row.trivia) {
+                    row.trivia = JSON.parse(row.trivia);
+                    if (typeof row.trivia === "string") {
+                        row.trivia = [row.trivia];
+                    }
+                }
+            });
             resolve(rows);
         });
     });

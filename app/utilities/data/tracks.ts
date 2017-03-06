@@ -49,11 +49,22 @@ export function saveTracks(tracks: Track[]): Promise<boolean> {
 export function getTracks(key?: string): Promise<Track[]> {
     return new Promise<Track[]>((resolve, reject) => {
         let statement = trackSelect;
-        db.all(statement, (err, rows: Track[]) => {
+        if (key) {
+            statement = statement + ` where key = '${key}'`
+        }
+        db.all(statement, (err, rows: any[]) => {
             if (err) {
                 reject(err);
                 return;
             }
+            rows.forEach(row => {
+                if (row.trivia) {
+                    row.trivia = JSON.parse(row.trivia);
+                    if (typeof row.trivia === "string") {
+                        row.trivia = [row.trivia];
+                    }
+                }
+            });
             resolve(rows);
         });
     });
