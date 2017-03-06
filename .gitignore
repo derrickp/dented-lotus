@@ -2,8 +2,6 @@
 node_modules
 packages
 obj
-bin
-dist/bundle.js
-dist/bundle.js.map
-src/**/*.jsx
-src/**/*.js
+bin 
+*.jsx
+*.js
