@@ -89,7 +89,7 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
             </div>
         } else {
             let content = <div className="login-modal">
-                <div className="modal-header">Header</div>
+                <div className="modal-header">Log In</div>
                 <div className="g-signin2" data-onsuccess="onGoogleSignIn"></div>
                 {/*<GoogleLogin autoLoad={true} clientId="1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com" buttonText="Login" onSuccess={this.googleSignedIn.bind(this)} onFailure={this.loginFailed.bind(this)} />*/}
                 {/*<FacebookLogin appId="1088597931155576" autoLoad={true} fields="name,email,picture" callback={(a) => { }} cssClass="my-facebook-button-class" icon="fa-facebook" />*/}
