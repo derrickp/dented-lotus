@@ -46,9 +46,9 @@ var LoginLogout = (function (_super) {
     LoginLogout.prototype.hide = function () {
         this.setState({ modalVisible: false });
     };
-    LoginLogout.prototype.googleSignedIn = function (args) {
+    LoginLogout.prototype.googleSignedIn = function () {
         this.hide();
-        this.onGoogleLogin(args);
+        // this.onGoogleLogin(args);
     };
     LoginLogout.prototype.facebookSignedIn = function (args) {
         alert("facebookLoggedIn");
