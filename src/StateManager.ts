@@ -47,8 +47,7 @@ export class StateManager {
         return this.currentUser != null;
     }
 
-    get drivers():Promise<DriverModel[]>{
-
+    get drivers():Promise<DriverModel[]>{ 
         this._drivers = this._drivers ? this._drivers : getAllDrivers();
         return this._drivers;
     } 

@@ -21,6 +21,10 @@ var DriverComponent = (function (_super) {
         _this.driver = props.driver;
         return _this;
     }
+    DriverComponent.prototype.render = function () {
+        return React.createElement("div", null,
+            React.createElement("span", null, this.driver.getName()));
+    };
     return DriverComponent;
 }(React.Component));
 exports.DriverComponent = DriverComponent;

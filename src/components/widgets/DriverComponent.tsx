@@ -20,4 +20,10 @@ export class DriverComponent extends React.Component<DriverProps,any> {
         this.driver = props.driver
         
     }
+
+    render(){
+        return <div>
+            <span>{this.driver.getName()}</span>
+        </div>
+    }
 }

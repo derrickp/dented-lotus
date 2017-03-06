@@ -1,6 +1,7 @@
 
 import { Track } from "../../common/models/Track";
 import { DriverModel,DriverResponse } from "../../common/models/DriverModel";
+import {TeamModel, TeamResponse} from "../../common/models/TeamModel";
 
 const baseUrl = window.location.origin;
 
@@ -19,6 +20,16 @@ export function getAllDrivers(): Promise<DriverModel[]> {
         return fetch(baseUrl + "/drivers").then(response => {
             return response.json().then((drivers: DriverResponse[]) => {
                 resolve(drivers.map((d)=>{return new DriverModel(d)}));
+            });
+        });
+    });
+}
+
+export function getTeamByAbbreviation(abbreviation:string): Promise<TeamModel> {
+    return new Promise<TeamModel>((resolve, reject) => {
+        return fetch(baseUrl + "/teams/" + abbreviation).then(response => {
+            return response.json().then((team: TeamResponse) => {
+                resolve(new TeamModel(team));
             });
         });
     });
