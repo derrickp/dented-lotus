@@ -3,6 +3,9 @@ export class Track {
     name: string;
     country: string;
     length: number;
+    title: string;
     trivia?: string[];
-    description: string;
+    description?: string;
+    latitude?: number;
+    longitude?: number;
 }

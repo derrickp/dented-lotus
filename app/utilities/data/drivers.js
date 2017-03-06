@@ -56,6 +56,9 @@ function getDrivers(active, key) {
                 else {
                     row.active = false;
                 }
+                if (row.trivia) {
+                    row.trivia = JSON.parse(row.trivia);
+                }
             });
             resolve(rows);
         });

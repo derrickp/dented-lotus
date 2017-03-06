@@ -2,10 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var sqlite3 = require("sqlite3");
 var drivers_1 = require("./data/drivers");
-var formatString = require('format-string');
 var db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 var allChallengesSelect = "SELECT * from challenges";
-var driverSelect = "SELECT drivers.key, drivers.active, drivers.name, drivers.points, drivers.teamkey as teamKey, teams.name as teamName FROM drivers inner join teams on drivers.teamKey == teams.key";
 var raceSelect = "select r.*, s.cutoff, s.racedate as raceDate, s.scored from races as r inner join seasons as s on r.key == s.racekey";
 var trackSelect = "select * from tracks_vw";
 var challengeSelect = "select c.*, ac.racekey as raceKey from challenges as c inner join activechallenges as ac on c.key == ac.challengekey";
@@ -30,19 +28,6 @@ function getLatestRadioMessage() {
     });
 }
 exports.getLatestRadioMessage = getLatestRadioMessage;
-function getTracks(key) {
-    return new Promise(function (resolve, reject) {
-        var statement = trackSelect;
-        db.all(statement, function (err, rows) {
-            if (err) {
-                reject(err);
-                return;
-            }
-            resolve(rows);
-        });
-    });
-}
-exports.getTracks = getTracks;
 function addNewRadioMessage(newMessage) {
     return new Promise(function (resolve, reject) {
         try {

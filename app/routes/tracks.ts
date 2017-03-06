@@ -1,7 +1,9 @@
 'use strict';
 
 import { IRouteConfiguration } from "hapi";
-import { getTracks } from "../utilities/sqliteUtilities";
+import * as Boom from "boom";
+import { getTracks, saveTracks } from "../utilities/data/tracks";
+import { Track } from "../../common/models/Track";
 
 export const trackRoutes: IRouteConfiguration[] = [
     {
@@ -10,8 +12,33 @@ export const trackRoutes: IRouteConfiguration[] = [
         config: {
             cors: true,
             handler: (request, reply) => {
-                getTracks(parseInt(request.params["key"])).then(tracks => {
+                getTracks(request.params["key"]).then(tracks => {
                     reply(tracks);
+                });
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "/tracks",
+        config: {
+            cors: true,
+            handler: (request, reply) => {
+                const tracks: Track[] = request.payload;
+                tracks.forEach(track => {
+                    if (!track.name) {
+                        reply(Boom.badRequest("need a track name"));
+                        return;
+                    }
+                    if (!track.key) track.key = track.name.replace(/\s+/g, '-').toLowerCase();
+                });
+                saveTracks(tracks).then(success => {
+                    return getTracks();
+                }).then(tracks => {
+                    console.log(tracks);
+                    reply(tracks).code(201);
+                }).catch((error: Error) => {
+                    reply(Boom.badRequest(error.message));
                 });
             }
         }
