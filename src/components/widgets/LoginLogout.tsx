@@ -74,6 +74,7 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
     }
 
     render() {
+        
         let sidebarContent = "<b>Sidebar content</b>";
         if (this.props.loggedIn) {
             return <div className="logout" onClick={this.onMenuClicked.bind(this)}>
@@ -89,7 +90,8 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
         } else {
             let content = <div className="login-modal">
                 <div className="modal-header">Header</div>
-                <GoogleLogin clientId="1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com" buttonText="Login" onSuccess={this.googleSignedIn.bind(this)} onFailure={this.loginFailed.bind(this)} />
+                <div className="g-signin2" data-onsuccess="onGoogleSignIn"></div>
+                {/*<GoogleLogin autoLoad={true} clientId="1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com" buttonText="Login" onSuccess={this.googleSignedIn.bind(this)} onFailure={this.loginFailed.bind(this)} />*/}
                 {/*<FacebookLogin appId="1088597931155576" autoLoad={true} fields="name,email,picture" callback={(a) => { }} cssClass="my-facebook-button-class" icon="fa-facebook" />*/}
                 {/*<div className="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" data-onsuccess={this.facebookSignedIn.bind(this)}></div>*/}
             </div>

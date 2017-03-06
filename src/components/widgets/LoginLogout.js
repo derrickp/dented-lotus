@@ -12,7 +12,6 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var User_1 = require("../User");
-var react_google_login_1 = require("react-google-login");
 var Modal_1 = require("./Modal");
 var burger = require("react-burger-menu");
 var Menu = burger.slide;
@@ -73,7 +72,7 @@ var LoginLogout = (function (_super) {
         else {
             var content = React.createElement("div", { className: "login-modal" },
                 React.createElement("div", { className: "modal-header" }, "Header"),
-                React.createElement(react_google_login_1.default, { clientId: "1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com", buttonText: "Login", onSuccess: this.googleSignedIn.bind(this), onFailure: this.loginFailed.bind(this) }));
+                React.createElement("div", { className: "g-signin2", "data-onsuccess": "onGoogleSignIn" }));
             return React.createElement("div", { className: "login" },
                 React.createElement("span", { onClick: this.login }, "Log In"),
                 React.createElement(Modal_1.Modal, { content: content, isOpen: this.state.modalVisible, stateManager: this.stateManager, onClose: this.hide.bind(this) }));

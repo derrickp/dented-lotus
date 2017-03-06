@@ -37,7 +37,6 @@ function verifyGoogleId(token) {
                 return;
             }
             var payload = login.getPayload();
-            console.log(payload.email);
             var userid = payload['sub'];
             // If request specified a G Suite domain:
             //var domain = payload['hd'];
@@ -59,7 +58,6 @@ function verifyCredentials(req, res) {
     // Find an entry from the database that
     // matches either the email or username
     authPromise.then(function (email) {
-        console.log("getting user by email");
         sqliteUtilities_1.getUsers(email).then(function (users) {
             if (users && users.length > 0) {
                 var user = users[0];

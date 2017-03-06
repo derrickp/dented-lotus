@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <title>Project Dented Lotus</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <link href="//fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
-    <link href='//fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <link href="//fonts.googleapis.com/css?family=Orbitron" rel="stylesheet"/>
+    <link href='//fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'/>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com">
 </head>
 
 <body>
@@ -15,6 +17,14 @@
     <!-- Dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.js"></script>
+    <script>
+        function onGoogleSignIn(user) {
+            var event = new CustomEvent("google-login-success", {
+              detail: user  
+            });
+            window.dispatchEvent(event);
+        }
+    </script>
     <!-- Main -->
     <script src="bundle.js"></script>
     </div>

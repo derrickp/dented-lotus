@@ -75,6 +75,9 @@ var DentedLotus = (function (_super) {
         var parameters = PageUtilities_1.getUrlParameters();
         _this.stateManager = props.stateManager;
         _this.state = { loggedIn: false, race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
+        window.addEventListener("google-login-success", function (args) {
+            _this.onGoogleLogin(args.detail);
+        });
         return _this;
     }
     DentedLotus.prototype.onGoogleLogin = function (args) {

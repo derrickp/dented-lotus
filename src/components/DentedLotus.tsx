@@ -83,6 +83,9 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         const parameters = getUrlParameters();
         this.stateManager = props.stateManager;
         this.state = { loggedIn: false, race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
+        window.addEventListener("google-login-success", (args: CustomEvent) => {
+            this.onGoogleLogin(args.detail);
+        });
     }
 
      onGoogleLogin(args: GoogleLoginResponse) {
