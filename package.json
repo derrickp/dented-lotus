@@ -75,6 +75,7 @@
     "copy-static-files": "cpy index.html dist",
     "compile-less": "lessc style.less dist/style.css && echo less compile complete",
     "build": "npm run compile && npm run webpack && npm run copy-static-files && npm run compile-less",
-    "compile": "tsc -v && tsc && echo Typescript compile complete"
+    "compile": "tsc -v && tsc && echo Typescript compile complete",
+    "compile-watch": "tsc -v && tsc -w"
   }
 }
