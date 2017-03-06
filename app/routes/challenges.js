@@ -23,11 +23,11 @@ exports.challengesRoutes = [
     },
     {
         method: 'GET',
-        path: '/challenges/{season}/{raceKey}/{key?}',
+        path: '/challenges/{raceKey}/{key?}',
         config: {
             cors: true,
             handler: function (request, reply) {
-                sqliteUtilities_1.getChallenges(request.params["season"], request.params["raceKey"], request.params["key"]).then(function (challenges) {
+                sqliteUtilities_1.getChallenges(request.params["raceKey"], request.params["key"]).then(function (challenges) {
                     reply(challenges);
                 });
             },

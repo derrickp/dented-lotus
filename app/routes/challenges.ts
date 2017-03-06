@@ -25,11 +25,11 @@ export const challengesRoutes: IRouteConfiguration[] = [
     },
     {
         method: 'GET',
-        path: '/challenges/{season}/{raceKey}/{key?}',
+        path: '/challenges/{raceKey}/{key?}',
         config: {
             cors: true,
             handler: function (request, reply) {
-                getChallenges(request.params["season"], request.params["raceKey"], request.params["key"]).then(challenges => {
+                getChallenges(request.params["raceKey"], request.params["key"]).then(challenges => {
                     reply(challenges);
                 });
             },

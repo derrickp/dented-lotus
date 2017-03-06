@@ -2,6 +2,7 @@
 
 import * as sqlite3 from "sqlite3";
 import { Track } from "../models/Track";
+import { getDrivers } from "./data/drivers";
 
 const formatString = require('format-string');
 const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
@@ -87,36 +88,6 @@ export function getBlogs(): Promise<any[]> {
         });     
     });
 }
-
-export function getDrivers(active, key?: string): Promise<any[]> {
-    return new Promise((resolve, reject) => {
-        let whereStatement = "";
-        if (active) {
-            whereStatement = "where active = 1";
-        }
-        else {
-            whereStatement = "where active >= 0";
-        }
-        if (key) {
-            whereStatement = "and key = '" + key + "'";
-        }
-        db.all(driverSelect + " " + whereStatement, (err, rows) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            rows.forEach(row => {
-                if (row.active) {
-                    row.active = true;
-                }
-                else {
-                    row.active = false;
-                }
-            });
-            resolve(rows);
-        });
-    });
-};
 
 export function getRaces(season, key): Promise<any[]> {
     return new Promise((resolve, reject) => {
@@ -286,15 +257,11 @@ export function updateUser(user): Promise<boolean> {
     });
 }
 
-export function getChallenges(season, raceKey, challengeKey): Promise<any[]> {
+export function getChallenges(raceKey, challengeKey): Promise<any[]> {
     return new Promise((resolve, reject) => {
-        if (!season) {
-            reject(new Error("Need a season and a race key"));
-            return;
-        }
         let driverPromise = getDrivers(true);
-        let challengePromise = _getChallengesInternal(season, raceKey);
-        let challengeChoiceMapsPromise = _getChallengeChoicesInternal(season, raceKey);
+        let challengePromise = _getChallengesInternal(raceKey);
+        let challengeChoiceMapsPromise = _getChallengeChoicesInternal(raceKey);
         Promise.all([driverPromise, challengePromise, challengeChoiceMapsPromise]).then((results) => {
             let challenges = results[1];
             let drivers = results[0];
@@ -383,11 +350,11 @@ export function saveUserPicks(userPicks) {
     });
 }
 
-function _getChallengesInternal(season, raceKey): Promise<any[]> {
+function _getChallengesInternal(raceKey): Promise<any[]> {
     return new Promise((resolve, reject) => {
-        let where = "where ac.season = " + season;
+        let where: string;
         if (raceKey) {
-            where = where + " and ac.racekey = '" + raceKey + "'";
+            where = "where ac.racekey = '" + raceKey + "'";
         }
         db.all(challengeSelect + " " + where, function (err, rows) {
             resolve(rows);
@@ -395,12 +362,12 @@ function _getChallengesInternal(season, raceKey): Promise<any[]> {
     });
 };
 
-function _getChallengeChoicesInternal(season, raceKey): Promise<any[]> {
+function _getChallengeChoicesInternal(raceKey): Promise<any[]> {
     return new Promise((resolve, reject) => {
         let statement = "select distinct challengechoices.challengekey as challengeKey, " + 
         "challengechoices.season, challengechoices.racekey as raceKey, challengechoices.driverkey as driverKey " +
         "from challengechoices inner join activechallenges as ac on challengechoices.challengeKey == ac.challengekey where " +
-        "challengechoices.season == " + season + " and challengechoices.raceKey == '" + raceKey + "'";
+        "challengechoices.raceKey == '" + raceKey + "'";
         let challengeChoiceMaps = [];
         db.all(statement, (err, rows) => {
             rows.forEach(row => {
