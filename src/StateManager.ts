@@ -1,10 +1,10 @@
 
-import { Blog } from "./models/Blog";
+import { Blog } from "../common/models/Blog";
 
 import { Promise } from "bluebird";
-import { User, GoogleUser, FacebookUser } from "./models/User";
-import { Race, races } from "./models/Race";
-import { Track } from "./models/Track";
+import { User, GoogleUser, FacebookUser } from "../common/models/User";
+import { Race, races } from "../common/models/Race";
+import { Track } from "../common/models/Track";
 import { getAllTracks } from "./Utilities/ServerUtils"
 
 declare var FB: FBSDK;

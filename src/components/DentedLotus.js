@@ -13,11 +13,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var Banner_1 = require("./Banner");
 var BlogComponent_1 = require("./BlogComponent");
-var HeaderSection_1 = require("./HeaderSection");
 var RaceCountdown_1 = require("./widgets/RaceCountdown");
 var Pages_1 = require("./Pages");
 var PageUtilities_1 = require("../utilities/PageUtilities");
-var User_1 = require("../models/User");
+var User_1 = require("../../common/models/User");
 var DentedLotus = (function (_super) {
     __extends(DentedLotus, _super);
     /**
@@ -81,8 +80,6 @@ var DentedLotus = (function (_super) {
         return _this;
     }
     DentedLotus.prototype.onGoogleLogin = function (args) {
-        console.log("Ongooglesignedin!");
-        debugger;
         // this.hide();
         this.stateManager.setUser(new User_1.GoogleUser(args));
         this.setState({ loggedIn: this.stateManager.isLoggedIn });
@@ -125,8 +122,7 @@ var DentedLotus = (function (_super) {
     };
     DentedLotus.prototype.render = function () {
         return React.createElement("div", null,
-            React.createElement(Banner_1.Banner, { loggedIn: this.stateManager.isLoggedIn, onGoogleLogin: this.onGoogleLogin.bind(this), onPageChange: this.onPageChange.bind(this), stateManager: this.stateManager, title: "Project Dented Lotus", onMenuClicked: this.onMenuClicked }),
-            React.createElement(HeaderSection_1.HeaderSection, { stateManager: this.stateManager }),
+            React.createElement(Banner_1.Banner, { loggedIn: this.stateManager.isLoggedIn, onGoogleLogin: this.onGoogleLogin.bind(this), onPageChange: this.onPageChange.bind(this), stateManager: this.stateManager, title: "Project Dented Lotus" }),
             React.createElement("div", { className: "wrapper" }, this.getCurrentView()));
     };
     return DentedLotus;

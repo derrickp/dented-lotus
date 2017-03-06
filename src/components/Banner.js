@@ -21,7 +21,6 @@ var Banner = (function (_super) {
     function Banner(props) {
         var _this = _super.call(this, props) || this;
         _this.stateManager = props.stateManager;
-        _this.onMenuClicked = props.onMenuClicked;
         _this.onPageChange = props.onPageChange;
         _this.onGoogleLogin = props.onGoogleLogin;
         return _this;
@@ -29,7 +28,7 @@ var Banner = (function (_super) {
     Banner.prototype.render = function () {
         return React.createElement("div", { className: "banner" },
             React.createElement("h1", null, this.props.title),
-            React.createElement(LoginLogout_1.LoginLogout, { loggedIn: this.props.loggedIn, onGoogleLogin: this.onGoogleLogin, onPageChange: this.onPageChange, onLogin: this.props.stateManager.setUser.bind(this.stateManager), onLogout: this.props.stateManager.signOut, stateManager: this.stateManager, onMenuClicked: this.onMenuClicked }));
+            React.createElement(LoginLogout_1.LoginLogout, { loggedIn: this.props.loggedIn, onGoogleLogin: this.onGoogleLogin, onPageChange: this.onPageChange, onLogin: this.props.stateManager.setUser.bind(this.stateManager), onLogout: this.props.stateManager.signOut, stateManager: this.stateManager }));
     };
     return Banner;
 }(React.Component));

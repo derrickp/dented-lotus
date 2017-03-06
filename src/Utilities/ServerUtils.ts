@@ -1,5 +1,5 @@
 
-import { Track } from "../models/Track";
+import { Track } from "../../common/models/Track";
 
 const baseUrl = window.location.origin;
 
