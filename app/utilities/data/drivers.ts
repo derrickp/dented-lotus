@@ -1,6 +1,6 @@
 import * as sqlite3 from "sqlite3";
 
-import { Driver } from "../../models/Driver";
+import { Driver } from "../../../common/models/DriverModel";
 
 const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 
