@@ -13,7 +13,7 @@ import { PropsBase } from "../utilities/ComponentUtilities";
 import { getUrlParameters } from "../utilities/PageUtilities";
 import { GoogleUser } from "../models/User";
 
-import { GoogleLoginResponse } from "react-google-login";
+import { GoogleLoginResponse } from "../models/GoogleLoginResponse";
 
 export interface DentedLotusProps extends PropsBase {
 

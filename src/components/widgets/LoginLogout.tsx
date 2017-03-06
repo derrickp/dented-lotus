@@ -5,8 +5,6 @@ import { PropsBase } from "../../utilities/ComponentUtilities";
 import { Promise } from "bluebird";
 import { User, FacebookUser, GoogleUser } from "../../models/User";
 import {UserComponent} from "../User";
-import GoogleLogin from 'react-google-login';
-import { GoogleLoginProps, GoogleLoginResponse } from 'react-google-login';
 import { FacebookLogin } from 'react-facebook-login';
 import Rodal from "rodal";
 import { Modal } from "./Modal"
@@ -60,9 +58,9 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
         this.setState({ modalVisible: false });
     }
 
-    googleSignedIn(args: GoogleLoginResponse) {
+    googleSignedIn() {
         this.hide();
-        this.onGoogleLogin(args);
+        // this.onGoogleLogin(args);
     }
 
     facebookSignedIn(args) {
@@ -91,7 +89,6 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
             let content = <div className="login-modal">
                 <div className="modal-header">Header</div>
                 <div className="g-signin2" data-onsuccess="onGoogleSignIn"></div>
-                {/*<GoogleLogin autoLoad={true} clientId="1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com" buttonText="Login" onSuccess={this.googleSignedIn.bind(this)} onFailure={this.loginFailed.bind(this)} />*/}
                 {/*<FacebookLogin appId="1088597931155576" autoLoad={true} fields="name,email,picture" callback={(a) => { }} cssClass="my-facebook-button-class" icon="fa-facebook" />*/}
                 {/*<div className="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" data-onsuccess={this.facebookSignedIn.bind(this)}></div>*/}
             </div>
