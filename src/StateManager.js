@@ -51,6 +51,14 @@ var StateManager = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(StateManager.prototype, "drivers", {
+        get: function () {
+            this._drivers = this._drivers ? this._drivers : ServerUtils_1.getAllDrivers();
+            return this._drivers;
+        },
+        enumerable: true,
+        configurable: true
+    });
     StateManager.prototype._initGoogle = function () {
         var _this = this;
         if (!window["onSignIn"]) {

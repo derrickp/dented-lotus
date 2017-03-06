@@ -5,7 +5,8 @@ import { Promise } from "bluebird";
 import { User, GoogleUser, FacebookUser } from "../common/models/User";
 import { Race, races } from "../common/models/Race";
 import { Track } from "../common/models/Track";
-import { getAllTracks } from "./Utilities/ServerUtils"
+import {DriverModel} from "../common/models/DriverModel";
+import { getAllTracks, getAllDrivers } from "./Utilities/ServerUtils"
 
 declare var FB: FBSDK;
 export class StateManager {
@@ -31,6 +32,7 @@ export class StateManager {
     };
 
     private _tracks: Promise<Track[]>;
+    private _drivers: Promise<DriverModel[]>;
 
     get races(): Race[] {
         return races;
@@ -44,6 +46,12 @@ export class StateManager {
     get isLoggedIn(): boolean {
         return this.currentUser != null;
     }
+
+    get drivers():Promise<DriverModel[]>{
+
+        this._drivers = this._drivers ? this._drivers : getAllDrivers();
+        return this._drivers;
+    } 
 
     currentUser: User = null;
 

@@ -4,9 +4,9 @@ import * as ReactDOM from "react-dom";
 import { Banner } from "./Banner";
 import { UserComponent } from "./User";
 import { StateManager } from "../StateManager";
-import { BlogComponent } from "./BlogComponent"; 
+import { BlogComponent } from "./BlogComponent";
 import { RaceCountdown } from "./widgets/RaceCountdown";
-import { RacePage, AllRaces, TrackPage, Tracks } from "./Pages";
+import { RacePage, AllRaces, TrackPage, Tracks, Drivers,Pages } from "./Pages";
 import { Race } from "../../common/models/Race";
 import { PropsBase } from "../utilities/ComponentUtilities";
 import { getUrlParameters } from "../utilities/PageUtilities";
@@ -87,10 +87,10 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         });
     }
 
-     onGoogleLogin(args: GoogleLoginResponse) { 
+    onGoogleLogin(args: GoogleLoginResponse) {
         // this.hide();
         this.stateManager.setUser(new GoogleUser(args));
-        this.setState({loggedIn: this.stateManager.isLoggedIn});
+        this.setState({ loggedIn: this.stateManager.isLoggedIn });
         // this.setState({ loggedIn: true });
     }
 
@@ -104,7 +104,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     launchRacePicks() {
         let parameters = this.state.parameters;
-        parameters.page = "race";
+        parameters.page = Pages.RACE;
         this.setState({ parameters: parameters, race: this.stateManager.getNextRace() });
     }
 
@@ -116,14 +116,16 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     getCurrentView() {
         switch (this.state.parameters.page) {
-            case "race":
+            case Pages.RACE:
                 return <RacePage race={this.state.race} small={false} ></RacePage>;
-            case "user":
+            case Pages.USER:
                 return <div>User!!!!</div>;
-            case "all-races":
+            case Pages.ALL_RACES:
                 return <AllRaces races={this.stateManager.races} />;
-            case "tracks":
+            case Pages.TRACKS:
                 return <Tracks tracks={this.stateManager.tracks} />;
+            case Pages.DRIVERS:
+                return <Drivers drivers={this.stateManager.drivers} />
             default:
                 return this.getHomePage();
         }
@@ -138,7 +140,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     render() {
         return <div>
-            <Banner loggedIn={this.stateManager.isLoggedIn} onGoogleLogin={this.onGoogleLogin.bind(this)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus"/> 
+            <Banner loggedIn={this.stateManager.isLoggedIn} onGoogleLogin={this.onGoogleLogin.bind(this)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
             <div className="wrapper">
                 {this.getCurrentView()}
             </div>

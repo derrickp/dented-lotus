@@ -93,7 +93,7 @@ var DentedLotus = (function (_super) {
     };
     DentedLotus.prototype.launchRacePicks = function () {
         var parameters = this.state.parameters;
-        parameters.page = "race";
+        parameters.page = Pages_1.Pages.RACE;
         this.setState({ parameters: parameters, race: this.stateManager.getNextRace() });
     };
     DentedLotus.prototype.onPageChange = function (page) {
@@ -103,14 +103,16 @@ var DentedLotus = (function (_super) {
     };
     DentedLotus.prototype.getCurrentView = function () {
         switch (this.state.parameters.page) {
-            case "race":
+            case Pages_1.Pages.RACE:
                 return React.createElement(Pages_1.RacePage, { race: this.state.race, small: false });
-            case "user":
+            case Pages_1.Pages.USER:
                 return React.createElement("div", null, "User!!!!");
-            case "all-races":
+            case Pages_1.Pages.ALL_RACES:
                 return React.createElement(Pages_1.AllRaces, { races: this.stateManager.races });
-            case "tracks":
+            case Pages_1.Pages.TRACKS:
                 return React.createElement(Pages_1.Tracks, { tracks: this.stateManager.tracks });
+            case Pages_1.Pages.DRIVERS:
+                return React.createElement(Pages_1.Drivers, { drivers: this.stateManager.drivers });
             default:
                 return this.getHomePage();
         }

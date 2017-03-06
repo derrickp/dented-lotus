@@ -10,6 +10,14 @@ export class DriverModel{
     abbreviation:string;
     team:TeamModel;
 
+    /**
+     *
+     */
+    constructor(driverResponse:DriverResponse) {
+        
+        
+    }
+
     public getName():string{
         return this.firstName + " " + this.lastName;
     }
@@ -21,4 +29,16 @@ export class DriverModel{
         this.points += inPoints;
     }
  
+}
+
+export interface DriverResponse{
+        firstName:string;
+    lastName:string;
+    nationality:string;
+    flag:string;
+    points:number;
+    age:number;
+    number:number;
+    abbreviation:string;
+    team:TeamModel;
 }

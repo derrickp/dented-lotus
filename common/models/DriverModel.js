@@ -1,7 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var DriverModel = (function () {
-    function DriverModel() {
+    /**
+     *
+     */
+    function DriverModel(driverResponse) {
     }
     DriverModel.prototype.getName = function () {
         return this.firstName + " " + this.lastName;
