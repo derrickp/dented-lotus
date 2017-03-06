@@ -4,16 +4,15 @@ import * as ReactDOM from "react-dom";
 import { Banner } from "./Banner";
 import { UserComponent } from "./User";
 import { StateManager } from "../StateManager";
-import { BlogComponent } from "./BlogComponent";
-import { HeaderSection } from "./HeaderSection";
+import { BlogComponent } from "./BlogComponent"; 
 import { RaceCountdown } from "./widgets/RaceCountdown";
 import { RacePage, AllRaces, TrackPage, Tracks } from "./Pages";
-import { Race } from "../models/Race";
+import { Race } from "../../common/models/Race";
 import { PropsBase } from "../utilities/ComponentUtilities";
 import { getUrlParameters } from "../utilities/PageUtilities";
-import { GoogleUser } from "../models/User";
+import { GoogleUser } from "../../common/models/User";
 
-import { GoogleLoginResponse } from "../models/GoogleLoginResponse";
+import { GoogleLoginResponse } from "../../common/models/GoogleLoginResponse";
 
 export interface DentedLotusProps extends PropsBase {
 
@@ -88,9 +87,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         });
     }
 
-     onGoogleLogin(args: GoogleLoginResponse) {
-        console.log("Ongooglesignedin!");
-        debugger;
+     onGoogleLogin(args: GoogleLoginResponse) { 
         // this.hide();
         this.stateManager.setUser(new GoogleUser(args));
         this.setState({loggedIn: this.stateManager.isLoggedIn});
@@ -141,8 +138,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     render() {
         return <div>
-            <Banner loggedIn={this.stateManager.isLoggedIn} onGoogleLogin={this.onGoogleLogin.bind(this)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" onMenuClicked={this.onMenuClicked} />
-            <HeaderSection stateManager={this.stateManager} />
+            <Banner loggedIn={this.stateManager.isLoggedIn} onGoogleLogin={this.onGoogleLogin.bind(this)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus"/> 
             <div className="wrapper">
                 {this.getCurrentView()}
             </div>

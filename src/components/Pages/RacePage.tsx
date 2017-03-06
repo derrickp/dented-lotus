@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { PropsBase } from "../../utilities/ComponentUtilities";
-import { Race as RaceModel } from "../../models/Race";
+import { Race as RaceModel } from "../../../common/models/Race";
 
 export interface RaceProps {
     race: Promise<RaceModel>;

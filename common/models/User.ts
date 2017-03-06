@@ -6,6 +6,7 @@ export class User {
     lastName: string;
     email: string;
     imageUrl: string;
+    isAdmin:boolean;
 
     isLoggedIn(): boolean {
         return this._loggedIn;
