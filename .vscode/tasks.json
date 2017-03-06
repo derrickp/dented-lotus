@@ -3,34 +3,58 @@
     // for the documentation about the tasks.json format
     "version": "0.1.0",
     "command": "npm",
-    "isShellCommand": true, 
+    "isShellCommand": true,
     "suppressTaskName": true,
     "tasks": [
         {
             "taskName": "compile",
-            "args": [ "run", "build" ],
-    "showOutput": "silent",
-            "isBuildCommand": true
+            "args": [
+                "run",
+                "build"
+            ],
+            "showOutput": "silent"
         },
         {
             "taskName": "compile-less",
-            "args": [ "run", "compile-less" ]
+            "args": [
+                "run",
+                "compile-less"
+            ]
         },
         {
             "taskName": "copy-static",
-            "args": [ "run", "copy-static-files" ]
+            "args": [
+                "run",
+                "copy-static-files"
+            ]
         },
         {
             "taskName": "webpack",
-            "args": [ "run", "webpack" ]
+            "args": [
+                "run",
+                "webpack"
+            ]
         },
         {
             "taskName": "update",
-            "args": ["update"]
+            "args": [
+                "update"
+            ]
         },
         {
             "taskName": "start-dev",
-            "args": ["run", "start-dev"]
+            "args": [
+                "run",
+                "start-dev"
+            ]
+        },
+        {
+            "taskName": "minimal-compile",
+            "args": [
+                "run",
+                "compile"
+            ],
+            "isBuildCommand": true
         }
     ]
 }

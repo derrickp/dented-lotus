@@ -1,4 +1,5 @@
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 var Boom = require("boom");
 var User_1 = require("../models/User");
 var createUser_1 = require("../utilities/createUser");
@@ -71,27 +72,19 @@ exports.userRoutes = [
                 user.key = base64url.encode(user.email);
                 user.firstName = req.payload.firstName;
                 user.lastName = req.payload.lastName;
-                // !TODO! - We need to do something else to push new users into the db.
-                // Not storing passwords anymore.
-                // hashPassword(req.payload.password, (err, hash) => {
-                //     if (err) {
-                //         throw Boom.badRequest(err);
-                //     }
-                //     user.password = hash;
-                //     saveUser(user).then(success => {
-                //         if (success) {
-                //             res({
-                //                 id_token: createToken(user),
-                //                 key: user.key
-                //             }).code(201);
-                //         }
-                //         else {
-                //             res(Boom.badRequest("unable to save user"));
-                //         }
-                //     }).catch(error => {
-                //         res(Boom.badRequest(error));
-                //     });
-                // });
+                sqliteUtilities_1.saveUser(user).then(function (success) {
+                    if (success) {
+                        res({
+                            id_token: token_1.createToken(user),
+                            user: user
+                        }).code(201);
+                    }
+                    else {
+                        res(Boom.badRequest("unable to save user"));
+                    }
+                }).catch(function (error) {
+                    res(Boom.badRequest(error));
+                });
             },
             // Validate the payload against the Joi schema
             validate: {
@@ -111,11 +104,11 @@ exports.userRoutes = [
             ],
             cors: true,
             handler: function (req, res) {
-                // If the user's password is correct, we can issue a token.
-                // If it was incorrect, the error will bubble up from the pre method
+                // If we get here with a user, then we are good to go. Let's issue that token
+                // If not, then the error bubbles up from the verify step
                 res({
                     id_token: token_1.createToken(req.pre["user"]),
-                    key: req.pre["user"]["key"]
+                    user: req.pre["user"]
                 }).code(200);
             },
             validate: {

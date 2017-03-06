@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var bluebird_1 = require("bluebird");
 var User_1 = require("./models/User");
 var Race_1 = require("./models/Race");

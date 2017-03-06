@@ -1,4 +1,5 @@
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 var sqlite3 = require("sqlite3");
 var formatString = require('format-string');
 var db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
@@ -10,8 +11,8 @@ var challengeSelect = "select c.*, ac.racekey as raceKey from challenges as c in
 var basicUserSelect = "select users.displayname as displayName, users.firstname as firstName, users.key, users.points from users";
 var userSelectNoPass = "select users.displayname as displayName, users.email, users.firstname as firstName, users.key, users.lastname as lastName, users.role, users.points from users";
 var userChoiceSelect = "select userchoices.challengeKey as key, userchoices.choice as value from userchoices";
-var userInsert = "INSERT INTO users (key, email, pass, displayname, firstname, lastname, role, points)";
-var userSelect = "select users.displayname as displayName, users.email, users.firstname as firstName, users.key, users.lastname as lastName, users.role, users.pass, users.points from users";
+var userInsert = "INSERT INTO users (key, email, displayname, firstname, lastname, role, points)";
+var userSelect = "select users.displayname as displayName, users.email, users.firstname as firstName, users.key, users.lastname as lastName, users.role, users.points from users";
 var blogQuery = "select blogs.message, blogs.title, blogs.userkey as userKey, blogs.postdate as postDate from blogs";
 var topMessage = "select * from messageoftherace order by created_date DESC LIMIT 1 ";
 var userChoicesInsert = "INSERT OR REPLACE INTO userchoices (userkey, season, racekey, challengekey, choice)";
@@ -132,7 +133,7 @@ function getRaces(season, key) {
 }
 exports.getRaces = getRaces;
 ;
-function getUsers(email, withPassword) {
+function getUsers(email) {
     return new Promise(function (resolve, reject) {
         var statement = userSelect;
         if (email) {
@@ -199,16 +200,15 @@ function saveUser(user) {
             reject(new Error("must have a user to save"));
             return;
         }
-        var valuesStatement = "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);";
+        var valuesStatement = "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7);";
         var valuesObject = {
             1: user.key,
             2: user.email,
-            3: user.password,
-            4: user.displayName ? user.displayName : "",
-            5: user.firstName ? user.firstName : "",
-            6: user.lastName ? user.lastName : "",
-            7: user.role,
-            8: user.points ? user.points : 0
+            3: user.displayName ? user.displayName : "",
+            4: user.firstName ? user.firstName : "",
+            5: user.lastName ? user.lastName : "",
+            6: user.role,
+            7: user.points ? user.points : 0
         };
         var insertStatement = userInsert + " " + valuesStatement;
         db.run(insertStatement, valuesObject, function (err) {

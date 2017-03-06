@@ -3,6 +3,7 @@
 // To access secured routes, an Authorization header must be set. 
 // ex: Authorization: Bearer <TOKEN>
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 var hapi_1 = require("hapi");
 var config_1 = require("./app/config");
 var hapiAuthJwt = require("hapi-auth-jwt");

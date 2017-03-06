@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var baseUrl = window.location.origin;
 function getAllTracks() {
     return new Promise(function (resolve, reject) {

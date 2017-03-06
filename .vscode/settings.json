@@ -13,6 +13,4 @@
         "app/**/*.js": true,
         "src/**/*.js": true
     }
-
-
 }

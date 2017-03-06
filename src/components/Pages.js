@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var RacePage_1 = require("./Pages/RacePage");
 exports.RacePage = RacePage_1.RacePage;
 var AllRaces_1 = require("./Pages/AllRaces");

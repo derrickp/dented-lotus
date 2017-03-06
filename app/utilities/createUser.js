@@ -1,4 +1,5 @@
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 var joi_1 = require("joi");
 exports.createUserSchema = joi_1.object({
     displayName: joi_1.string().alphanum().min(2).max(30),

@@ -1,4 +1,5 @@
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 var Boom = require("boom");
 var sqliteUtilities_1 = require("../utilities/sqliteUtilities");
 exports.challengesRoutes = [

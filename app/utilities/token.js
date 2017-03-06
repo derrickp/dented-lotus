@@ -1,4 +1,5 @@
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 var jwt = require("jsonwebtoken");
 var config_1 = require("../config");
 function createToken(user) {

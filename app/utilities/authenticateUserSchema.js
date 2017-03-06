@@ -1,8 +1,9 @@
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 var Joi = require("joi");
 exports.authenticateUserSchema = Joi.alternatives().try([
     Joi.object({
-        email: Joi.string().email().required(),
-        password: Joi.string().required()
+        authType: Joi.string().required(),
+        auth_token: Joi.string().required()
     })
 ]);
