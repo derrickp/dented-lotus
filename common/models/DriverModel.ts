@@ -29,6 +29,9 @@ export class DriverModel{
         
     }
 
+    public update(data){}
+
+
     public getName():string{
         return  this.firstName + " " + this.lastName;
     }

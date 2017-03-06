@@ -16,8 +16,9 @@ var DriverModel = (function () {
         //     this.team = team;
         // });
     }
+    DriverModel.prototype.update = function (data) { };
     DriverModel.prototype.getName = function () {
-        return this.name; //this.firstName + " " + this.lastName;
+        return this.firstName + " " + this.lastName;
     };
     DriverModel.prototype.addPoints = function (inPoints) {
         if (inPoints < 0) {
@@ -27,4 +28,4 @@ var DriverModel = (function () {
     };
     return DriverModel;
 }());
-exports.DriverModel = DriverModel; 
+exports.DriverModel = DriverModel;

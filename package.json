@@ -13,6 +13,8 @@
     "boron": "^0.2.3",
     "file-loader": "^0.10.0",
     "format-string": "^1.0.0",
+    "formsy-react": "^0.19.2",
+    "formsy-react-components": "^0.10.1",
     "glob": "^7.0.3",
     "google-auth-library": "^0.10.0",
     "hapi": "^13.4.1",
