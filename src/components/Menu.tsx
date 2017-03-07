@@ -31,7 +31,7 @@ export class MenuComponent extends React.Component<MenuProps, any>{
 
     render(): JSX.Element | null {
 
-        if (this.props.stateManager.currentUser.isLoggedIn && this.props.stateManager.currentUser.isAdmin) {
+        if (this.props.stateManager.user.isLoggedIn && this.props.stateManager.user.isAdmin) {
 
         }
         return <Menu width={270} customBurgerIcon={false} pageWrapId={"page-wrap"} isOpen={this.props.isOpen} right>

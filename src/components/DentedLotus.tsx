@@ -82,18 +82,18 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         const parameters = getUrlParameters();
         this.stateManager = props.stateManager;
         this.state = { loggedIn: false, race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
-        
-        window.addEventListener("google-login-success", (args: CustomEvent) => {
-            this.onGoogleLogin(args.detail); 
+
+        this.stateManager.watch("user", (user: GoogleUser) => {
+            this.onLogin();
         });
     }
-    
 
-    onGoogleLogin(args: GoogleLoginResponse) {
-        // this.hide();
-        this.stateManager.setUser(new GoogleUser(args));
+    componentDidMount() {
+        this.onLogin();
+    }
+
+    onLogin() {
         this.setState({ loggedIn: this.stateManager.isLoggedIn });
-        // this.setState({ loggedIn: true });
     }
 
     onMenuClicked() {
@@ -142,7 +142,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     render() {
         return <div>
-            <Banner loggedIn={this.state.loggedIn} onGoogleLogin={this.onGoogleLogin.bind(this)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
+            <Banner loggedIn={this.state.loggedIn} onGoogleLogin={this.stateManager.onGoogleLogin.bind(this.stateManager)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
             <div className="wrapper">
                 {this.getCurrentView()}
             </div>

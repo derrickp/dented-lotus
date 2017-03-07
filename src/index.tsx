@@ -7,7 +7,7 @@ import { StateManager } from "./StateManager";
 import { BlogComponent } from "./components/BlogComponent"; 
 import { RaceCountdown } from "./components/widgets/RaceCountdown";
 import {DentedLotus} from "./components/DentedLotus";
-let stateManager = new StateManager();
+const stateManager = new StateManager();
 
 ReactDOM.render(
     <DentedLotus stateManager={stateManager}/>,

@@ -5,13 +5,13 @@ import { Promise } from "bluebird";
 import { User, GoogleUser, FacebookUser } from "../common/models/User";
 import { Race, races } from "../common/models/Race";
 import { Track } from "../common/models/Track";
-import {DriverModel} from "../common/models/DriverModel";
+import { DriverModel } from "../common/models/DriverModel";
 import { getAllTracks, getAllDrivers } from "./Utilities/ServerUtils"
 
 declare var FB: FBSDK;
 export class StateManager {
     modalVisible = false;
-    onLogIn:()=>void;
+    onLogIn: () => void;
     blogs: Blog[] = [
         {
             author: "Craig",
@@ -32,8 +32,28 @@ export class StateManager {
         date: "March 26, 2017"
     };
 
+    private _googleAuth: gapi.auth2.GoogleAuth;
+
+    private _watches: Map<string, Function[]> = new Map<string, Function[]>();
+
     private _tracks: Promise<Track[]>;
     private _drivers: Promise<DriverModel[]>;
+
+    private _user: User;
+
+    get user(): User {
+        return this._user;
+    }
+
+    set user(user: User) {
+        this._user = user;
+        if (this._watches.has("user")) {
+            const callbacks = this._watches.get("user");
+            callbacks.forEach(callback => {
+                callback(this._user);
+            });
+        }
+    }
 
     get races(): Race[] {
         return races;
@@ -45,15 +65,13 @@ export class StateManager {
     }
 
     get isLoggedIn(): boolean {
-        return this.currentUser != null && this.currentUser.isLoggedIn();
+        return this.user != null && this.user.isLoggedIn();
     }
 
-    get drivers():Promise<DriverModel[]>{ 
+    get drivers(): Promise<DriverModel[]> {
         this._drivers = this._drivers ? this._drivers : getAllDrivers();
         return this._drivers;
-    } 
-
-    currentUser: User = null;
+    }
 
     constructor() {
         this._initGoogle();
@@ -61,10 +79,37 @@ export class StateManager {
     }
 
     private _initGoogle() {
-        if (!window["onSignIn"]) {
-            window["onSignIn"] = (args) => {
-                this.currentUser = new GoogleUser(args);
-            }
+        if (window["gapi"]) {
+            gapi.load("auth2", () => {
+                gapi.auth2.init({
+                    client_id: "1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com"
+                }).then(() => {
+                    this._googleAuth = gapi.auth2.getAuthInstance();
+                    this._googleAuth.isSignedIn.listen(signedIn => {
+                        const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
+                        this.onGoogleLogin(user);
+                    });
+                    const loggedIn = this._googleAuth.isSignedIn.get();
+                    if (loggedIn) {
+                        const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
+                        this.onGoogleLogin(user);
+                    } else {
+                        window.setTimeout(() => {
+                            const signinPromise = this._googleAuth.signIn().then(() => {
+                                debugger;
+                            }, (error: Error) => {
+                                debugger;
+                            });
+                        }, 1000);
+                    }
+                }, (reason: string) => {
+
+                });
+            });
+        } else {
+            window.addEventListener("gapi-loaded", () => {
+                this._initGoogle();
+            });
         }
     }
 
@@ -83,7 +128,7 @@ export class StateManager {
                     // Logged into your app and Facebook.
                     this.currentUser = new FacebookUser(response);
                     return;
-                }  
+                }
             });
         };
         (function (d, s, id) {
@@ -93,6 +138,14 @@ export class StateManager {
             js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.8";
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
+    }
+
+    watch(path: string, callback: Function) {
+        if (this._watches.has(path)) {
+            this._watches.get(path).push(callback);
+        } else {
+            this._watches.set(path, [callback]);
+        }
     }
 
     /**
@@ -106,21 +159,17 @@ export class StateManager {
     getNextRace(): Promise<Race> {
         return Promise.resolve(this.nextRace);
     }
-    /**
-     * Get the currently logged in user.    
-     */
-    getUser(): Promise<User> {
-        return Promise.resolve(this.currentUser);
+
+    signOut(): void {
+        this.user.logOut();
     }
 
-    setUser(user:User): void{
-        this.currentUser = user;
-        if (this.onLogIn){
-            this.onLogIn();
-        }
+    setUser(user) {
+        this.user = user;
     }
 
-    signOut():void{
-        this.currentUser.logOut();
+    onGoogleLogin(response: gapi.auth2.GoogleUser) {
+        const googleUser = new GoogleUser(response);
+        this.user = googleUser;
     }
 }

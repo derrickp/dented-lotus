@@ -25,7 +25,7 @@ export class User {
 }
 
 export class GoogleUser extends User {
-    constructor(googleUser) { 
+    constructor(googleUser: gapi.auth2.GoogleUser) { 
         super();
         const profile = googleUser.getBasicProfile();
         this.email = profile.getEmail();

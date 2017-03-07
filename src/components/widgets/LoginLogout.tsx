@@ -8,7 +8,8 @@ import { FacebookLogin } from 'react-facebook-login';
 import Rodal from "rodal";
 import { Modal } from "./Modal";
 import {Pages} from "../Pages";
-import {MenuComponent}  from "../Menu"; 
+import {MenuComponent}  from "../Menu";
+import { GoogleLogin } from "../Auth/GoogleLogin";
 
 export interface LoginLogoutProps extends PropsBase {
     onLogin: (User) => void; 
@@ -27,7 +28,7 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
     constructor(props: LoginLogoutProps) {
         super(props);
         this.stateManager = props.stateManager;  
-        this.state = { loggedIn: (!!this.stateManager.currentUser && this.stateManager.currentUser.isLoggedIn()), modalVisible: false, sidebarOpen: false };
+        this.state = { modalVisible: false, sidebarOpen: false };
         this.onLogin = props.onLogin; 
         this.onPageChange = props.onPageChange;
         this.onGoogleLogin = props.onGoogleLogin;
@@ -37,7 +38,6 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
     afterLogIn(){
         this.hideLoginModal();
         this.setState({loggedIn:true});
-
     }
 
     componentDidMount() {
@@ -77,16 +77,16 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
     }
 
     render() {
-        
         let sidebarContent = "<b>Sidebar content</b>";
-        if (this.state.loggedIn) {
+        if (this.props.loggedIn) {
             return <div className="logout" onClick={this.onMenuClicked.bind(this)}>
                 <MenuComponent onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} isOpen={this.state.sidebarOpen} onLogout={this.logout.bind(this)}/>
             </div>
         } else {
             let content = <div className="login-modal">
                 <div className="modal-header">Log In</div>
-                <div className="g-signin2" data-onsuccess="onGoogleSignIn"></div>
+                <GoogleLogin loggedIn={this.props.loggedIn} onGoogleLogin={this.onGoogleLogin} stateManager={this.stateManager} />
+                {/*<div className="g-signin2" data-onsuccess="onGoogleSignIn"></div>*/}
                 {/*<FacebookLogin appId="1088597931155576" autoLoad={true} fields="name,email,picture" callback={(a) => { }} cssClass="my-facebook-button-class" icon="fa-facebook" />*/}
                 {/*<div className="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" data-onsuccess={this.facebookSignedIn.bind(this)}></div>*/}
             </div>
