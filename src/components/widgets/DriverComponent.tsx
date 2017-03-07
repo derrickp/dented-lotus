@@ -5,6 +5,7 @@ import { DriverModel } from "../../../common/models/DriverModel";
 import { Form, Input } from "formsy-react-components";
 
 export interface DriverProps {
+    updateDriver: (driverModel: DriverModel) => Promise<DriverModel>;
     driver: DriverModel;
     userIsAdmin:boolean;
     small: boolean;
@@ -44,7 +45,7 @@ export class DriverComponent extends React.Component<DriverProps, DriverState> {
     render() {
         let content;
         if (this.state.isEditing) {
-            content = <EditDriver driver={this.driver} onEditClicked={this.editClicked.bind(this)} userIsAdmin={this.state.userIsAdmin} onCloseEdit={this.closeEdit.bind(this)} onValueChanged={this.onValueChanged.bind(this)}/>
+            content = <EditDriver driver={this.driver} onEditClicked={this.editClicked.bind(this)} userIsAdmin={this.state.userIsAdmin} onCloseEdit={this.closeEdit.bind(this)} updateDriver={this.props.updateDriver} onValueChanged={this.onValueChanged.bind(this)}/>
         } else {
             content = <DisplayDriver driver={this.driver} onEditClicked={this.editClicked.bind(this)} userIsAdmin={this.state.userIsAdmin} onCloseEdit={this.closeEdit.bind(this)} onValueChanged={this.onValueChanged.bind(this)}/>
         }
@@ -55,6 +56,7 @@ export class DriverComponent extends React.Component<DriverProps, DriverState> {
 
 
 interface EditDriverProps {
+    updateDriver?: (driverModel: DriverModel) => Promise<DriverModel>;
     driver: DriverModel;
     userIsAdmin:boolean;
     onEditClicked: () => void;
@@ -62,7 +64,7 @@ interface EditDriverProps {
     onValueChanged:(name:string,value:any)=>void;
 }
 function EditDriver(props: EditDriverProps) {
-    return <Form onSubmit={(data) => { props.driver.update(data) }}>
+    return <Form onSubmit={(data) => { props.updateDriver(this.props.driver); }}>
         <Input layout="vertical" type="text" value={props.driver.firstName} onChange={props.onValueChanged} name="firstName" label="First Name:" />
         <Input layout="vertical" type="text" value={props.driver.lastName} onChange={props.onValueChanged} name="lastName" label="Last Name:" />
         <Input layout="vertical" type="text" value={props.driver.nationality} onChange={props.onValueChanged} name="nationality" label="Nationality:" />

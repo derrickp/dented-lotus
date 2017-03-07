@@ -9,7 +9,9 @@ const driverSelect = "SELECT * from drivers_vw";
 export function saveDrivers(drivers: Driver[]): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         try {
-            const insert = "INSERT OR REPLACE INTO drivers (key, active, name, teamkey, trivia) VALUES (?1, ?2, ?3, ?4, ?5)";
+            const insert = `INSERT OR REPLACE INTO drivers 
+            (key, active, firstname, lastname, team, trivia, nationality, flag, birthdate, abbreviation, wins, number) 
+            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)`;
             db.serialize(() => {
                 db.exec("BEGIN;");
 
@@ -17,9 +19,16 @@ export function saveDrivers(drivers: Driver[]): Promise<boolean> {
                     let valuesObject = {
                         1: driver.key,
                         2: driver.active ? 1 : 0,
-                        3: driver.name,
-                        4: driver.teamKey,
-                        5: driver.trivia ? JSON.stringify(driver.trivia) : ""
+                        3: driver.firstName ? driver.firstName : "",
+                        4: driver.lastName,
+                        5: driver.team ? driver.team : "",
+                        6: driver.trivia ? JSON.stringify(driver.trivia) : "",
+                        7: driver.nationality ? driver.nationality : "",
+                        8: driver.flag ? driver.flag : "",
+                        9: driver.birthdate ? driver.birthdate : "",
+                        10: driver.abbreviation ? driver.abbreviation : "",
+                        11: driver.wins ? driver.wins : 0,
+                        12: driver.number ? driver.number : 0
                     };
                     db.run(insert, valuesObject);
                 });

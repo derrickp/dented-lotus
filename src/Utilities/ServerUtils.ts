@@ -1,6 +1,6 @@
 
 import { Track } from "../../common/models/Track";
-import { DriverModel, DriverResponse } from "../../common/models/DriverModel";
+import { DriverModel, Driver } from "../../common/models/DriverModel";
 import { TeamModel, TeamResponse } from "../../common/models/TeamModel";
 import { DentedLotusUser } from "../../common/models/User";
 import { AuthenticationPayload, AuthenticationResponse } from "../../common/models/Authentication";
@@ -20,8 +20,31 @@ export function getAllTracks(): Promise<Track[]> {
 export function getAllDrivers(): Promise<DriverModel[]> {
     return new Promise<DriverModel[]>((resolve, reject) => {
         return fetch(baseUrl + "/drivers").then(response => {
-            return response.json().then((drivers: DriverResponse[]) => {
+            return response.json().then((drivers: Driver[]) => {
                 resolve(drivers.map((d) => { return new DriverModel(d) }));
+            });
+        });
+    });
+}
+
+export function saveDrivers(drivers: DriverModel[], id_token: string): Promise<DriverModel[]> {
+    if (!id_token) return Promise.reject(new Error("Unauthorized"));
+    return new Promise<DriverModel[]>((resolve, reject) => {
+        const driversPayload: Driver[] = [];
+        drivers.forEach(dm => {
+            const driver = dm.json;
+            driversPayload.push(driver);
+        });
+        return fetch('/drivers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + id_token
+            },
+            body: JSON.stringify(drivers)
+        }).then(response => {
+            return response.json().then((driverResponse: Driver[]) => {
+                resolve(driverResponse.map((d) => { return new DriverModel(d) }));
             });
         });
     });

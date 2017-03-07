@@ -7,7 +7,7 @@ import { Race, races } from "../common/models/Race";
 import { Track } from "../common/models/Track";
 import { DriverModel } from "../common/models/DriverModel";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
-import { getAllTracks, getAllDrivers, authenticate } from "./Utilities/ServerUtils"
+import { getAllTracks, getAllDrivers, authenticate, saveDrivers } from "./Utilities/ServerUtils"
 
 declare var FB: FBSDK;
 export class StateManager {
@@ -128,6 +128,19 @@ export class StateManager {
     signOut(): void {
         this.user.logOut().then(success => {
             this.user = null;
+        });
+    }
+
+    updateDriver(driverModel: DriverModel): Promise<DriverModel> {
+        if (!this.user.isAdmin || !this.user.id_token) {
+            return Promise.reject(new Error("Unauthorized"));
+        }
+        return new Promise<DriverModel>((resolve, reject) => {
+            return saveDrivers([driverModel], this.user.id_token).then(newModels => {
+                if (newModels.length) {
+                    resolve(newModels[0]);
+                }
+            });
         });
     }
 

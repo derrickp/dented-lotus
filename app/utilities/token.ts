@@ -15,7 +15,7 @@ export function createToken(user) {
       scopes = ['user'];
   }
   // Sign the JWT
-  return jwt.sign({ key: user.key, email: user.email, scope: scopes }, secret, { algorithm: 'HS256', expiresIn: "1h" } );
+  return jwt.sign({ key: user.key, email: user.email, scope: scopes }, secret, { algorithm: 'HS256', expiresIn: "4h" } );
 }
 
 export function checkAndDecodeToken(token) {

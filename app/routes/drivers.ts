@@ -45,6 +45,10 @@ export const driverRoutes: IRouteConfiguration[] = [
                 }).catch((error: Error) => {
                     reply(Boom.badRequest(error.message)).code(400);
                 });
+            },
+            auth: {
+                strategies: ['jwt'],
+                scope: ['admin']
             }
         }
     },
@@ -56,11 +60,11 @@ export const driverRoutes: IRouteConfiguration[] = [
             handler: function (request, reply) {
                 const drivers: Driver[] = request.payload;
                 drivers.forEach(driver => {
-                    if (!driver.name) {
-                        reply(Boom.badRequest("need a driver name"));
+                    if (!driver.lastName) {
+                        reply(Boom.badRequest("need a driver last name"));
                         return;
                     }
-                    if (!driver.key) driver.key = driver.name.split(" ")[1].substring(0, 3).toLowerCase();
+                    if (!driver.key) driver.key = driver.lastName.toLowerCase();
                 });
                 saveDrivers(drivers).then(success => {
                     return getDrivers(true);
@@ -70,6 +74,10 @@ export const driverRoutes: IRouteConfiguration[] = [
                 }).catch((error: Error) => {
                     reply(Boom.badRequest(error.message));
                 });
+            },
+            auth: {
+                strategies: ['jwt'],
+                scope: ['admin']
             }
         }
     }
