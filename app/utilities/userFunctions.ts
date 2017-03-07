@@ -1,7 +1,7 @@
 'use strict';
 import * as Boom from "boom";
 import { getUsers } from "./sqliteUtilities";
-import { AuthenticationPayload } from "../models/Authentication";
+import { AuthenticationPayload } from "../../common/models/Authentication";
 import { GOOGLE_CLIENT_ID } from "../config";
 
 import * as GoogleAuth from "google-auth-library";

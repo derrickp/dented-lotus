@@ -32,7 +32,7 @@ export class UserComponent extends React.Component<UserProps, any>{
 
     render(): JSX.Element | null { 
         if (this.props.small){
-            return <SmallUser imgUrl={this.props.stateManager.user.imageUrl} name={this.props.stateManager.user.getName()}/>
+            return <SmallUser imgUrl={this.props.stateManager.user.imageUrl} name={this.props.stateManager.user.name}/>
         }
         return <FullUser stateManager={this.props.stateManager}/>
     }

@@ -12,15 +12,13 @@ import {MenuComponent}  from "../Menu";
 import { GoogleLogin } from "../Auth/GoogleLogin";
 
 export interface LoginLogoutProps extends PropsBase {
-    onLogin: (User) => void; 
     onPageChange: (page: string) => void;
-    onGoogleLogin: (args) => void;
+    completeGoogleLogin: (args) => void;
+    logout: () => void;
     loggedIn: boolean;
 }
 export class LoginLogout extends React.Component<LoginLogoutProps, any>{
-    onLogin: (User) => void; 
-    onPageChange: (page: string) => void;
-    onGoogleLogin: (args) => void;
+    completeGoogleLogin: (args) => void;
     stateManager: StateManager;
     /**
      *
@@ -29,26 +27,9 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
         super(props);
         this.stateManager = props.stateManager;  
         this.state = { modalVisible: false, sidebarOpen: false };
-        this.onLogin = props.onLogin; 
-        this.onPageChange = props.onPageChange;
-        this.onGoogleLogin = props.onGoogleLogin;
-        this.stateManager.onLogIn = this.afterLogIn.bind(this);
-    } 
-
-    afterLogIn(){
-        this.hideLoginModal();
-        this.setState({loggedIn:true});
+        this.completeGoogleLogin = props.completeGoogleLogin;
     }
 
-    componentDidMount() {
-        this.setState({ loggedIn: false }); 
-    }
-
-    logout() {
-        this.stateManager.signOut(); 
-        this.setState({ loggedIn: false });
-        this.onPageChange(Pages.HOME);
-    }
     showLoginModal() {
         this.setState({ modalVisible: true });
     }
@@ -57,18 +38,9 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
         this.setState({ modalVisible: false });
     }
 
-    googleSignedIn() {
-        this.hideLoginModal();
-        this.setState({loggedIn:true});
-        // this.onGoogleLogin(args);
-    }
-
     facebookSignedIn(args) {
         alert("facebookLoggedIn");
         this.hideLoginModal();
-    }
-    loginFailed(args) {
-
     }
 
     onMenuClicked(){
@@ -76,17 +48,20 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
         this.setState({sidebarOpen: next});
     }
 
+    onLogin() {
+        this.hideLoginModal();
+    }
+
     render() {
         let sidebarContent = "<b>Sidebar content</b>";
         if (this.props.loggedIn) {
             return <div className="logout" onClick={this.onMenuClicked.bind(this)}>
-                <MenuComponent onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} isOpen={this.state.sidebarOpen} onLogout={this.logout.bind(this)}/>
+                <MenuComponent onPageChange={this.props.onPageChange} stateManager={this.stateManager} isOpen={this.state.sidebarOpen} onLogout={this.props.logout}/>
             </div>
         } else {
             let content = <div className="login-modal">
                 <div className="modal-header">Log In</div>
-                <GoogleLogin loggedIn={this.props.loggedIn} onGoogleLogin={this.onGoogleLogin} stateManager={this.stateManager} />
-                {/*<div className="g-signin2" data-onsuccess="onGoogleSignIn"></div>*/}
+                <GoogleLogin loggedIn={this.props.loggedIn} completeGoogleLogin={this.completeGoogleLogin} stateManager={this.stateManager} onLogin={this.onLogin.bind(this)} />
                 {/*<FacebookLogin appId="1088597931155576" autoLoad={true} fields="name,email,picture" callback={(a) => { }} cssClass="my-facebook-button-class" icon="fa-facebook" />*/}
                 {/*<div className="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" data-onsuccess={this.facebookSignedIn.bind(this)}></div>*/}
             </div>

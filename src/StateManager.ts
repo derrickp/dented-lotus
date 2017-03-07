@@ -6,12 +6,11 @@ import { User, GoogleUser, FacebookUser } from "../common/models/User";
 import { Race, races } from "../common/models/Race";
 import { Track } from "../common/models/Track";
 import { DriverModel } from "../common/models/DriverModel";
-import { getAllTracks, getAllDrivers } from "./Utilities/ServerUtils"
+import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
+import { getAllTracks, getAllDrivers, authenticate } from "./Utilities/ServerUtils"
 
 declare var FB: FBSDK;
 export class StateManager {
-    modalVisible = false;
-    onLogIn: () => void;
     blogs: Blog[] = [
         {
             author: "Craig",
@@ -32,8 +31,6 @@ export class StateManager {
         date: "March 26, 2017"
     };
 
-    private _googleAuth: gapi.auth2.GoogleAuth;
-
     private _watches: Map<string, Function[]> = new Map<string, Function[]>();
 
     private _tracks: Promise<Track[]>;
@@ -47,12 +44,7 @@ export class StateManager {
 
     set user(user: User) {
         this._user = user;
-        if (this._watches.has("user")) {
-            const callbacks = this._watches.get("user");
-            callbacks.forEach(callback => {
-                callback(this._user);
-            });
-        }
+        this._publishWatches("user");
     }
 
     get races(): Race[] {
@@ -65,7 +57,7 @@ export class StateManager {
     }
 
     get isLoggedIn(): boolean {
-        return this.user != null && this.user.isLoggedIn();
+        return this.user != null && this.user.isLoggedIn;
     }
 
     get drivers(): Promise<DriverModel[]> {
@@ -74,43 +66,7 @@ export class StateManager {
     }
 
     constructor() {
-        this._initGoogle();
-        this._initFacebook();
-    }
-
-    private _initGoogle() {
-        if (window["gapi"]) {
-            gapi.load("auth2", () => {
-                gapi.auth2.init({
-                    client_id: "1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com"
-                }).then(() => {
-                    this._googleAuth = gapi.auth2.getAuthInstance();
-                    this._googleAuth.isSignedIn.listen(signedIn => {
-                        const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
-                        this.onGoogleLogin(user);
-                    });
-                    const loggedIn = this._googleAuth.isSignedIn.get();
-                    if (loggedIn) {
-                        const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
-                        this.onGoogleLogin(user);
-                    } else {
-                        window.setTimeout(() => {
-                            const signinPromise = this._googleAuth.signIn().then(() => {
-                                debugger;
-                            }, (error: Error) => {
-                                debugger;
-                            });
-                        }, 1000);
-                    }
-                }, (reason: string) => {
-
-                });
-            });
-        } else {
-            window.addEventListener("gapi-loaded", () => {
-                this._initGoogle();
-            });
-        }
+        // this._initFacebook();
     }
 
     private _initFacebook() {
@@ -148,6 +104,15 @@ export class StateManager {
         }
     }
 
+    private _publishWatches(path: string) {
+        if (this._watches.has(path)) {
+            const callbacks = this._watches.get(path);
+            callbacks.forEach(callback => {
+                callback(this._user);
+            });
+        }
+    }
+
     /**
      *  Query for blog posts.
      *  returns Blog[]
@@ -161,15 +126,20 @@ export class StateManager {
     }
 
     signOut(): void {
-        this.user.logOut();
+        this.user.logOut().then(success => {
+            this.user = null;
+        });
     }
 
-    setUser(user) {
-        this.user = user;
-    }
+    completeGoogleLogin(response: gapi.auth2.GoogleUser) {
+        const authPayload: AuthenticationPayload = {
+            auth_token: response.getAuthResponse().id_token,
+            authType: AuthenticationTypes.GOOGLE
+        };
 
-    onGoogleLogin(response: gapi.auth2.GoogleUser) {
-        const googleUser = new GoogleUser(response);
-        this.user = googleUser;
+        authenticate(authPayload).then(authResponse => {
+            const googleUser = new GoogleUser(response, authResponse.user, authResponse.id_token);
+            this.user = googleUser;
+        });
     }
 }

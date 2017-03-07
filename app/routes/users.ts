@@ -2,7 +2,7 @@
 
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
-import { User } from "../models/User";
+import { DentedLotusUser } from "../../common/models/User";
 import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";
@@ -27,11 +27,12 @@ export const userRoutes: IRouteConfiguration[] = [
                     return;
                 }
 
-                let newUser = new User();
-                newUser.displayName = req.payload.displayName;
-                newUser.firstName = req.payload.firstName;
-                newUser.lastName = req.payload.lastName;
-                newUser.key = key;
+                let newUser: DentedLotusUser = {
+                    displayName: req.payload.displayName,
+                    firstName: req.payload.firstName,
+                    lastName: req.payload.lastName,
+                    key: key
+                };
 
                 if (isAdmin) {
                     newUser.role = req.payload.role;
@@ -72,7 +73,7 @@ export const userRoutes: IRouteConfiguration[] = [
             ],
             cors: true,
             handler: (req, res) => {
-                let user = new User();
+                let user: DentedLotusUser = {};
                 user.email = req.payload.email;
                 user.displayName = req.payload.displayName;
                 user.role = "user";

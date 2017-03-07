@@ -6,11 +6,11 @@ import { UserComponent } from "./User";
 import { StateManager } from "../StateManager";
 import { BlogComponent } from "./BlogComponent";
 import { RaceCountdown } from "./widgets/RaceCountdown";
-import { RacePage, AllRaces, TrackPage, Tracks, Drivers,Pages } from "./Pages";
+import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages } from "./Pages";
 import { Race } from "../../common/models/Race";
 import { PropsBase } from "../utilities/ComponentUtilities";
 import { getUrlParameters } from "../utilities/PageUtilities";
-import { GoogleUser } from "../../common/models/User";
+import { User } from "../../common/models/User";
 
 import { GoogleLoginResponse } from "../../common/models/GoogleLoginResponse";
 
@@ -83,25 +83,24 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         this.stateManager = props.stateManager;
         this.state = { loggedIn: false, race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
 
-        this.stateManager.watch("user", (user: GoogleUser) => {
-            this.onLogin();
+        this.stateManager.watch("user", (user: User) => {
+            this.onUserChange();
         });
     }
 
     componentDidMount() {
-        this.onLogin();
+        this.onUserChange();
     }
 
-    onLogin() {
-        this.setState({ loggedIn: this.stateManager.isLoggedIn });
-    }
-
-    onMenuClicked() {
-        this.setState({ sidebarOpen: true });
-    }
-
-    onSetSidebarOpen() {
-        this.setState({ sidebarOpen: true });
+    onUserChange() {
+        const loggedIn = this.stateManager.isLoggedIn;
+        if (!loggedIn) {
+            let parameters = this.state.parameters;
+            parameters.page = Pages.HOME;
+            this.setState({ loggedIn: loggedIn, parameters: parameters });
+        } else {
+            this.setState({ loggedIn: loggedIn });
+        }
     }
 
     launchRacePicks() {
@@ -142,7 +141,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     render() {
         return <div>
-            <Banner loggedIn={this.state.loggedIn} onGoogleLogin={this.stateManager.onGoogleLogin.bind(this.stateManager)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
+            <Banner logout={this.stateManager.signOut.bind(this.stateManager)} loggedIn={this.state.loggedIn} completeGoogleLogin={this.stateManager.completeGoogleLogin.bind(this.stateManager)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
             <div className="wrapper">
                 {this.getCurrentView()}
             </div>

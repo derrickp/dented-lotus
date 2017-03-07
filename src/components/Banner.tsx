@@ -6,14 +6,15 @@ import * as moment from "moment";
 export interface BannerProps extends PropsBase {
     title: string; 
     onPageChange: (page: string) => void;
-    onGoogleLogin: (args) => void;
+    completeGoogleLogin: (args) => void;
+    logout: () => void;
     loggedIn: boolean;
 };
 
 export class Banner extends React.Component<BannerProps, any>{
-    stateManager; 
+    stateManager;
     onPageChange: (page: string) => void;
-    onGoogleLogin: (args) => void;
+    completeGoogleLogin: (args) => void;
     /**
      *
      */
@@ -21,12 +22,12 @@ export class Banner extends React.Component<BannerProps, any>{
         super(props);
         this.stateManager = props.stateManager; 
         this.onPageChange = props.onPageChange;
-        this.onGoogleLogin = props.onGoogleLogin;
+        this.completeGoogleLogin = props.completeGoogleLogin;
     }
     render() {
         return <div className="banner">
             <h1>{this.props.title}</h1>
-            <LoginLogout loggedIn={this.props.loggedIn} onGoogleLogin={this.onGoogleLogin} onPageChange={this.onPageChange} onLogin={this.props.stateManager.setUser.bind(this.stateManager)} stateManager={this.stateManager} /> 
+            <LoginLogout logout={this.props.logout} loggedIn={this.props.loggedIn} completeGoogleLogin={this.completeGoogleLogin} onPageChange={this.onPageChange} stateManager={this.stateManager} /> 
         </div>;
     }
 }

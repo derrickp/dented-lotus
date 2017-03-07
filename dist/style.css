@@ -17,7 +17,7 @@ html {
   margin: 0;
   color: #f2f2f2;
   background-color: #f2f2f2;
-  background-image: url("../images/brushed.png");
+  background-image: url("/images/brushed.png");
   font-family: 'Arimo', Helvetica, Arial, sans-serif;
   box-sizing: border-box;
   overflow-x: hidden;
@@ -191,13 +191,13 @@ html .header-section {
   border: 1px solid silver;
   margin-bottom: 4rem;
   width: 100%;
-  background-image: url("../images/honda.jpg");
+  background-image: url("/images/honda.jpg");
   background-size: cover;
   background-position: center;
 }
 body .small-user,
 html .small-user {
-  height: 6em;
+  height: 5em;
   width: 100%;
   display: block;
   box-sizing: border-box;
@@ -211,7 +211,7 @@ html .small-user span {
   display: inline-block;
   /* vertical-align: bottom; */
   margin-left: 1em;
-  font-size: x-large;
+  font-size: medium;
 }
 body .small-user img.round,
 html .small-user img.round {
@@ -402,4 +402,38 @@ html .small-user img.round {
 /* Styling of overlay */
 .bm-overlay {
   background: rgba(0, 0, 0, 0.3);
+}
+#customBtn {
+  display: inline-block;
+  background: white;
+  color: #444;
+  width: 190px;
+  border-radius: 5px;
+  border: thin solid #888;
+  box-shadow: 1px 1px 1px grey;
+  white-space: nowrap;
+}
+#customBtn:hover {
+  cursor: pointer;
+}
+span.label {
+  font-family: serif;
+  font-weight: normal;
+}
+span.icon {
+  background: url('/images/g-normal.png') transparent 5px 50% no-repeat;
+  display: inline-block;
+  vertical-align: middle;
+  width: 42px;
+  height: 42px;
+}
+span.buttonText {
+  display: inline-block;
+  vertical-align: middle;
+  padding-left: 42px;
+  padding-right: 42px;
+  font-size: 14px;
+  font-weight: bold;
+  /* Use the Roboto font that is loaded in the <head> */
+  font-family: 'Roboto', sans-serif;
 }

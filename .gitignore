@@ -1,7 +1,8 @@
 node_modules
 packages
 obj
-bin  
+bin
+**debug.log*
 **/*.js 
 **/*.jsx 
 **/*.js.map 

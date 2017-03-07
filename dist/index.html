@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Project Dented Lotus</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" href="style.css"/>
     <link href="//fonts.googleapis.com/css?family=Orbitron" rel="stylesheet"/>
     <link href='//fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'/>
@@ -16,14 +17,7 @@
     <!-- Dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.js"></script>
-    <script>
-        function triggerGoogleLoaded(user) {
-            window["gapi-loaded"] = true;
-            var event = new Event("gapi-loaded");
-            window.dispatchEvent(event);
-        }
-    </script>
-    <script src="https://apis.google.com/js/platform.js?onload=triggerGoogleLoaded" async defer></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <!-- Main -->
     <script src="bundle.js"></script>
     </div>
