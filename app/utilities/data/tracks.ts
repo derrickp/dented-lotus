@@ -1,11 +1,11 @@
 import * as sqlite3 from "sqlite3";
-import { Track } from "../../../common/models/Track";
+import { TrackResponse } from "../../../common/models/Track";
 
 const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 
 const trackSelect = "SELECT * from tracks_vw";
 
-export function saveTracks(tracks: Track[]): Promise<boolean> {
+export function saveTracks(tracks: TrackResponse[]): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         try {
             const insert = "INSERT OR REPLACE INTO tracks (key, name, country, title, latitude, longitude, trivia, tracklength, description) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)";
@@ -46,8 +46,8 @@ export function saveTracks(tracks: Track[]): Promise<boolean> {
     });
 }
 
-export function getTracks(key?: string): Promise<Track[]> {
-    return new Promise<Track[]>((resolve, reject) => {
+export function getTracks(key?: string): Promise<TrackResponse[]> {
+    return new Promise<TrackResponse[]>((resolve, reject) => {
         let statement = trackSelect;
         if (key) {
             statement = statement + ` where key = '${key}'`

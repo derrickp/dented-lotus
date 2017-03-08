@@ -1,17 +1,14 @@
 
-import { Blog } from "../common/models/Blog";
-
-import { Promise } from "bluebird";
+import { BlogResponse } from "../common/models/Blog";
 import { User, GoogleUser, FacebookUser } from "../common/models/User";
-import { Race, races } from "../common/models/Race";
-import { Track } from "../common/models/Track";
-import { DriverModel } from "../common/models/DriverModel";
+import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
+import { TrackResponse, TrackModel } from "../common/models/Track";
+import { DriverModel } from "../common/models/Driver";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
-import { getAllTracks, getAllDrivers, authenticate, saveDrivers } from "./Utilities/ServerUtils"
+import { getAllTracks, getAllDrivers, authenticate, saveDrivers, getAllRaces, saveRaces, getTrack, getDriver } from "./Utilities/ServerUtils"
 
-declare var FB: FBSDK;
 export class StateManager {
-    blogs: Blog[] = [
+    blogs: BlogResponse[] = [
         {
             author: "Craig",
             date: "Sept. 33rd",
@@ -26,16 +23,11 @@ export class StateManager {
         }
     ];
 
-    nextRace = {
-        displayName: "Australian GP",
-        date: "March 26, 2017"
-    };
-
     private _watches: Map<string, Function[]> = new Map<string, Function[]>();
 
-    private _tracks: Promise<Track[]>;
+    private _tracks: Promise<TrackResponse[]>;
     private _drivers: Promise<DriverModel[]>;
-
+    private _races: Promise<RaceModel[]>;
     private _user: User;
 
     get user(): User {
@@ -47,11 +39,38 @@ export class StateManager {
         this._publishWatches("user");
     }
 
-    get races(): Race[] {
-        return races;
+    get races(): Promise<RaceModel[]> {
+        this._races = this._races ? this._races : this._getRaces();
+        return this._races;
     }
 
-    get tracks(): Promise<Track[]> {
+    private _getRaces(): Promise<RaceModel[]> {
+        return new Promise<RaceModel[]>((resolve, reject) => {
+            return getAllRaces(2017).then((raceResponses: RaceResponse[]) => {
+                const raceModels: RaceModel[] = raceResponses.map(rr => {
+                    const context: RaceModelContext = {
+                        saveRace: (raceModel: RaceModel) => {
+                            return this.saveRace(raceModel);
+                        },
+                        getTrack: (key: string): Promise<TrackModel> => {
+                            return getTrack(key).then(trackResponse => {
+                                return Promise.resolve(new TrackModel(trackResponse));
+                            });
+                        },
+                        getDriver: (key: string): Promise<DriverModel> => {
+                            return getDriver(key).then(driverResponse => {
+                                return Promise.resolve(new DriverModel(driverResponse));
+                            });
+                        }
+                    };
+                    return new RaceModel(rr, context);
+                });
+                resolve(raceModels);
+            });
+        });
+    }
+
+    get tracks(): Promise<TrackResponse[]> {
         this._tracks = this._tracks ? this._tracks : getAllTracks();
         return this._tracks;
     }
@@ -117,12 +136,24 @@ export class StateManager {
      *  Query for blog posts.
      *  returns Blog[]
      */
-    getBlogs(whereClause?: string): Promise<Blog[]> {
-        return Promise.resolve(this.blogs.sort((a: Blog, b: Blog) => { return b.date.localeCompare(a.date) }));
+    getBlogs(whereClause?: string): Promise<BlogResponse[]> {
+        return Promise.resolve(this.blogs.sort((a: BlogResponse, b: BlogResponse) => { return b.date.localeCompare(a.date) }));
     }
 
-    getNextRace(): Promise<Race> {
-        return Promise.resolve(this.nextRace);
+    get nextRace(): Promise<RaceModel> {
+        return new Promise<RaceModel>((resolve, reject) => {
+            return this.races.then((races: RaceModel[]) => {
+                let nextRace: RaceModel;
+                races.some(r => {
+                    if (r.complete) {
+                        nextRace = r;
+                        return true;
+                    }
+                    return false;
+                });
+                resolve(nextRace);
+            });
+        });
     }
 
     signOut(): void {
@@ -141,6 +172,14 @@ export class StateManager {
                     resolve(newModels[0]);
                 }
             });
+        });
+    }
+
+    saveRace(model: RaceModel): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            return saveRaces(2017, [model.json], this.user.id_token).then(() => {
+                resolve(true);
+            })
         });
     }
 

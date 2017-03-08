@@ -1,12 +1,12 @@
 import * as sqlite3 from "sqlite3";
 
-import { Driver } from "../../../common/models/DriverModel";
+import { DriverResponse } from "../../../common/models/Driver";
 
 const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 
 const driverSelect = "SELECT * from drivers_vw";
 
-export function saveDrivers(drivers: Driver[]): Promise<boolean> {
+export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         try {
             const insert = `INSERT OR REPLACE INTO drivers 
@@ -43,7 +43,7 @@ export function saveDrivers(drivers: Driver[]): Promise<boolean> {
     });
 }
 
-export function getDrivers(active, key?: string): Promise<any[]> {
+export function getDrivers(active, key?: string): Promise<DriverResponse[]> {
     return new Promise((resolve, reject) => {
         let whereStatement: string;
         if (active) {

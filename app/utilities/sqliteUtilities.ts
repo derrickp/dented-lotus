@@ -1,15 +1,11 @@
 'use strict';
 
 import * as sqlite3 from "sqlite3";
-import { Track } from "../models/Track";
 import { getDrivers } from "./data/drivers";
 
 const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 
 const allChallengesSelect = "SELECT * from challenges";
-
-const raceSelect = "select r.*, s.cutoff, s.racedate as raceDate, s.scored from races as r inner join seasons as s on r.key == s.racekey";
-const trackSelect = "select * from tracks_vw";
 const challengeSelect = "select c.*, ac.racekey as raceKey from challenges as c inner join activechallenges as ac on c.key == ac.challengekey";
 const basicUserSelect = "select users.displayname as displayName, users.firstname as firstName, users.key, users.points from users";
 const userSelectNoPass = "select users.displayname as displayName, users.email, users.firstname as firstName, users.key, users.lastname as lastName, users.role, users.points from users";
@@ -73,25 +69,6 @@ export function getBlogs(): Promise<any[]> {
         });     
     });
 }
-
-export function getRaces(season, key): Promise<any[]> {
-    return new Promise((resolve, reject) => {
-        let whereStatement = "";
-        if (key) {
-            whereStatement = "where key = '" + key + "'";
-        }
-        db.all(raceSelect + " " + whereStatement, (err, rows) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            rows.forEach(row => {
-                row.scored = !!row.scored;
-            });
-            resolve(rows);
-        });
-    });
-};
 
 export function getUsers(email): Promise<any[]> {
 	return new Promise((resolve, reject) => {

@@ -1,5 +1,5 @@
 
-export interface DentedLotusUser {
+export interface UserResponse {
     key?: string;
     displayName?: string;
     firstName?: string;
@@ -24,7 +24,7 @@ export class User {
     imageUrl: string;
     isAdmin: boolean;
 
-    constructor(dentedLotusUser: DentedLotusUser, id_token: string) {
+    constructor(dentedLotusUser: UserResponse, id_token: string) {
         if (dentedLotusUser) {
             this.displayName = dentedLotusUser.displayName;
             if (dentedLotusUser.role === UserRoles.ADMIN) {
@@ -50,7 +50,7 @@ export class User {
 }
 
 export class GoogleUser extends User {
-    constructor(googleUser: gapi.auth2.GoogleUser, dentedLotusUser: DentedLotusUser, id_token: string) {
+    constructor(googleUser: gapi.auth2.GoogleUser, dentedLotusUser: UserResponse, id_token: string) {
         super(dentedLotusUser, id_token);
         const profile = googleUser.getBasicProfile();
         this.email = profile.getEmail();

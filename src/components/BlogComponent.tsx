@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Blog } from "../../common/models/Blog";
+import { BlogResponse } from "../../common/models/Blog";
 import { StateManager } from "StateManager";
 import { Promise } from "bluebird";
 import { PropsBase } from "../utilities/ComponentUtilities";

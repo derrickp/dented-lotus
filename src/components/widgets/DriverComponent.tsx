@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { PropsBase } from "../../utilities/ComponentUtilities";
-import { DriverModel } from "../../../common/models/DriverModel";
+import { DriverModel } from "../../../common/models/Driver";
 import { Form, Input } from "formsy-react-components";
 
 export interface DriverProps {

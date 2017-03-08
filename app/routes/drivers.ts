@@ -4,7 +4,7 @@ import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 
 import { saveDrivers, getDrivers } from "../utilities/data/drivers";
-import { Driver } from "../../common/models/DriverModel";
+import { DriverResponse } from "../../common/models/Driver";
 
 export const driverRoutes: IRouteConfiguration[] = [
     {
@@ -37,7 +37,7 @@ export const driverRoutes: IRouteConfiguration[] = [
         config: {
             cors: true,
             handler: (request, reply) => {
-                const driver: Driver = request.payload;
+                const driver: DriverResponse = request.payload;
                 saveDrivers([driver]).then(success => {
                     return getDrivers(false, driver.key);
                 }).then(driver => {
@@ -58,7 +58,7 @@ export const driverRoutes: IRouteConfiguration[] = [
         config: {
             cors: true,
             handler: function (request, reply) {
-                const drivers: Driver[] = request.payload;
+                const drivers: DriverResponse[] = request.payload;
                 drivers.forEach(driver => {
                     if (!driver.lastName) {
                         reply(Boom.badRequest("need a driver last name"));

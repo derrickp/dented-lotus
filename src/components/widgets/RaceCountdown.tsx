@@ -1,15 +1,17 @@
 import * as React from "react";
+import { RaceModel } from "../../../common/models/Race";
+import { DATE_FORMAT } from "../../../common/utils/date";
 import { PropsBase } from "../../utilities/ComponentUtilities";
 import * as moment from "moment";
+
 export interface RaceCountdownProps extends PropsBase {
-    displayName: string;
-    cutoffDate: string;
+    race: Promise<RaceModel>;
     onclick: () => void;
 }
 
 export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
     interval;
-    nextRace;
+    nextRace: RaceModel;
     onclick: () => void;
     /**
      *
@@ -18,7 +20,7 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
         super(props);
         this.state = { timeRemaining: 0 };
         this.tick = this.tick.bind(this);
-        this.props.stateManager.getNextRace().then((race) => {
+        props.race.then(race => {
             this.nextRace = race;
         });
         this.onclick = props.onclick;
@@ -31,12 +33,13 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
     componentWillUnmount() {
         clearInterval(this.interval);
     }
+
     tick() {
 
         if (!this.nextRace) {
             return;
         }
-        let cutoffTime = moment(this.nextRace.date);
+        let cutoffTime = moment(this.nextRace.raceResponse.raceDate, DATE_FORMAT);
         let now = moment();
         let timeRemaining = cutoffTime.diff(now);
         let duration = moment.duration(timeRemaining, "milliseconds");
@@ -60,7 +63,7 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
         if (!this.nextRace) {
             return <span className="race-countdown">Loading race countdown...</span>;
         }
-        return <div className="race-countdown"><span>{this.nextRace.displayName}</span>:&nbsp;<span className="timer">{this.state.timeRemaining}</span><span onClick={this.onclick} className="button">Make Your Picks</span></div>
+        return <div className="race-countdown"><span>{this.nextRace.raceResponse.displayName}</span>:&nbsp;<span className="timer">{this.state.timeRemaining}</span><span onClick={this.onclick} className="button">Make Your Picks</span></div>
     }
 
 

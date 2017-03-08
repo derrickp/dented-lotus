@@ -18,7 +18,7 @@ export class DriverModel {
     /**
      *
      */
-    constructor(driverResponse: Driver) {
+    constructor(driverResponse: DriverResponse) {
         this.key = driverResponse.key;
         this.firstName = driverResponse.firstName;
         this.lastName = driverResponse.lastName;
@@ -51,8 +51,8 @@ export class DriverModel {
         this.points += inPoints;
     }
 
-    get json(): Driver {
-        const driver: Driver = {
+    get json(): DriverResponse {
+        const driver: DriverResponse = {
             key: this.key ? this.key : "",
             lastName: this.lastName,
             firstName: this.firstName,
@@ -69,7 +69,7 @@ export class DriverModel {
     }
 }
 
-export interface Driver {
+export interface DriverResponse {
     key: string;
     trivia: string[];
     firstName: string;

@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { PropsBase } from "../../utilities/ComponentUtilities";
-import { Race as RaceModel } from "../../../common/models/Race";
+import { RaceModel as RaceModel } from "../../../common/models/Race";
 
 export interface RaceProps {
     race: Promise<RaceModel>;
@@ -13,7 +13,7 @@ export interface RaceState {
     small: boolean;
 }
 
-export class RacePage extends React.Component<RaceProps, any> {
+export class RacePage extends React.Component<RaceProps, RaceState> {
     race: RaceModel;
 
     constructor(props: RaceProps) {
@@ -23,7 +23,9 @@ export class RacePage extends React.Component<RaceProps, any> {
             small: this.props.small
         };
         props.race.then(race => {
-            this.setState({ race: race });
+            return race.initialize().then(() => {
+                this.setState({ race: race });
+            });
         });
     }
 
@@ -34,17 +36,17 @@ export class RacePage extends React.Component<RaceProps, any> {
 
     getSmall() {
         return <div onClick={this.toggleSize.bind(this)} className="panel">
-            <div>{this.state.race.displayName} - SMALL</div>
-            <div>{this.state.race.date.toDateString()}</div>
-            <div>{this.state.race.country}</div>
+            <div>{this.state.race.raceResponse.displayName} - SMALL</div>
+            <div>{this.state.race.raceDate.toDateString()}</div>
+            <div>{this.state.race.track.trackResponse.country}</div>
         </div>;
     }
 
     getFull() {
         return <div onClick={this.toggleSize.bind(this)} className="panel">
-            <div>{this.state.race.displayName}</div>
-            <div>{this.state.race.date.toDateString()}</div>
-            <div>{this.state.race.country}</div>
+            <div>{this.state.race.raceResponse.displayName}</div>
+            <div>{this.state.race.raceDate.toDateString()}</div>
+            <div>{this.state.race.track.trackResponse.country}</div>
         </div>;
     }
 

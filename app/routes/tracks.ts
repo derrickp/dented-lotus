@@ -3,7 +3,7 @@
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 import { getTracks, saveTracks } from "../utilities/data/tracks";
-import { Track } from "../../common/models/Track";
+import { TrackResponse } from "../../common/models/Track";
 
 export const trackRoutes: IRouteConfiguration[] = [
     {
@@ -24,7 +24,7 @@ export const trackRoutes: IRouteConfiguration[] = [
         config: {
             cors: true,
             handler: (request, reply) => {
-                const tracks: Track[] = request.payload;
+                const tracks: TrackResponse[] = request.payload;
                 tracks.forEach(track => {
                     if (!track.name) {
                         reply(Boom.badRequest("need a track name"));

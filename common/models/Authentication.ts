@@ -1,4 +1,4 @@
-import { DentedLotusUser } from "./User";
+import { UserResponse } from "./User";
 
 export interface AuthenticationPayload {
     auth_token: string;
@@ -12,5 +12,5 @@ export namespace AuthenticationTypes {
 
 export interface AuthenticationResponse {
     id_token: string;
-    user: DentedLotusUser;
+    user: UserResponse;
 }

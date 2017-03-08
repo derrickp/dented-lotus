@@ -1,9 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { PropsBase } from "../../utilities/ComponentUtilities";
-import { Track as TrackModel } from "../../../common/models/Track";
+import { TrackResponse as TrackModel } from "../../../common/models/Track";
 import { TrackPage } from "./TrackPage";
-import {DriverModel} from "../../../common/models/DriverModel";
+import {DriverModel} from "../../../common/models/Driver";
 import {DriverComponent} from "../widgets/DriverComponent"
 
 export interface DriverProps {

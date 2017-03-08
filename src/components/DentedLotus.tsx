@@ -7,7 +7,7 @@ import { StateManager } from "../StateManager";
 import { BlogComponent } from "./BlogComponent";
 import { RaceCountdown } from "./widgets/RaceCountdown";
 import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages } from "./Pages";
-import { Race } from "../../common/models/Race";
+import { RaceModel } from "../../common/models/Race";
 import { PropsBase } from "../utilities/ComponentUtilities";
 import { getUrlParameters } from "../utilities/PageUtilities";
 import { User } from "../../common/models/User";
@@ -21,7 +21,7 @@ export interface DentedLotusProps extends PropsBase {
 export interface DentedLotusState {
     parameters: any;
     sidebarOpen: boolean;
-    race: Promise<Race>;
+    race: Promise<RaceModel>;
     loggedIn: boolean;
 }
 
@@ -106,7 +106,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     launchRacePicks() {
         let parameters = this.state.parameters;
         parameters.page = Pages.RACE;
-        this.setState({ parameters: parameters, race: this.stateManager.getNextRace() });
+        this.setState({ parameters: parameters, race: this.stateManager.nextRace });
     }
 
     onPageChange(page: string) {
@@ -134,7 +134,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     getHomePage() {
         return <div>
-            <RaceCountdown onclick={this.launchRacePicks.bind(this)} stateManager={this.stateManager} displayName={this.stateManager.nextRace.displayName} cutoffDate={this.stateManager.nextRace.date} />
+            <RaceCountdown onclick={this.launchRacePicks.bind(this)} stateManager={this.stateManager} race={this.stateManager.nextRace} />
             <BlogComponent stateManager={this.stateManager} />
         </div>;
     }

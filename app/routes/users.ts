@@ -2,7 +2,7 @@
 
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
-import { DentedLotusUser } from "../../common/models/User";
+import { UserResponse } from "../../common/models/User";
 import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";
@@ -27,7 +27,7 @@ export const userRoutes: IRouteConfiguration[] = [
                     return;
                 }
 
-                let newUser: DentedLotusUser = {
+                let newUser: UserResponse = {
                     displayName: req.payload.displayName,
                     firstName: req.payload.firstName,
                     lastName: req.payload.lastName,
@@ -73,7 +73,7 @@ export const userRoutes: IRouteConfiguration[] = [
             ],
             cors: true,
             handler: (req, res) => {
-                let user: DentedLotusUser = {};
+                let user: UserResponse = {};
                 user.email = req.payload.email;
                 user.displayName = req.payload.displayName;
                 user.role = "user";

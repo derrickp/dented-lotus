@@ -1,4 +1,4 @@
-export class Track {
+export interface TrackResponse {
     key: string;
     name: string;
     country: string;
@@ -8,4 +8,14 @@ export class Track {
     description?: string;
     latitude?: number;
     longitude?: number;
+}
+
+export class TrackModel {
+    key: string;
+    trackResponse: TrackResponse;
+
+    constructor(trackResponse: TrackResponse, context?: any) {
+        this.trackResponse = trackResponse;
+        this.key = trackResponse.key;
+    }
 }
