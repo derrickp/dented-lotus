@@ -1,1 +1,1 @@
-web: tsc && node app.js
+web: npm install && tsc && node app.js
