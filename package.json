@@ -4,11 +4,7 @@
   "version": "0.0.0",
   "description": "",
   "repository": "",
-  "license": "MIT",
-  "engines": {
-    "node": ">=0.4.7 <0.7.0",
-    "npm": ">=1.0.0"
-  },
+  "license": "MIT", 
   "dependencies": {
     "base64-url": "^1.2.2",
     "bluebird": "^3.4.0",
