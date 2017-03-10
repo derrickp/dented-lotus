@@ -5,7 +5,7 @@ import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race
 import { TrackResponse, TrackModel } from "../common/models/Track";
 import { DriverModel } from "../common/models/Driver";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
-import { getAllTracks, getAllDrivers, authenticate, saveDrivers, getAllRaces, saveRaces, getTrack, getDriver } from "./Utilities/ServerUtils"
+import { getAllTracks, getAllDrivers, authenticate, saveDrivers, getAllRaces, saveRaces, getTrack, getDriver } from "./utilities/ServerUtils"
 
 export class StateManager {
     blogs: BlogResponse[] = [

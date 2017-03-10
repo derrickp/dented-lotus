@@ -1,5 +1,5 @@
 import * as React from "react"; 
-import {PropsBase} from "../Utilities/ComponentUtilities"
+import {PropsBase} from "../utilities/ComponentUtilities"
 
 export interface UserProps extends PropsBase { 
     small?:boolean;

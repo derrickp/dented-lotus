@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PropsBase } from "../Utilities/ComponentUtilities"
+import { PropsBase } from "../utilities/ComponentUtilities"
 import {Pages} from "../components/Pages"
 import { UserComponent } from "./User";
 import * as burger from "react-burger-menu";
