@@ -14,3 +14,8 @@ export interface AuthenticationResponse {
     id_token: string;
     user: UserResponse;
 }
+
+export interface Credentials {
+    scope: string[];
+    key: string;
+}

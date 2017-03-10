@@ -12,7 +12,8 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false,
     "sourceMap": false, 
-    "jsx": "react"
+    "jsx": "react",
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "src",

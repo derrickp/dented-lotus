@@ -34,7 +34,7 @@ export const driverRoutes: IRouteConfiguration[] = [
     },
     {
         method: "PUT",
-        path: "/drivers/{key?}",
+        path: "/drivers/{key}",
         config: {
             cors: true,
             handler: (request, reply) => {
@@ -60,13 +60,18 @@ export const driverRoutes: IRouteConfiguration[] = [
             cors: true,
             handler: function (request, reply) {
                 const drivers: DriverResponse[] = request.payload;
-                drivers.forEach(driver => {
+                for (const driver of drivers) {
+                    if (driver.key) {
+                        reply(Boom.badRequest("cannot create a driver with a pre-defined key"));
+                        return;
+                    }
                     if (!driver.lastName) {
                         reply(Boom.badRequest("need a driver last name"));
                         return;
                     }
-                    if (!driver.key) driver.key = driver.lastName.toLowerCase();
-                });
+                    driver.key = driver.lastName.toLowerCase();
+                }
+
                 saveDrivers(drivers).then(success => {
                     return getDrivers(true);
                 }).then(drivers => {

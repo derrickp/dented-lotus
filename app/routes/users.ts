@@ -3,6 +3,7 @@
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 import { UserResponse } from "../../common/models/User";
+import { Credentials } from "../../common/models/Authentication";
 import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";
@@ -18,7 +19,7 @@ export const userRoutes: IRouteConfiguration[] = [
         config: {
             cors: true,
             handler: (req, res) => {
-                let credentials = req.auth.credentials;
+                let credentials: Credentials = req.auth.credentials;
                 let isAdmin = credentials.scope.indexOf('admin') >= 0;
                 const key = req.params["key"];
                 // If someone tries to save info for a different user, don't allow it, unless the person saving is an admin
@@ -46,6 +47,8 @@ export const userRoutes: IRouteConfiguration[] = [
                         res(Boom.badRequest("user key provided was not found"));
                         return;
                     }
+
+
 
                     updateUser(newUser).then(updatedUser => {
                         res(updatedUser);

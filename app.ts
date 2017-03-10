@@ -14,7 +14,7 @@ import * as hapiAuthJwt from "hapi-auth-jwt";
 
 // Routes import
 import { raceRoutes } from "./app/routes/races";
-import { challengesRoutes } from "./app/routes/challenges";
+import { predictionsRoutes } from "./app/routes/predictions";
 import { driverRoutes } from "./app/routes/drivers";
 import { userRoutes } from "./app/routes/users";
 import { blogRoutes } from "./app/routes/blogs";
@@ -45,7 +45,7 @@ server.register([{
 });
 
 server.route(raceRoutes);
-server.route(challengesRoutes);
+server.route(predictionsRoutes);
 server.route(driverRoutes);
 server.route(userRoutes);
 server.route(blogRoutes);

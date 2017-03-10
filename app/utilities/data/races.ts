@@ -17,11 +17,11 @@ export function getRaces(season: number, key?: string): Promise<RaceResponse[]> 
                 reject(err);
                 return;
             }
-            rows.forEach(row => {
+            for (const row of rows) {
                 if (row.trivia) {
                     row.trivia = JSON.parse(row.trivia);
                 }
-            });
+            }
             resolve(rows);
         });
     });

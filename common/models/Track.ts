@@ -18,4 +18,8 @@ export class TrackModel {
         this.trackResponse = trackResponse;
         this.key = trackResponse.key;
     }
+
+    get json(): TrackResponse {
+        return this.trackResponse;
+    }
 }
