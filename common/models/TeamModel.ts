@@ -1,5 +1,5 @@
 import { DriverModel } from "./Driver";
-import { getTeamByAbbreviation } from "../../src/Utilities/ServerUtils";
+import { getTeamByAbbreviation } from "../../src/utilities/ServerUtils";
 export class TeamModel {
     name: string;
     abbreviation: string;
