@@ -3,9 +3,10 @@ import { BlogResponse } from "../common/models/Blog";
 import { User, GoogleUser, FacebookUser } from "../common/models/User";
 import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
-import { DriverModel } from "../common/models/Driver";
+import { DriverModel, DriverResponse, DriverModelContext } from "../common/models/Driver";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
-import { getAllTracks, getAllDrivers, authenticate, saveDrivers, getAllRaces, saveRaces, getTrack, getDriver } from "./utilities/ServerUtils"
+import { getAllTracks, getAllDrivers, authenticate, saveDrivers, getAllRaces, saveRaces, getTrack, getDriver,  getRace} from "./utilities/ServerUtils"
+
 
 export class StateManager {
     blogs: BlogResponse[] = [
@@ -80,6 +81,29 @@ export class StateManager {
     }
 
     get drivers(): Promise<DriverModel[]> {
+        return new Promise<DriverModel[]>((resolve, reject) => {
+            return getAllDrivers().then((driverResponses: DriverResponse[]) => {
+                const driverModels: DriverModel[] = driverResponses.map(rr => {
+                    const context: DriverModelContext = {
+                        saveDriver: (driver: DriverModel) => {
+                            return this.saveDriver(driver);
+                        },
+                        getTrack: (key: string): Promise<TrackModel> => {
+                            return getTrack(key).then(trackResponse => {
+                                return Promise.resolve(new TrackModel(trackResponse));
+                            });
+                        },
+                        getRace: (key: string): Promise<RaceModel> => {
+                            return getAllRaces(key).then(driverResponse => {
+                                return Promise.resolve(new RaceModel(driverResponse));
+                            });
+                        }
+                    };
+                    return new RaceModel(rr, context);
+                });
+                resolve(driverModels);
+            });
+        });
         this._drivers = this._drivers ? this._drivers : getAllDrivers();
         return this._drivers;
     }

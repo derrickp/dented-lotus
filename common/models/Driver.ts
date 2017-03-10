@@ -1,4 +1,12 @@
 import { TeamModel, getTeamByAbbreviation } from "./TeamModel";
+import { TrackModel } from "./Track";
+import { RaceModel } from "./Race";
+export interface DriverModelContext {
+    getTrack?: (key: string) => Promise<TrackModel>;
+    getRace?: (key: string) => Promise<RaceModel>;
+    saveDriver?: (model:DriverModel) => Promise<boolean>;
+}
+
 
 export class DriverModel {
     key: string;
@@ -18,7 +26,7 @@ export class DriverModel {
     /**
      *
      */
-    constructor(driverResponse: DriverResponse) {
+    constructor(driverResponse: DriverResponse, context?:DriverModelContext) {
         this.key = driverResponse.key;
         this.firstName = driverResponse.firstName;
         this.lastName = driverResponse.lastName;

@@ -60,11 +60,26 @@ export function saveRaces(season: number, races: RaceResponse[], id_token: strin
     });
 }
 
-export function getAllDrivers(): Promise<DriverModel[]> {
-    return new Promise<DriverModel[]>((resolve, reject) => {
+export function getRace(key:string): Promise<RaceResponse> {
+    return new Promise<RaceResponse>((resolve, reject) => {
+        return fetch(`/races/${key}`).then(response => {
+            return response.json().then((race: RaceResponse) => {
+                resolve(race);
+            });
+        });
+    });
+}
+
+
+export function getAllDrivers(activeOnly:boolean = true): Promise<DriverResponse[]> {
+    return new Promise<DriverResponse[]>((resolve, reject) => {
+        let suffix = "/drivers";
+        if (activeOnly){
+            suffix += "/active";
+        }
         return fetch(baseUrl + "/drivers").then(response => {
             return response.json().then((drivers: DriverResponse[]) => {
-                resolve(drivers.map((d) => { return new DriverModel(d) }));
+                resolve(drivers);
             });
         });
     });
