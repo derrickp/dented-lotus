@@ -71,13 +71,13 @@
   },
   "scripts": {
     "start": "node app.js",
-    "start-dev": "concurrently --kill-others \"gulp\" \"tsc -w\" && node app.js",
+    "start-dev": "concurrently --kill-others \"gulp\" \"tsc -w\" && nodemon app.js",
     "deploy": "gulp deploy",
     "webpack": "webpack && echo Webpack complete",
     "copy-static-files": "cpy index.html dist && cpy src/images/*.* dist/images",
     "compile-less": "lessc style.less dist/style.css && echo less compile complete",
     "build": "npm run compile && npm run webpack && npm run copy-static-files && npm run compile-less",
     "compile": "tsc -v && tsc && echo Typescript compile complete",
-    "compile-watch": "tsc -v && tsc -w"
+    "compile-watch": "tsc -v && tsc -w" 
   }
 }

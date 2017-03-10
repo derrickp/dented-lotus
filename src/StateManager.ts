@@ -5,7 +5,7 @@ import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race
 import { TrackResponse, TrackModel } from "../common/models/Track";
 import { DriverModel, DriverResponse, DriverModelContext } from "../common/models/Driver";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
-import { getAllTracks, getAllDrivers, authenticate, saveDrivers, getAllRaces, saveRaces, getTrack, getDriver,  getRace} from "./utilities/ServerUtils"
+import { getAllTracks, getAllDrivers, authenticate, saveDrivers, getAllRaces, saveRaces, getTrack, getDriver, getRace } from "./utilities/ServerUtils"
 
 
 export class StateManager {
@@ -83,7 +83,7 @@ export class StateManager {
     get drivers(): Promise<DriverModel[]> {
         return new Promise<DriverModel[]>((resolve, reject) => {
             return getAllDrivers().then((driverResponses: DriverResponse[]) => {
-                const driverModels: DriverModel[] = driverResponses.map(rr => {
+                const driverModels: DriverModel[] = driverResponses.map(dr => {
                     const context: DriverModelContext = {
                         saveDriver: (driver: DriverModel) => {
                             return this.saveDriver(driver);
@@ -94,18 +94,16 @@ export class StateManager {
                             });
                         },
                         getRace: (key: string): Promise<RaceModel> => {
-                            return getAllRaces(key).then(driverResponse => {
-                                return Promise.resolve(new RaceModel(driverResponse));
+                            return getRace(key).then(RaceResponse => {
+                                return Promise.resolve(new RaceModel(RaceResponse));
                             });
                         }
                     };
-                    return new RaceModel(rr, context);
+                    return new DriverModel(dr, context);
                 });
                 resolve(driverModels);
             });
         });
-        this._drivers = this._drivers ? this._drivers : getAllDrivers();
-        return this._drivers;
     }
 
     constructor() {
@@ -206,6 +204,15 @@ export class StateManager {
             })
         });
     }
+
+    saveDriver(model: DriverModel): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            return saveDrivers([model], this.user.id_token).then(() => {
+                resolve(true);
+            })
+        });
+    }
+
 
     completeGoogleLogin(response: gapi.auth2.GoogleUser) {
         const authPayload: AuthenticationPayload = {

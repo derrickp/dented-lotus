@@ -221,29 +221,29 @@ export function updateUser(user): Promise<boolean> {
 
 export function getChallenges(raceKey, challengeKey): Promise<any[]> {
     return new Promise((resolve, reject) => {
-        let driverPromise = getDrivers(true);
-        let challengePromise = _getChallengesInternal(raceKey);
-        let challengeChoiceMapsPromise = _getChallengeChoicesInternal(raceKey);
-        Promise.all([driverPromise, challengePromise, challengeChoiceMapsPromise]).then((results) => {
-            let challenges = results[1];
-            let drivers = results[0];
-            let challengeChoiceMaps = results[2];
-            challenges.forEach(challenge => {
-                var challengeChoiceMap = challengeChoiceMaps.filter(map => { return map.challengeKey === challenge.key; })[0];
-                if (!challengeChoiceMap) {
-                    challenge.driverChoices = drivers.slice(0);
-                }
-                else {
-                    challenge.driverChoices = drivers.filter(driver => {
-                        return challengeChoiceMap.drivers.some(dk => { return dk === driver.key; })
-                    });
-                }
-            });
-            if (!challenges) {
-                reject(new Error("internal error while retrieving challenges"));
-            }
-            resolve(challenges);
-        });
+        // let driverPromise = getDrivers(true);
+        // let challengePromise = _getChallengesInternal(raceKey);
+        // let challengeChoiceMapsPromise = _getChallengeChoicesInternal(raceKey);
+        // Promise.all([driverPromise, challengePromise, challengeChoiceMapsPromise]).then((results) => {
+        //     let challenges = results[1];
+        //     let drivers = results[0];
+        //     let challengeChoiceMaps = results[2];
+        //     challenges.forEach(challenge => {
+        //         var challengeChoiceMap = challengeChoiceMaps.filter(map => { return map.challengeKey === challenge.key; })[0];
+        //         if (!challengeChoiceMap) {
+        //             challenge.driverChoices = drivers.slice(0);
+        //         }
+        //         else {
+        //             challenge.driverChoices = drivers.filter(driver => {
+        //                 return challengeChoiceMap.drivers.some(dk => { return dk === driver.key; })
+        //             });
+        //         }
+        //     });
+        //     if (!challenges) {
+        //         reject(new Error("internal error while retrieving challenges"));
+        //     }
+        //     resolve(challenges);
+        // });
     });
 };
 
