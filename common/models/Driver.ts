@@ -20,9 +20,10 @@ export class DriverModel {
     birthdate: string;
     number: number;
     abbreviation: string;
-    team: TeamModel;
+    team: string; //TeamModel;
     wins: number;
     trivia: string[];
+    private save: (model:DriverModel)=>Promise<boolean>;
     /**
      *
      */
@@ -38,14 +39,22 @@ export class DriverModel {
         this.active = driverResponse.active;
         this.trivia = driverResponse.trivia;
         this.wins = driverResponse.wins;
+        this.team = driverResponse.team;
+
+        if (context){
+            this.save = context.saveDriver;
+        }
+
         // TeamModel.getTeamByAbbreviation(driverResponse.team).then((team)=>{
         //     this.team = team;
         // });
 
 
-    }
+    } 
 
-    public update(data) { }
+    public update(){
+        this.save(this);
+    }
 
 
     public getName(): string {
@@ -69,7 +78,7 @@ export class DriverModel {
             active: this.active,
             birthdate: this.birthdate,
             nationality: this.nationality,
-            team: this.team.abbreviation,
+            team: this.team,
             trivia: this.trivia,
             wins: this.wins
         };

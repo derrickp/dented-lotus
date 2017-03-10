@@ -31,6 +31,7 @@ export class StateManager {
     private _races: Promise<RaceModel[]>;
     private _user: User;
 
+    private _dummyTeams = ["fer","mer","fin"]; 
     get user(): User {
         return this._user;
     }
@@ -87,16 +88,6 @@ export class StateManager {
                     const context: DriverModelContext = {
                         saveDriver: (driver: DriverModel) => {
                             return this.saveDriver(driver);
-                        },
-                        getTrack: (key: string): Promise<TrackModel> => {
-                            return getTrack(key).then(trackResponse => {
-                                return Promise.resolve(new TrackModel(trackResponse));
-                            });
-                        },
-                        getRace: (key: string): Promise<RaceModel> => {
-                            return getRace(key).then(RaceResponse => {
-                                return Promise.resolve(new RaceModel(RaceResponse));
-                            });
                         }
                     };
                     return new DriverModel(dr, context);
@@ -106,9 +97,15 @@ export class StateManager {
         });
     }
 
+    get teams():Promise<string[]>{
+
+        return Promise.resolve(this._dummyTeams);
+    }
+
     constructor() {
         // this._initFacebook();
     }
+
 
     private _initFacebook() {
         (<any>window).fbAsyncInit = function () {

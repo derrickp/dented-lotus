@@ -126,7 +126,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             case Pages.TRACKS:
                 return <Tracks tracks={this.stateManager.tracks} />;
             case Pages.DRIVERS:
-                return <Drivers drivers={this.stateManager.drivers} updateDriver={this.stateManager.updateDriver.bind(this.stateManager)} userIsAdmin={true} />
+                return <Drivers drivers={this.stateManager.drivers} allTeams={this.stateManager.teams} userIsAdmin={true} />
             default:
                 return this.getHomePage();
         }

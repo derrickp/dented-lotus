@@ -13,6 +13,7 @@ export const driverRoutes: IRouteConfiguration[] = [
         config: {
             cors: true,
             handler: function (request, reply) {
+                console.log("In Handler");
                 getDrivers(false, request.params["key"]).then(drivers => {
                     reply(drivers);
                 });

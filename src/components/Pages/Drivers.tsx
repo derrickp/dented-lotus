@@ -9,7 +9,7 @@ import {DriverComponent} from "../widgets/DriverComponent"
 export interface DriverProps {
     drivers: Promise<DriverModel[]>;
     userIsAdmin:boolean;
-    updateDriver: (driverModel: DriverModel) => Promise<DriverModel>;
+    allTeams:Promise<string[]>; 
 } 
 
 export interface DriverState{
@@ -43,7 +43,9 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
             return <div>Loading...</div>;
         }
         const entries = this.state.drivers.map(driver => {
-            return <li key={driver.key} className="panel"><DriverComponent updateDriver={this.props.updateDriver} userIsAdmin={this.state.userIsAdmin} key={driver.abbreviation} driver={driver} small={true}/></li>
+            return  <li key={driver.key} className="panel">
+                        <DriverComponent userIsAdmin={this.state.userIsAdmin} allTeams={this.props.allTeams} key={driver.abbreviation} driver={driver} small={true}/>
+                    </li>
         });
         return <ul>{entries}</ul>
     }

@@ -44,6 +44,7 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
 }
 
 export function getDrivers(active, key?: string): Promise<DriverResponse[]> {
+    console.log("IN DRIVERS")
     return new Promise((resolve, reject) => {
         let whereStatement: string;
         if (active) {
