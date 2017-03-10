@@ -142,8 +142,9 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     render() {
         return <div>
             <Banner logout={this.stateManager.signOut.bind(this.stateManager)} loggedIn={this.state.loggedIn} completeGoogleLogin={this.stateManager.completeGoogleLogin.bind(this.stateManager)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
-            <div className="wrapper">
+            
                 <div className="header-section"></div>
+                <div className="wrapper"> 
                 {this.getCurrentView()}
             </div>
         </div>
