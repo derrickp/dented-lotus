@@ -1,5 +1,5 @@
-<<<<<<< HEAD
-import { TeamModel, getTeamByAbbreviation } from "./TeamModel";
+
+import { TeamModel, getTeamByAbbreviation, TeamResponse } from "./Team";
 import { TrackModel } from "./Track";
 import { RaceModel } from "./Race";
 export interface DriverModelContext {
@@ -7,10 +7,6 @@ export interface DriverModelContext {
     getRace?: (key: string) => Promise<RaceModel>;
     saveDriver?: (model:DriverModel) => Promise<boolean>;
 }
-
-=======
-import { TeamModel, getTeamByAbbreviation, TeamResponse } from "./Team";
->>>>>>> Server code
 
 export class DriverModel {
     key: string;
@@ -24,7 +20,7 @@ export class DriverModel {
     birthdate: string;
     number: number;
     abbreviation: string;
-    team: string; //TeamModel;
+    team: TeamModel; //TeamModel;
     wins: number;
     trivia: string[];
     private save: (model:DriverModel)=>Promise<boolean>;
@@ -43,7 +39,6 @@ export class DriverModel {
         this.active = driverResponse.active;
         this.trivia = driverResponse.trivia;
         this.wins = driverResponse.wins;
-        this.team = driverResponse.team;
 
         if (context){
             this.save = context.saveDriver;
@@ -82,11 +77,7 @@ export class DriverModel {
             active: this.active,
             birthdate: this.birthdate,
             nationality: this.nationality,
-<<<<<<< HEAD
-            team: this.team,
-=======
             team: this.team.json,
->>>>>>> Server code
             trivia: this.trivia,
             wins: this.wins
         };

@@ -6,7 +6,13 @@ import { Credentials } from "../../common/models/Authentication";
 import { getRaces, saveRaces, DbRace } from "../utilities/data/races";
 import { getDriverResponses } from "../utilities/data/drivers";
 import { getTrackResponses } from "../utilities/data/tracks";
-import { getPredictionResponses, saveRacePredictions, DbRacePrediction } from "../utilities/data/predictions";
+import {
+    getPredictionResponses,
+    updateRacePredictions,
+    DbRacePrediction,
+    deleteRacePredictions,
+    savePredictionChoices
+} from "../utilities/data/predictions";
 import { RaceResponse } from "../../common/models/Race";
 import { TrackResponse } from "../../common/models/Track";
 import { DriverResponse } from "../../common/models/Driver";
@@ -60,7 +66,7 @@ export const raceRoutes: IRouteConfiguration[] = [
     },
     {
         method: "POST",
-        path: "/races/{season}",
+        path: "/admin/races/{season}",
         config: {
             cors: true,
             handler: async (request, reply) => {
@@ -82,6 +88,84 @@ export const raceRoutes: IRouteConfiguration[] = [
                 try {
                     const success = await saveRaces(season, races);
                     reply("done").code(201);
+                } catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
+            },
+            auth: {
+                strategies: ['jwt'],
+                scope: ['admin']
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "/admin/races/{raceKey}/predictions",
+        config: {
+            cors: true,
+            handler: async (request, reply) => {
+                const adds: PredictionResponse[] = [];
+                const raceKey = request.params["raceKey"];
+                console.log(request.payload);
+                try {
+                    const dbAdds: DbRacePrediction[] = [];
+                    for (const add of adds) {
+                        const dbAdd: DbRacePrediction = {
+                            race: raceKey,
+                            prediction: add.key,
+                            value: add.value,
+                            modifier: add.modifier
+                        };
+                        dbAdds.push(dbAdd);
+                    }
+                    await updateRacePredictions(raceKey, dbAdds);
+                    reply("done").code(201);
+                } catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
+            },
+            auth: {
+                strategies: ['jwt'],
+                scope: ['admin']
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "/admin/races/{raceKey}/predictions/{predictionKey}/choices",
+        config: {
+            cors: true,
+            handler: async (request, reply) => {
+                const raceKey = request.params["raceKey"];
+                const predictionKey = request.params["predictionKey"];
+                const choices: string[] = request.payload;
+                try {
+                    await savePredictionChoices(predictionKey, raceKey, choices);
+                    reply("done");
+                } catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
+            },
+            auth: {
+                strategies: ['jwt'],
+                scope: ['admin']
+            }
+        }
+    },
+    {
+        method: "DELETE",
+        path: "/admin/races/predictions/{raceKey}",
+        config: {
+            cors: true,
+            handler: async (request, reply) => {
+                const raceKey = request.params["raceKey"];
+                const predictionKeys: string[] = request.payload;
+                if (!predictionKeys || !predictionKeys.length) {
+                    reply("done");
+                }
+                try {
+                    await deleteRacePredictions(raceKey, predictionKeys);
+                    reply("done");
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
                 }

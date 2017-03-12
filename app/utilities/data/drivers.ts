@@ -44,10 +44,6 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
     });
 }
 
-<<<<<<< HEAD
-export function getDrivers(active, key?: string): Promise<DriverResponse[]> {
-    console.log("IN DRIVERS")
-=======
 export async function getDriverResponses(active?: boolean, keys?: string[]): Promise<DriverResponse[]> {
     console.log(keys);
     const driverRows = await getDrivers(false, keys);
@@ -75,7 +71,6 @@ export async function getDriverResponses(active?: boolean, keys?: string[]): Pro
 }
 
 export function getDrivers(active, keys?: string[]): Promise<DbDriver[]> {
->>>>>>> Server code
     return new Promise((resolve, reject) => {
         let whereStatement: string;
         if (active) {
