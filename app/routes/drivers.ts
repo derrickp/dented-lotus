@@ -13,17 +13,11 @@ export const driverRoutes: IRouteConfiguration[] = [
         path: '/drivers/{key?}',
         config: {
             cors: true,
-<<<<<<< HEAD
-            handler: function (request, reply) {
-                console.log("In Handler");
-                getDrivers(false, request.params["key"]).then(drivers => {
-=======
             handler: async (request, reply: (drivers: DriverResponse[] | Boom.BoomError) => void) => {
                 try {
                     const keys = request.params["key"] ? [request.params["key"]] : [];
                     const drivers = await getDriverResponses(false, keys);
                     console.log(drivers);
->>>>>>> Server code
                     reply(drivers);
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
@@ -48,7 +42,7 @@ export const driverRoutes: IRouteConfiguration[] = [
     },
     {
         method: "PUT",
-        path: "/drivers/{key}",
+        path: "/admin/drivers/{key}",
         config: {
             cors: true,
             handler: (request, reply) => {
@@ -69,7 +63,7 @@ export const driverRoutes: IRouteConfiguration[] = [
     },
     {
         method: "POST",
-        path: "/drivers",
+        path: "/admin/drivers",
         config: {
             cors: true,
             handler: function (request, reply) {

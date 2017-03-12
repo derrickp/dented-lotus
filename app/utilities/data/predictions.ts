@@ -16,19 +16,28 @@ export const racePredictionsChoicesSelect = "select choice from racepredictionch
 export async function getPredictionResponses(raceKeys: string[], credentials: Credentials): Promise<PredictionResponse[]> {
     const predictionResponses: PredictionResponse[] = [];
     const racePredictionRows = await getRacePredictions(raceKeys);
+    const predictionKeys = racePredictionRows.filter(rp => rp.prediction).map(rp => rp.prediction);
+    const predictions = await getPredictions(predictionKeys);
     const drivers = await getDriverResponses(true, []);
     const teams = await getTeamResponses([]);
     const userPicks = await getUserPicks(credentials.key, raceKeys);
     for (const racePredictionRow of racePredictionRows) {
+        const thisPrediction = predictions.filter(p => {
+            return p.key === racePredictionRow.prediction;
+        })[0];
+        // If we don't have a base prediction, then we won't add this.
+        if (!thisPrediction) {
+            continue;
+        }
         const prediction: PredictionResponse = {
-            allSeason: racePredictionRow.allSeason ? true : false,
-            key: racePredictionRow.key,
+            allSeason: thisPrediction.allSeason ? true : false,
+            key: thisPrediction.key,
             value: racePredictionRow.value,
             modifier: racePredictionRow.modifier,
-            description: racePredictionRow.description,
-            title: racePredictionRow.type,
-            numChoices: racePredictionRow.numChoices,
-            type: racePredictionRow.type,
+            description: thisPrediction.description,
+            title: thisPrediction.type,
+            numChoices: thisPrediction.numChoices,
+            type: thisPrediction.type,
             outcome: [],
             userPicks: [],
             choices: [],
@@ -101,6 +110,58 @@ export function getPredictionChoices(prediction: string, race: string): Promise<
     });
 }
 
+export function savePredictionChoices(prediction: string, race: string, choices: string[]): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+        if (!prediction || !race) {
+            reject(new Error("need race key and prediction key"));
+            return;
+        }
+        const deleteStatement = `DELETE FROM racepredictionchoices where race == '${race}' AND prediction == '${prediction}'`
+        db.run(deleteStatement, (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            try {
+                const insert = `INSERT OR REPLACE INTO racepredictionchoices
+            (race, prediction, choice)
+            VALUES (?1, ?2, ?3)`;
+                db.serialize(() => {
+                    db.exec("BEGIN;", (beginError) => {
+                        if (beginError) {
+                            reject(beginError);
+                            return;
+                        }
+
+                        for (const choice of choices) {
+                            if (!choice) {
+                                continue;
+                            }
+                            const valuesObject = {
+                                1: race,
+                                2: prediction,
+                                3: choice,
+                            };
+                            db.run(insert, valuesObject);
+                        }
+                        db.exec("COMMIT;", (commitError) => {
+                            if (commitError) {
+                                reject(commitError);
+                                return;
+                            }
+                            resolve(true);
+                        });
+                    });
+                });
+            } catch (exception) {
+                console.log(exception);
+                db.exec("ROLLBACK;");
+                reject(exception);
+            }
+        });
+    });
+}
+
 export function getUserPicks(userKey: string, raceKeys?: string[]): Promise<DbUserPick[]> {
     return new Promise<DbUserPick[]>((resolve, reject) => {
         let statement = userPicksSelect + " where user = '" + userKey + "'";
@@ -118,11 +179,12 @@ export function getUserPicks(userKey: string, raceKeys?: string[]): Promise<DbUs
     });
 }
 
-export function getPredictions(key?: string): Promise<PredictionResponse[]> {
+export function getPredictions(keys?: string[]): Promise<PredictionResponse[]> {
     return new Promise((resolve, reject) => {
         let whereStatement: string;
-        if (key) {
-            whereStatement = `key = '${key}'`;
+        if (keys && keys.length) {
+            const innerKeys = keys.join("','");
+            whereStatement = `key IN ('${innerKeys}')`;
         }
 
         db.all(predictionsSelect + " " + whereStatement, (err, rows) => {
@@ -199,7 +261,24 @@ export function saveUserPicks(userPicks: DbUserPick[]): Promise<boolean> {
     });
 }
 
-export function saveRacePredictions(race: string, racePredictions: DbRacePrediction[]): Promise<boolean> {
+export function deleteRacePredictions(race: string, keys: string[]): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+        const joinedKeys = keys.join("','");
+        const deleteStatement = `DELETE FROM racepredictions WHERE 
+        race == '${race}' && prediction in ('${joinedKeys}')`;
+
+        db.run(deleteStatement, (err) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(true);
+            }
+        });
+    });
+}
+
+export function updateRacePredictions(race: string, updates: DbRacePrediction[]): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         try {
             const insert = `INSERT OR REPLACE INTO racepredictions
@@ -212,9 +291,9 @@ export function saveRacePredictions(race: string, racePredictions: DbRacePredict
                         return;
                     }
 
-                    for (const racePrediction of racePredictions) {
+                    for (const racePrediction of updates) {
                         const valuesObject = {
-                            1: racePrediction.key,
+                            1: racePrediction.prediction,
                             2: race,
                             3: racePrediction.value,
                             4: racePrediction.modifier
@@ -239,7 +318,7 @@ export function saveRacePredictions(race: string, racePredictions: DbRacePredict
     });
 }
 
-export function savePredictions(predictions: PredictionResponse[]): Promise<boolean> {
+export function updatePredictions(predictions: PredictionResponse[]): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         try {
             const insert = `INSERT OR REPLACE INTO predictions
@@ -283,15 +362,10 @@ export function savePredictions(predictions: PredictionResponse[]): Promise<bool
 }
 
 export interface DbRacePrediction {
-    key: string;
-    description?: string;
-    title: string;
-    type: string;
-    allSeason: number;
-    numChoices: number;
-    value: number;
-    modifier: number;
     race: string;
+    prediction: string;
+    modifier: number;
+    value: number;
 }
 
 export interface DbUserPick {
