@@ -3,8 +3,9 @@
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 
-import { saveDrivers, getDrivers } from "../utilities/data/drivers";
+import { saveDrivers, getDrivers, getDriverResponses } from "../utilities/data/drivers";
 import { DriverResponse } from "../../common/models/Driver";
+import { TeamResponse } from "../../common/models/Team";
 
 export const driverRoutes: IRouteConfiguration[] = [
     {
@@ -12,11 +13,21 @@ export const driverRoutes: IRouteConfiguration[] = [
         path: '/drivers/{key?}',
         config: {
             cors: true,
+<<<<<<< HEAD
             handler: function (request, reply) {
                 console.log("In Handler");
                 getDrivers(false, request.params["key"]).then(drivers => {
+=======
+            handler: async (request, reply: (drivers: DriverResponse[] | Boom.BoomError) => void) => {
+                try {
+                    const keys = request.params["key"] ? [request.params["key"]] : [];
+                    const drivers = await getDriverResponses(false, keys);
+                    console.log(drivers);
+>>>>>>> Server code
                     reply(drivers);
-                });
+                } catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
             }
         }
     },
@@ -25,10 +36,13 @@ export const driverRoutes: IRouteConfiguration[] = [
         path: '/drivers/active/{key?}',
         config: {
             cors: true,
-            handler: function (request, reply) {
-                getDrivers(true, request.params["key"]).then(drivers => {
+            handler: async (request, reply) => {
+                try {
+                    const drivers = getDriverResponses(true, [request.params["key"]]);
                     reply(drivers);
-                });
+                } catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
             }
         }
     },
@@ -40,7 +54,7 @@ export const driverRoutes: IRouteConfiguration[] = [
             handler: (request, reply) => {
                 const driver: DriverResponse = request.payload;
                 saveDrivers([driver]).then(success => {
-                    return getDrivers(false, driver.key);
+                    return getDrivers(false, [driver.key]);
                 }).then(driver => {
                     reply(driver);
                 }).catch((error: Error) => {

@@ -5,29 +5,39 @@ const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 
 const raceSelect = "select * from races_vw";
 
-export function getRaces(season: number, key?: string): Promise<RaceResponse[]> {
-    return new Promise((resolve, reject) => {
+export interface DbRace {
+    displayName?: string;
+    raceDate?: string;
+    qualiDate?: string;
+    season?: number;
+    key: string;
+    laps?: number;
+    track: string;
+    trivia?: string;
+    cutoff?: string;
+    winner?: string;
+}
+
+export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
+    return new Promise<DbRace[]>((resolve, reject) => {
         let selectStatement = `${raceSelect} where season = ${season}`;
         let whereStatement = "";
-        if (key) {
-            whereStatement = "and key = '" + key + "'";
+        if (keys && keys.length) {
+            whereStatement = "and key in ('" + keys.join("','") + "')";
         }
         db.all(`${selectStatement} ${whereStatement}`, (err, rows) => {
             if (err) {
                 reject(err);
                 return;
             }
-            for (const row of rows) {
-                if (row.trivia) {
-                    row.trivia = JSON.parse(row.trivia);
-                }
-            }
             resolve(rows);
         });
     });
 }
 
-export function saveRaces(season, races: RaceResponse[]): Promise<boolean> {
+export async function saveRaces(season, newRaces: RaceResponse[]): Promise<boolean> {
+    const raceKeys = newRaces.filter(r => r.key).map(r => r.key);
+    const existingRaces = await getRaces(season, raceKeys);
     return new Promise<boolean>((resolve, reject) => {
         try {
             const insert = `INSERT OR REPLACE INTO races 
@@ -39,21 +49,73 @@ export function saveRaces(season, races: RaceResponse[]): Promise<boolean> {
                         reject(beginError);
                         return;
                     }
-                    races.forEach(race => {
-                        let valuesObject = {
-                            1: race.key,
-                            2: race.track,
-                            3: season,
-                            4: race.trivia ? JSON.stringify(race.trivia) : null,
-                            5: race.cutoff,
-                            6: race.raceDate,
-                            7: race.qualiDate,
-                            8: race.winner,
-                            9: race.displayName,
-                            10: race.laps ? race.laps : 0
+                    for (const race of newRaces) {
+                        const existingRace = existingRaces.filter(r => {
+                            r.key === race.key;
+                        })[0];
+                        const values = {
+                            1: race.key
                         };
-                        db.run(insert, valuesObject);
-                    });
+                        // track
+                        if (race.track) {
+                            values[2] = race.track.key;
+                        }
+                        else {
+                            values[2] = existingRace ? existingRace.track : null;
+                        }
+                        // season
+                        values[3] = season;
+                        // trivia
+                        if (race.trivia) {
+                            values[4] = JSON.stringify(race.trivia);
+                        }
+                        else {
+                            values[4] = existingRace ? existingRace.trivia : JSON.stringify([]);
+                        }
+                        // cutoff
+                        if (race.cutoff) {
+                            values[5] = race.cutoff;
+                        }
+                        else {
+                            values[5] = existingRace ? existingRace.cutoff : null;
+                        }
+                        // raceDate
+                        if (race.raceDate) {
+                            values[6] = race.raceDate;
+                        }
+                        else {
+                            values[6] = existingRace ? existingRace.raceDate : null;
+                        }
+                        // qualiDate
+                        if (race.qualiDate) {
+                            values[7] = race.qualiDate;
+                        }
+                        else {
+                            values[7] = existingRace ? existingRace.qualiDate : null;
+                        }
+                        // winner
+                        if (race.winner && race.winner.key) {
+                            values[8] = race.winner.key;
+                        }
+                        else {
+                            values[8] = existingRace ? existingRace.winner : null;
+                        }
+                        // displayName
+                        if (race.displayName) {
+                            values[9] = race.displayName;
+                        }
+                        else {
+                            values[9] = existingRace ? existingRace.displayName : null;
+                        }
+                        // laps
+                        if (race.laps) {
+                            values[10] = race.laps;
+                        }
+                        else {
+                            values[10] = existingRace ? existingRace.laps : null;
+                        }
+                        db.run(insert, values);
+                    }
                     db.exec("COMMIT;", (err: Error) => {
                         if (err) {
                             reject(err);

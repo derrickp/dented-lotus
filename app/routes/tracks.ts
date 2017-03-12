@@ -2,7 +2,7 @@
 
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
-import { getTracks, saveTracks } from "../utilities/data/tracks";
+import { getTracks, saveTracks, getTrackResponses } from "../utilities/data/tracks";
 import { TrackResponse } from "../../common/models/Track";
 
 export const trackRoutes: IRouteConfiguration[] = [
@@ -11,10 +11,14 @@ export const trackRoutes: IRouteConfiguration[] = [
         path: '/tracks/{key?}',
         config: {
             cors: true,
-            handler: (request, reply) => {
-                getTracks(request.params["key"]).then(tracks => {
-                    reply(tracks);
-                });
+            handler: async (request, reply: (tracks: TrackResponse[] | Boom.BoomError) => void) => {
+                try {
+                    const keys = request.params["key"] ? [request.params["key"]] : [];
+                    const tracks = await getTrackResponses(keys);
+                    reply (tracks);
+                } catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
             }
         }
     },

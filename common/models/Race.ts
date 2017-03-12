@@ -1,5 +1,5 @@
 import { TrackModel, TrackResponse } from "./Track";
-import { DriverModel } from "./Driver";
+import { DriverModel, DriverResponse } from "./Driver";
 import { PredictionResponse, PredictionModel } from "./Prediction";
 
 export interface RaceModelContext {
@@ -34,6 +34,10 @@ export class RaceModel {
         this._context = context;
     }
 
+    async initialize(): Promise<void> {
+        
+    }
+
     save(): Promise<boolean> {
         if (!this._context || !this._context.saveRace) {
             return Promise.reject(new Error("Need valid context to save"));
@@ -51,7 +55,7 @@ export class RaceModel {
             qualiDate: this.qualiDate ? this.qualiDate.toString() : null,
             raceDate: this.raceDate ? this.raceDate.toString() : null,
             displayName: this.raceResponse.displayName,
-            winner: this.winner ? this.winner.key : null,
+            winner: this.winner ? this.winner.json : null,
             predictions: this.predictions.map(p => p.json)
         };
         return raceResponse;
@@ -68,6 +72,6 @@ export interface RaceResponse {
     track: TrackResponse;
     trivia?: string[];
     cutoff?: string;
-    winner?: string;
+    winner?: DriverResponse;
     predictions: PredictionResponse[];
 }

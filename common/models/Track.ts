@@ -2,7 +2,7 @@ export interface TrackResponse {
     key: string;
     name: string;
     country: string;
-    length: number;
+    length?: number;
     title: string;
     trivia?: string[];
     description?: string;

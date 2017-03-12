@@ -2,14 +2,23 @@
 
 import * as Boom from "boom";
 import { IRouteConfiguration } from "hapi";
-
-import { PredictionResponse, RacePredictionResponse } from "../../common/models/Prediction";
-import { savePredictions, getPredictions, saveRacePredictions, getRacePredictions } from "../utilities/data/predictions";
+import { Credentials } from "../../common/models/Authentication";
+import { PredictionResponse, UserPickPayload } from "../../common/models/Prediction";
+import { DriverResponse } from "../../common/models/Driver";
+import { TeamResponse } from "../../common/models/Team";
+import { 
+    savePredictions, 
+    getPredictions, 
+    saveRacePredictions, 
+    getRacePredictions, 
+    getUserPicks, 
+    DbUserPick, 
+    saveUserPicks } from "../utilities/data/predictions";
 
 export const predictionsRoutes: IRouteConfiguration[] = [
     {
         method: "GET",
-        path: "/predictions/{key?}",
+        path: "/admin/predictions/{key?}",
         config: {
             cors: true,
             handler: (request, reply) => {
@@ -24,7 +33,37 @@ export const predictionsRoutes: IRouteConfiguration[] = [
     },
     {
         method: "POST",
-        path: "/predictions",
+        path: "/picks",
+        config: {
+            cors: true,
+            handler: async (request, reply) => {
+                const raceKey = request.params["race"];
+                const credentials: Credentials = request.auth.credentials;
+                const userChoices: UserPickPayload[] = request.payload;
+                if (userChoices && userChoices.length) {
+                    const dbUserPicks: DbUserPick[] = [];
+                    for (const userChoice of userChoices) {
+                        const pick: DbUserPick = {
+                            race: userChoice.race,
+                            prediction: userChoice.prediction,
+                            choice: userChoice.choice,
+                            user: credentials.key
+                        };
+                        dbUserPicks.push(pick);
+                    }
+                    const success = await saveUserPicks(dbUserPicks);
+                }
+                reply("done").code(201);
+            },
+            auth: {
+                strategies: ['jwt'],
+                scope: ['user']
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "/admin/predictions",
         config: {
             cors: true,
             handler: (request, reply) => {
@@ -56,11 +95,11 @@ export const predictionsRoutes: IRouteConfiguration[] = [
     },
     {
         method: "POST",
-        path: "/predictions/race/{race}",
+        path: "/admin/predictions/race/{race}",
         config: {
             cors: true,
             handler: (request, reply) => {
-                const racePredictions: RacePredictionResponse[] = request.payload;
+                const racePredictions: any[] = request.payload;
                 const race = request.params["race"];
                 for (const racePrediction of racePredictions) {
                     if (!race || !racePrediction.prediction) {
@@ -71,7 +110,7 @@ export const predictionsRoutes: IRouteConfiguration[] = [
                 // !TODO! Currently we aren't checking to see if these are new or not.
                 // This is bad for a POST, but for now? Deal with later.
                 saveRacePredictions(race, racePredictions).then(success => {
-                    return getRacePredictions(race);
+                    return getRacePredictions([race]);
                 }).then(newRacePredictions => {
                     reply(newRacePredictions);
                 }).catch((error: Error) => {

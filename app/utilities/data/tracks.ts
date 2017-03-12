@@ -5,6 +5,25 @@ const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 
 const trackSelect = "SELECT * from tracks_vw";
 
+export async function getTrackResponses(keys?: string[]): Promise<TrackResponse[]> {
+    const trackRows = await getTracks(keys);
+    const tracks: TrackResponse[] = [];
+    for (const trackRow of trackRows) {
+        const track: TrackResponse = {
+            key: trackRow.key,
+            latitude: trackRow.latitude,
+            longitude: trackRow.longitude,
+            name: trackRow.name,
+            country: trackRow.country,
+            trivia: trackRow.trivia ? JSON.parse(trackRow.trivia) : [],
+            length: trackRow.length,
+            title: trackRow.title
+        };
+        tracks.push(track);
+    }
+    return tracks;
+}
+
 export function saveTracks(tracks: TrackResponse[]): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         try {
@@ -46,26 +65,31 @@ export function saveTracks(tracks: TrackResponse[]): Promise<boolean> {
     });
 }
 
-export function getTracks(key?: string): Promise<TrackResponse[]> {
-    return new Promise<TrackResponse[]>((resolve, reject) => {
+export function getTracks(keys?: string[]): Promise<DbTrack[]> {
+    return new Promise<DbTrack[]>((resolve, reject) => {
         let statement = trackSelect;
-        if (key) {
-            statement = statement + ` where key = '${key}'`
+        
+        if (keys && keys.length) {
+            statement = statement + ` where key IN ('${keys.join("','")}')`
         }
-        db.all(statement, (err, rows: any[]) => {
+        db.all(statement, (err, rows: DbTrack[]) => {
             if (err) {
                 reject(err);
                 return;
             }
-            rows.forEach(row => {
-                if (row.trivia) {
-                    row.trivia = JSON.parse(row.trivia);
-                    if (typeof row.trivia === "string") {
-                        row.trivia = [row.trivia];
-                    }
-                }
-            });
             resolve(rows);
         });
     });
+}
+
+export interface DbTrack {
+    key: string;
+    name: string;
+    country: string;
+    length: number;
+    title: string;
+    trivia?: string;
+    description?: string;
+    latitude?: number;
+    longitude?: number;
 }

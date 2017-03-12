@@ -1,6 +1,7 @@
 import * as sqlite3 from "sqlite3";
 
 import { DriverResponse } from "../../../common/models/Driver";
+import { getTeamResponses } from "./teams";
 
 const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 
@@ -43,8 +44,38 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
     });
 }
 
+<<<<<<< HEAD
 export function getDrivers(active, key?: string): Promise<DriverResponse[]> {
     console.log("IN DRIVERS")
+=======
+export async function getDriverResponses(active?: boolean, keys?: string[]): Promise<DriverResponse[]> {
+    console.log(keys);
+    const driverRows = await getDrivers(false, keys);
+    const drivers: DriverResponse[] = [];
+    for (const driverRow of driverRows) {
+        const driver: DriverResponse = {
+            abbreviation: driverRow.abbreviation,
+            active: driverRow.active ? true : false,
+            birthdate: driverRow.birthdate,
+            firstName: driverRow.firstName,
+            lastName: driverRow.lastName,
+            flag: driverRow.flag,
+            nationality: driverRow.nationality,
+            team: null,
+            trivia: driverRow.trivia ? JSON.parse(driverRow.trivia) : [],
+            key: driverRow.key
+        };
+        const teams = await getTeamResponses([driverRow.team]);
+        if (teams && teams.length) {
+            driver.team = teams[0];
+        }
+        drivers.push(driver);
+    }
+    return drivers;
+}
+
+export function getDrivers(active, keys?: string[]): Promise<DbDriver[]> {
+>>>>>>> Server code
     return new Promise((resolve, reject) => {
         let whereStatement: string;
         if (active) {
@@ -53,28 +84,34 @@ export function getDrivers(active, key?: string): Promise<DriverResponse[]> {
         else {
             whereStatement = "where active >= 0";
         }
-        if (key) {
-            whereStatement = whereStatement + " and key = '" + key + "'";
+        if (keys && keys.length) {
+            whereStatement = whereStatement + " and key IN ('" + keys.join("','") + "')";
         }
         console.log(driverSelect + " " + whereStatement);
-        db.all(driverSelect + " " + whereStatement, (err, rows) => {
+        db.all(driverSelect + " " + whereStatement, (err: Error, rows: DbDriver[]) => {
             if (err) {
                 reject(err);
                 return;
             }
             
-            rows.forEach((row) => {
-                if (row.active) {
-                    row.active = true;
-                }
-                else {
-                    row.active = false;
-                }
-                if (row.trivia) {
-                    row.trivia = JSON.parse(row.trivia);
-                }
-            });
             resolve(rows);
         });
     }); 
 };
+
+export interface DbDriver {
+    key: string;
+    trivia: string;
+    firstName: string;
+    lastName: string;
+    nationality: string;
+    active: number;
+    flag?: string;
+    points?: number;
+    birthdate?: string;
+    number?: number;
+    abbreviation?: string;
+    /**Abbreviation for the team */
+    team?: string;
+    wins?: number;
+}

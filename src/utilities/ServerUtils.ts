@@ -2,7 +2,7 @@
 import { TrackResponse } from "../../common/models/Track";
 import { DriverModel, DriverResponse } from "../../common/models/Driver";
 import { RaceResponse } from "../../common/models/Race";
-import { TeamModel, TeamResponse } from "../../common/models/TeamModel";
+import { TeamModel, TeamResponse } from "../../common/models/Team";
 import { UserResponse } from "../../common/models/User";
 import { AuthenticationPayload, AuthenticationResponse } from "../../common/models/Authentication";
 

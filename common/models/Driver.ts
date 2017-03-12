@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { TeamModel, getTeamByAbbreviation } from "./TeamModel";
 import { TrackModel } from "./Track";
 import { RaceModel } from "./Race";
@@ -7,6 +8,9 @@ export interface DriverModelContext {
     saveDriver?: (model:DriverModel) => Promise<boolean>;
 }
 
+=======
+import { TeamModel, getTeamByAbbreviation, TeamResponse } from "./Team";
+>>>>>>> Server code
 
 export class DriverModel {
     key: string;
@@ -78,7 +82,11 @@ export class DriverModel {
             active: this.active,
             birthdate: this.birthdate,
             nationality: this.nationality,
+<<<<<<< HEAD
             team: this.team,
+=======
+            team: this.team.json,
+>>>>>>> Server code
             trivia: this.trivia,
             wins: this.wins
         };
@@ -99,7 +107,6 @@ export interface DriverResponse {
     number?: number;
     abbreviation?: string;
     /**Abbreviation for the team */
-    team?: string;
-    teamName?: string;
+    team?: TeamResponse;
     wins?: number;
 }

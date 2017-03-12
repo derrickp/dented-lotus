@@ -1,3 +1,6 @@
+import { DriverResponse } from "./Driver";
+import { TeamResponse } from "./Team";
+
 export interface PredictionResponse {
     key: string;
     description?: string;
@@ -5,10 +8,11 @@ export interface PredictionResponse {
     type: string;
     allSeason: boolean;
     numChoices: number;
+    choices: DriverResponse[] | TeamResponse[];
     value: number;
     modifier: number;
-    outcome?: string[];
-    userPick?: string[];
+    outcome?: DriverResponse[] | TeamResponse[];
+    userPicks?: DriverResponse[] | TeamResponse[];
 }
 
 export class PredictionModel {
@@ -21,4 +25,10 @@ export class PredictionModel {
     get json(): PredictionResponse {
         return this.predictionResponse;
     }
+}
+
+export interface UserPickPayload {
+    race: string;
+    prediction: string;
+    choice: string;
 }
