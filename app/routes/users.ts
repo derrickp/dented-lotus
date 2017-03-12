@@ -8,7 +8,7 @@ import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";
 import { createToken, checkAndDecodeToken } from "../utilities/token";
-import { getFullUsers, updateUser, saveUser, getBasicUsers } from "../utilities/sqliteUtilities";
+import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys } from "../utilities/data/users";
 
 const base64url = require('base64-url');
 
@@ -41,7 +41,7 @@ export const userRoutes: IRouteConfiguration[] = [
                 }
 
                 // Get the existing user out of the database.
-                getFullUsers(key).then(users => {
+                getFullUsers([key]).then(users => {
                     let existingUser = users[0];
                     if (!existingUser) {
                         res(Boom.badRequest("user key provided was not found"));
@@ -169,7 +169,7 @@ export const userRoutes: IRouteConfiguration[] = [
                 }
                 // If the person requesting information is a 
                 else if (isAdmin) {
-                    getFullUsers(key).then(users => {
+                    getFullUsers([key]).then(users => {
                         if (key) {
                             let user = users[0];
                             if (!user) {
@@ -183,7 +183,7 @@ export const userRoutes: IRouteConfiguration[] = [
                 }
                 // They have authenticated, so we'll get them the basic info
                 else {
-                    getBasicUsers(key).then(users => {
+                    getUsersByKeys([key]).then(users => {
                         if (key) {
                             let user = users[0];
                             if (!user) {

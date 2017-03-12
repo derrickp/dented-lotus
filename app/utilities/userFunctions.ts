@@ -1,6 +1,6 @@
 'use strict';
 import * as Boom from "boom";
-import { getUsers } from "./sqliteUtilities";
+import { getUsersByEmail } from "./data/users";
 import { AuthenticationPayload } from "../../common/models/Authentication";
 import { GOOGLE_CLIENT_ID } from "../config";
 
@@ -9,7 +9,8 @@ import * as GoogleAuth from "google-auth-library";
 export function verifyUniqueUser(req, res) {
     // Find an entry from the database that
     // matches the email
-    getUsers(req.payload.email).then(users => {
+    const email: string = req.payload.email;
+    getUsersByEmail([email]).then(users => {
         if (users && users.length > 0) {
             var user = users[0];
             if (user) {
@@ -65,7 +66,7 @@ export function verifyCredentials(req, res) {
     // Find an entry from the database that
     // matches either the email or username
     authPromise.then((email) => {
-        getUsers(email).then(users => {
+        getUsersByEmail([email]).then(users => {
             if (users && users.length > 0) {
                 var user = users[0];
                 // If we have a user at this point, everything is good to go.

@@ -12,13 +12,13 @@ export class StateManager {
     blogs: BlogResponse[] = [
         {
             author: "Craig",
-            date: "Sept. 33rd",
+            postDate: "Sept. 33rd",
             message: "Today shouldn't exist!",
             title: "but Why!?"
         },
         {
             author: "Derrick",
-            date: "Sept. 34th",
+            postDate: "Sept. 34th",
             message: "What have we done?!",
             title: "SEPTEMBER!!!"
         }
@@ -156,7 +156,7 @@ export class StateManager {
      *  returns Blog[]
      */
     getBlogs(whereClause?: string): Promise<BlogResponse[]> {
-        return Promise.resolve(this.blogs.sort((a: BlogResponse, b: BlogResponse) => { return b.date.localeCompare(a.date) }));
+        return Promise.resolve(this.blogs.sort((a: BlogResponse, b: BlogResponse) => { return b.postDate.localeCompare(a.postDate) }));
     }
 
     get nextRace(): Promise<RaceModel> {
