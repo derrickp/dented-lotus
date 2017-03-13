@@ -32,9 +32,14 @@ export function getTrack(key: string): Promise<TrackResponse> {
     });
 }
 
-export function getAllRaces(season: number): Promise<RaceResponse[]> {
+export function getAllRaces(season: number, id_token: string): Promise<RaceResponse[]> {
     return new Promise<RaceResponse[]>((resolve, reject) => {
-        return fetch(`/races/${season}`).then(response => {
+        return fetch(`/races/${season}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + id_token
+            }
+        }).then(response => {
             return response.json().then((races: RaceResponse[]) => {
                 resolve(races);
             });
@@ -60,7 +65,7 @@ export function saveRaces(season: number, races: RaceResponse[], id_token: strin
     });
 }
 
-export function getRace(key:string): Promise<RaceResponse> {
+export function getRace(key: string): Promise<RaceResponse> {
     return new Promise<RaceResponse>((resolve, reject) => {
         return fetch(`/races/${key}`).then(response => {
             return response.json().then((race: RaceResponse) => {
@@ -71,10 +76,10 @@ export function getRace(key:string): Promise<RaceResponse> {
 }
 
 
-export function getAllDrivers(activeOnly:boolean = true): Promise<DriverResponse[]> {
+export function getAllDrivers(activeOnly: boolean = true): Promise<DriverResponse[]> {
     return new Promise<DriverResponse[]>((resolve, reject) => {
         let suffix = "/drivers";
-        if (activeOnly){
+        if (activeOnly) {
             suffix += "/active";
         }
         return fetch(baseUrl + "/drivers").then(response => {
@@ -87,7 +92,7 @@ export function getAllDrivers(activeOnly:boolean = true): Promise<DriverResponse
 
 export function getDriver(key: string): Promise<DriverResponse> {
     return new Promise<DriverResponse>((resolve, reject) => {
-        return fetch(baseUrl +`/drivers/${key}`).then(response => {
+        return fetch(baseUrl + `/drivers/${key}`).then(response => {
             return response.json().then((drivers: DriverResponse[]) => {
                 if (drivers.length) {
                     resolve(drivers[0]);

@@ -42,13 +42,14 @@ export class StateManager {
     }
 
     get races(): Promise<RaceModel[]> {
+        if (!this.isLoggedIn) return Promise.resolve(null);
         this._races = this._races ? this._races : this._getRaces();
         return this._races;
     }
 
     private _getRaces(): Promise<RaceModel[]> {
         return new Promise<RaceModel[]>((resolve, reject) => {
-            return getAllRaces(2017).then((raceResponses: RaceResponse[]) => {
+            return getAllRaces(2017, this.user.id_token).then((raceResponses: RaceResponse[]) => {
                 const raceModels: RaceModel[] = raceResponses.map(rr => {
                     const context: RaceModelContext = {
                         saveRace: (raceModel: RaceModel) => {
