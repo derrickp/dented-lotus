@@ -1,0 +1,24 @@
+
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "lib": [
+      "es2015",
+      "dom",
+      "dom.iterable"
+    ],
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false,
+    "sourceMap": false, 
+    "jsx": "react",
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [ "./"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
