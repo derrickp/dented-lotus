@@ -133,18 +133,30 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     }
 
     getHomePage() {
-        return <div>
-            <RaceCountdown onclick={this.launchRacePicks.bind(this)} stateManager={this.stateManager} race={this.stateManager.nextRace} />
-            <BlogComponent stateManager={this.stateManager} />
-        </div>;
+        const components: any[] = [];
+
+        if (this.stateManager.isLoggedIn) {
+            components.push(<RaceCountdown onclick={this.launchRacePicks.bind(this)} stateManager={this.stateManager} race={this.stateManager.nextRace} />);
+            /*return <div>
+                <RaceCountdown onclick={this.launchRacePicks.bind(this)} stateManager={this.stateManager} race={this.stateManager.nextRace} />
+                <BlogComponent stateManager={this.stateManager} />
+            </div>;*/
+        }
+        /*else {
+            return <div>
+                <BlogComponent stateManager={this.stateManager} />
+            </div>;
+        }*/
+        components.push(<BlogComponent stateManager={this.stateManager} />);
+        return <div>{components}</div>
     }
 
     render() {
         return <div>
             <Banner logout={this.stateManager.signOut.bind(this.stateManager)} loggedIn={this.state.loggedIn} completeGoogleLogin={this.stateManager.completeGoogleLogin.bind(this.stateManager)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
-            
-                <div className="header-section"></div>
-                <div className="wrapper"> 
+
+            <div className="header-section"></div>
+            <div className="wrapper">
                 {this.getCurrentView()}
             </div>
         </div>

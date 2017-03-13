@@ -10,9 +10,10 @@ export function getTeams(keys?: string[]): Promise<DbTeam[]> {
     return new Promise((resolve, reject) => {
         let statement: string = teamSelect;
         if (keys && keys.length) {
-            statement = statement + " where key IN ('" + keys.join("','") + "')";
+            const innerKeys = keys.join("','");
+            statement = statement + " where key IN ('" + innerKeys + "')";
         }
-
+        console.log(statement);
         db.all(statement, (err: Error, rows: DbTeam[]) => {
             if (err) {
                 reject(err);

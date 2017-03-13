@@ -80,7 +80,8 @@ export function getDrivers(active, keys?: string[]): Promise<DbDriver[]> {
             whereStatement = "where active >= 0";
         }
         if (keys && keys.length) {
-            whereStatement = whereStatement + " and key IN ('" + keys.join("','") + "')";
+            const innerKeys = keys.join("','");
+            whereStatement = whereStatement + " and key IN ('" + innerKeys + "')";
         }
         console.log(driverSelect + " " + whereStatement);
         db.all(driverSelect + " " + whereStatement, (err: Error, rows: DbDriver[]) => {
