@@ -24,7 +24,7 @@ html {
 }
 body .wrapper,
 html .wrapper {
-  max-width: 960px;
+  max-width: 75%;
   margin: auto;
 }
 body .background,
@@ -126,10 +126,11 @@ html .banner {
   display: block;
   height: 2rem;
   width: 100%;
+  color: #f2f2f2;
 }
 body .banner h1,
 html .banner h1 {
-  color: #FFFFFF;
+  color: #f2f2f2;
   display: inline-block;
   width: 25%;
   font-size: 1.2rem;
@@ -147,6 +148,7 @@ html .banner .logout {
   background: #4CAF50;
   text-align: center;
   float: right;
+  color: #212121;
 }
 body .banner .logout,
 html .banner .logout {
@@ -157,6 +159,7 @@ html .banner .login > span {
   height: 100%;
   display: block;
   width: 100%;
+  font-family: 'Lato', sans-serif;
 }
 body .banner .menu,
 html .banner .menu {
@@ -402,6 +405,37 @@ html .small-user img.round {
 /* Styling of overlay */
 .bm-overlay {
   background: rgba(0, 0, 0, 0.3);
+}
+#signupBtn {
+  display: inline-block;
+  background: white;
+  color: #444;
+  width: 190px;
+  border-radius: 5px;
+  border: thin solid #888;
+  box-shadow: 1px 1px 1px grey;
+  white-space: nowrap;
+}
+#signupBtn:hover {
+  cursor: pointer;
+}
+span.signup-icon {
+  background: url('/images/winners-cup.png') transparent 5px 50% no-repeat;
+  display: inline-block;
+  vertical-align: middle;
+  width: 42px;
+  height: 42px;
+  margin-left: 10px;
+}
+span.signup-buttonText {
+  display: inline-block;
+  vertical-align: middle;
+  padding-left: 22px;
+  padding-right: 42px;
+  font-size: 14px;
+  font-weight: bold;
+  /* Use the Roboto font that is loaded in the <head> */
+  font-family: 'Roboto', sans-serif;
 }
 #customBtn {
   display: inline-block;
@@ -1103,4 +1137,73 @@ span.buttonText {
 }
 .simple-select.react-selectize.material.root-node .simple-value {
   margin: 4px 3px 3px 2px;
+}
+.signup-header {
+  font-size: x-large;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+}
+.signup-description {
+  font-size: medium;
+  letter-spacing: 1px;
+  line-height: 1.3em;
+  margin: -2px 0 35px;
+}
+.signup-form {
+  max-width: 100%;
+  background: #f2f2f2;
+  font-family: 'Lato', sans-serif;
+  color: #455A64;
+  text-align: center;
+  margin-left: 10%;
+  padding: 2%;
+}
+.signup-input {
+  align-items: center;
+}
+.signup-button {
+  height: 44px;
+  border: none;
+}
+#email {
+  width: 75%;
+  background: #FDFCFB;
+  font-family: inherit;
+  color: #455A64;
+  letter-spacing: 1px;
+  text-indent: 5%;
+  border-radius: 5px 5px 5px 5px;
+  box-shadow: 0 0 2px #4CAF50;
+  margin-bottom: 1em;
+}
+#name {
+  width: 75%;
+  background: #FDFCFB;
+  font-family: inherit;
+  color: #455A64;
+  letter-spacing: 1px;
+  text-indent: 5%;
+  border-radius: 5px 5px 5px 5px;
+  box-shadow: 0 0 2px #4CAF50;
+  margin-bottom: 1em;
+}
+#submit {
+  width: 75%;
+  height: 46px;
+  background: #4CAF50;
+  font-family: inherit;
+  font-weight: bold;
+  color: inherit;
+  letter-spacing: 1px;
+  border-radius: 5px 5px 5px 5px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+#submit:hover {
+  background: #4CAF50;
+}
+input:focus {
+  outline: none;
+  outline: 2px solid #4CAF50;
+  box-shadow: 0 0 2px #4CAF50;
 }

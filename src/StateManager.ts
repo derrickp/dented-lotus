@@ -4,8 +4,20 @@ import { User, GoogleUser, FacebookUser } from "../common/models/User";
 import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
 import { DriverModel, DriverResponse, DriverModelContext } from "../common/models/Driver";
+import { SignupInfo } from "../common/models/Signup";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
-import { getAllTracks, getAllDrivers, authenticate, saveDrivers, getAllRaces, saveRaces, getTrack, getDriver, getRace } from "./utilities/ServerUtils"
+import {
+    getAllTracks,
+    getAllDrivers,
+    authenticate,
+    saveDrivers,
+    getAllRaces,
+    saveRaces,
+    getTrack,
+    getDriver,
+    getRace,
+    signup
+} from "./utilities/ServerUtils"
 
 
 export class StateManager {
@@ -31,7 +43,7 @@ export class StateManager {
     private _races: Promise<RaceModel[]>;
     private _user: User;
 
-    private _dummyTeams = ["fer","mer","fin"]; 
+    private _dummyTeams = ["fer", "mer", "fin"];
     get user(): User {
         return this._user;
     }
@@ -98,7 +110,7 @@ export class StateManager {
         });
     }
 
-    get teams():Promise<string[]>{
+    get teams(): Promise<string[]> {
 
         return Promise.resolve(this._dummyTeams);
     }
@@ -221,6 +233,16 @@ export class StateManager {
         authenticate(authPayload).then(authResponse => {
             const googleUser = new GoogleUser(response, authResponse.user, authResponse.id_token);
             this.user = googleUser;
+        });
+    }
+
+    signup(type: string, info: SignupInfo): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            return signup(info).then(success => {
+                resolve(true);
+            }).catch((error: Error) => {
+                reject(error);
+            });
         });
     }
 }

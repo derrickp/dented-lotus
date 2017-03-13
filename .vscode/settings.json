@@ -5,13 +5,13 @@
         "**/.svn": true,
         "**/.hg": true,
         "**/.DS_Store": true,
-        "**/*.jsx":true,
-        "compiled":true,
-        "dist":true,
-        "node_modules":false,
-        "config":true,
+        "**/*.jsx": true,
+        "compiled": true,
+        "dist": true,
+        "node_modules": true,
+        "config": true,
         "app/**/*.js": true,
         "src/**/*.js": true,
-        "common/**/*.js":true
+        "common/**/*.js": true
     }
 }

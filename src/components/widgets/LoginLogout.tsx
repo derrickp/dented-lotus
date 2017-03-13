@@ -15,6 +15,7 @@ export interface LoginLogoutProps extends PropsBase {
     onPageChange: (page: string) => void;
     completeGoogleLogin: (args) => void;
     logout: () => void;
+    signUp: (type: string) => void;
     loggedIn: boolean;
 }
 export class LoginLogout extends React.Component<LoginLogoutProps, any>{
@@ -52,6 +53,11 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
         this.hideLoginModal();
     }
 
+    onSignUp(type: string) {
+        this.hideLoginModal();
+        this.props.signUp(type);
+    }
+
     render() {
         let sidebarContent = "<b>Sidebar content</b>";
         if (this.props.loggedIn) {
@@ -60,12 +66,15 @@ export class LoginLogout extends React.Component<LoginLogoutProps, any>{
             </div>
         } else {
             let content = <div className="login-modal">
-                <div className="modal-header">Log In</div>
+                <div className="modal-header">Log In With</div>
                 <GoogleLogin loggedIn={this.props.loggedIn} completeGoogleLogin={this.completeGoogleLogin} stateManager={this.stateManager} onLogin={this.onLogin.bind(this)} />
-                {/*<FacebookLogin appId="1088597931155576" autoLoad={true} fields="name,email,picture" callback={(a) => { }} cssClass="my-facebook-button-class" icon="fa-facebook" />*/}
-                {/*<div className="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" data-onsuccess={this.facebookSignedIn.bind(this)}></div>*/}
+                <div>Sign Up With</div>
+                <button id="signupBtn" onClick={() => { this.onSignUp("google"); }}>
+                    <span className="signup-icon"></span>
+                    <span className="signup-buttonText">Dented Lotus</span>
+                </button>
             </div>
-            return <div className="login"><span onClick={this.showLoginModal.bind(this)}>Log In</span>
+            return <div className="login"><span onClick={this.showLoginModal.bind(this)}>Log In / Sign Up</span>
                 <Modal content={content} isOpen={this.state.modalVisible} stateManager={this.stateManager} onClose={this.hideLoginModal.bind(this)} />
             </div>
         }

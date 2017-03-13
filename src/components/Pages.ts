@@ -3,8 +3,9 @@ import { AllRaces } from "./Pages/AllRaces";
 import { TrackPage } from "./Pages/TrackPage";
 import { Tracks } from "./Pages/Tracks";
 import {Drivers} from "./Pages/Drivers";
+import { Signup } from "./Pages/Signup";
 
-export { RacePage, AllRaces, TrackPage, Tracks, Drivers };
+export { RacePage, AllRaces, TrackPage, Tracks, Drivers, Signup };
 
 export class Pages {
     static HOME = "home";
@@ -13,4 +14,5 @@ export class Pages {
     static DRIVERS = "drivers"; 
     static TRACKS = "tracks";
     static ALL_RACES = "all-races";
+    static SIGN_UP = "signup";
 }
