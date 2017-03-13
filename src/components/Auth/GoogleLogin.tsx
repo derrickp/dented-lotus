@@ -34,7 +34,7 @@ export class GoogleLogin extends React.Component<GoogleLoginProps, GoogleLoginSt
         if (window["gapi"]) {
             gapi.load("auth2", () => {
                 gapi.auth2.init({
-                    client_id: "325303047770-9g47tfbs2vuiqkode24ts495rpe5bn4l.apps.googleusercontent.com"
+                    client_id: "1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com"
                 }).then(() => {
                     this._googleAuth = gapi.auth2.getAuthInstance();
                     this._googleAuth.isSignedIn.listen(signedIn => {
