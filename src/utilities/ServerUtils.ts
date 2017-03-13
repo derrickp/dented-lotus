@@ -4,6 +4,7 @@ import { DriverModel, DriverResponse } from "../../common/models/Driver";
 import { RaceResponse } from "../../common/models/Race";
 import { TeamModel, TeamResponse } from "../../common/models/Team";
 import { UserResponse } from "../../common/models/User";
+import { SignupInfo } from "../../common/models/Signup";
 import { AuthenticationPayload, AuthenticationResponse } from "../../common/models/Authentication";
 
 const baseUrl = window.location.origin;
@@ -148,6 +149,27 @@ export function authenticate(authPayload: AuthenticationPayload): Promise<Authen
         }).then(response => {
             return response.json().then((authResponse: AuthenticationResponse) => {
                 resolve(authResponse);
+            });
+        });
+    });
+}
+
+export function signup(info: SignupInfo): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+        return fetch("/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(info)
+        }).then(response => {
+            return response.json().then(json => {
+                if (response.ok) {
+                    resolve(true);
+                }
+                else {
+                    reject(new Error(json.message));
+                }
             });
         });
     });

@@ -3,12 +3,13 @@
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 import { UserResponse } from "../../common/models/User";
+import { SignupInfo } from "../../common/models/Signup";
 import { Credentials } from "../../common/models/Authentication";
 import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";
 import { createToken, checkAndDecodeToken } from "../utilities/token";
-import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys } from "../utilities/data/users";
+import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys, saveRequestedUser } from "../utilities/data/users";
 
 const base64url = require('base64-url');
 
@@ -62,6 +63,25 @@ export const userRoutes: IRouteConfiguration[] = [
             auth: {
                 strategies: ['jwt'],
                 scope: ['user']
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/signup',
+        config: {
+            pre: [
+                { method: verifyUniqueUser, assign: 'user' }
+            ],
+            cors: true,
+            handler: async (request, reply) => {
+                try {
+                    const info: SignupInfo = request.payload;
+                    await saveRequestedUser(info);
+                    reply({ status: "success" });
+                } catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
             }
         }
     },
