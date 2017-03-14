@@ -1,9 +1,9 @@
 @darkPrimaryColor:   #455A64;
 @primaryColor:       #607D8B;
 @lightPrimaryColor:  #f2f2f2;
-@textPrimaryColor:   #FFFFFF;
+
 @accentColor:        #4CAF50;
-@primaryTextColor:   #212121;
+@textPrimaryColor:   #212121;
 @secondaryTextColor: #757575;
 @dividerColor:       #BDBDBD;
 @panelColor: #828081;
@@ -35,7 +35,7 @@ body, html{
     overflow-x: hidden;
 .wrapper{
     
-    max-width:960px;
+    max-width:75%;
     margin: auto;
 }
  .background{
@@ -106,10 +106,11 @@ li {
     margin-top: 0;
     display: block;
     height: @bannerHeight;
-    width: 100%; 
+    width: 100%;
+    color: @lightPrimaryColor;
     
     h1{
-        color: @textPrimaryColor;
+        color: @lightPrimaryColor;
         display: inline-block;
         width: 25%; 
         font-size: 1.2rem;
@@ -117,7 +118,7 @@ li {
         line-height: 2rem;
     }
     
-    .login,.logout{
+    .login, .logout {
         height: 100%; 
         width:8.333333333333%;
         line-height: @bannerHeight;
@@ -125,14 +126,16 @@ li {
         background: @accentColor;
         text-align: center;
         float: right; 
+        color: @textPrimaryColor;
         
-    } .logout{
+    } .logout {
         width: 4em;
     }
     .login>span{ 
     height:100%;
     display: block;
-    width: 100%; 
+    width: 100%;
+    font-family: 'Lato', sans-serif;
     }
     .menu{ 
 
@@ -393,40 +396,72 @@ li {
   background: rgba(0, 0, 0, 0.3); 
 }
 
+#signupBtn {
+  display: inline-block;
+  background: white;
+  color: #444;
+  width: 190px;
+  border-radius: 5px;
+  border: thin solid #888;
+  box-shadow: 1px 1px 1px grey;
+  white-space: nowrap;
+}
+#signupBtn:hover {
+  cursor: pointer;
+}
+span.signup-icon {
+  background: url('/images/winners-cup.png') transparent 5px 50% no-repeat;
+  display: inline-block;
+  vertical-align: middle;
+  width: 42px;
+  height: 42px;
+  margin-left: 10px;
+}
+span.signup-buttonText {
+  display: inline-block;
+  vertical-align: middle;
+  padding-left: 22px;
+  padding-right: 42px;
+  font-size: 14px;
+  font-weight: bold;
+  /* Use the Roboto font that is loaded in the <head> */
+  font-family: 'Roboto', sans-serif;
+}
+
 #customBtn {
-      display: inline-block;
-      background: white;
-      color: #444;
-      width: 190px;
-      border-radius: 5px;
-      border: thin solid #888;
-      box-shadow: 1px 1px 1px grey;
-      white-space: nowrap;
-    }
-    #customBtn:hover {
-      cursor: pointer;
-    }
-    span.label {
-      font-family: serif;
-      font-weight: normal;
-    }
-    span.icon {
-      background: url('/images/g-normal.png') transparent 5px 50% no-repeat;
-      display: inline-block;
-      vertical-align: middle;
-      width: 42px;
-      height: 42px;
-    }
-    span.buttonText {
-      display: inline-block;
-      vertical-align: middle;
-      padding-left: 42px;
-      padding-right: 42px;
-      font-size: 14px;
-      font-weight: bold;
-      /* Use the Roboto font that is loaded in the <head> */
-      font-family: 'Roboto', sans-serif;
-    }
+  display: inline-block;
+  background: white;
+  color: #444;
+  width: 190px;
+  border-radius: 5px;
+  border: thin solid #888;
+  box-shadow: 1px 1px 1px grey;
+  white-space: nowrap;
+}
+#customBtn:hover {
+  cursor: pointer;
+}
+span.label {
+  font-family: serif;
+  font-weight: normal;
+}
+span.icon {
+  background: url('/images/g-normal.png') transparent 5px 50% no-repeat;
+  display: inline-block;
+  vertical-align: middle;
+  width: 42px;
+  height: 42px;
+}
+span.buttonText {
+  display: inline-block;
+  vertical-align: middle;
+  padding-left: 42px;
+  padding-right: 42px;
+  font-size: 14px;
+  font-weight: bold;
+  /* Use the Roboto font that is loaded in the <head> */
+  font-family: 'Roboto', sans-serif;
+}
 
 
 .react-selectize {
@@ -1095,4 +1130,83 @@ li {
 }
 .simple-select.react-selectize.material.root-node .simple-value {
   margin: 4px 3px 3px 2px;
+}
+
+.signup-header {
+  font-size: x-large;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+}
+
+.signup-description {
+  font-size: medium;
+  letter-spacing: 1px;
+  line-height: 1.3em;
+  margin: -2px 0 35px;
+}
+
+.signup-form {
+  max-width: 100%;
+  background: @lightPrimaryColor;
+  font-family: 'Lato', sans-serif;
+  color: @darkPrimaryColor;
+  text-align: center;
+  margin-left: 10%;
+  padding: 2%;
+}
+
+.signup-input {
+  align-items: center;
+}
+
+.signup-button {
+  height: 44px;
+  border: none;
+}
+
+#email {
+  width: 75%;
+  background: #FDFCFB;
+  font-family: inherit;
+  color: @darkPrimaryColor;
+  letter-spacing: 1px;
+  text-indent: 5%;
+  border-radius: 5px 5px 5px 5px;
+  box-shadow: 0 0 2px @accentColor;
+  margin-bottom: 1em;
+}
+
+#name {
+  width: 75%;
+  background: #FDFCFB;
+  font-family: inherit;
+  color: @darkPrimaryColor;
+  letter-spacing: 1px;
+  text-indent: 5%;
+  border-radius: 5px 5px 5px 5px;
+  box-shadow: 0 0 2px @accentColor;
+  margin-bottom: 1em;
+}
+
+#submit {
+  width: 75%;
+  height: 46px;
+  background: @accentColor;
+  font-family: inherit;
+  font-weight: bold;
+  color: inherit;
+  letter-spacing: 1px;
+  border-radius: 5px 5px 5px 5px;
+  cursor: pointer;
+  transition: background .3s ease-in-out;
+}
+
+#submit:hover {
+  background: @accentColor;
+}
+
+input:focus {
+  outline: none;
+  outline: 2px solid @accentColor;
+  box-shadow: 0 0 2px @accentColor;
 }

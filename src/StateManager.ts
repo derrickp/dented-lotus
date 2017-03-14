@@ -4,21 +4,33 @@ import { User, GoogleUser, FacebookUser } from "../common/models/User";
 import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
 import { DriverModel, DriverResponse, DriverModelContext } from "../common/models/Driver";
+import { SignupInfo } from "../common/models/Signup";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
-import { getAllTracks, getAllDrivers, authenticate, saveDrivers, getAllRaces, saveRaces, getTrack, getDriver, getRace } from "./utilities/ServerUtils"
+import {
+    getAllTracks,
+    getAllDrivers,
+    authenticate,
+    saveDrivers,
+    getAllRaces,
+    saveRaces,
+    getTrack,
+    getDriver,
+    getRace,
+    signup
+} from "./utilities/ServerUtils"
 
 
 export class StateManager {
     blogs: BlogResponse[] = [
         {
             author: "Craig",
-            date: "Sept. 33rd",
+            postDate: "Sept. 33rd",
             message: "Today shouldn't exist!",
             title: "but Why!?"
         },
         {
             author: "Derrick",
-            date: "Sept. 34th",
+            postDate: "Sept. 34th",
             message: "What have we done?!",
             title: "SEPTEMBER!!!"
         }
@@ -31,7 +43,7 @@ export class StateManager {
     private _races: Promise<RaceModel[]>;
     private _user: User;
 
-    private _dummyTeams = ["fer","mer","fin"]; 
+    private _dummyTeams = ["fer", "mer", "fin"];
     get user(): User {
         return this._user;
     }
@@ -42,13 +54,14 @@ export class StateManager {
     }
 
     get races(): Promise<RaceModel[]> {
+        if (!this.isLoggedIn) return Promise.resolve(null);
         this._races = this._races ? this._races : this._getRaces();
         return this._races;
     }
 
     private _getRaces(): Promise<RaceModel[]> {
         return new Promise<RaceModel[]>((resolve, reject) => {
-            return getAllRaces(2017).then((raceResponses: RaceResponse[]) => {
+            return getAllRaces(2017, this.user.id_token).then((raceResponses: RaceResponse[]) => {
                 const raceModels: RaceModel[] = raceResponses.map(rr => {
                     const context: RaceModelContext = {
                         saveRace: (raceModel: RaceModel) => {
@@ -97,7 +110,7 @@ export class StateManager {
         });
     }
 
-    get teams():Promise<string[]>{
+    get teams(): Promise<string[]> {
 
         return Promise.resolve(this._dummyTeams);
     }
@@ -156,7 +169,7 @@ export class StateManager {
      *  returns Blog[]
      */
     getBlogs(whereClause?: string): Promise<BlogResponse[]> {
-        return Promise.resolve(this.blogs.sort((a: BlogResponse, b: BlogResponse) => { return b.date.localeCompare(a.date) }));
+        return Promise.resolve(this.blogs.sort((a: BlogResponse, b: BlogResponse) => { return b.postDate.localeCompare(a.postDate) }));
     }
 
     get nextRace(): Promise<RaceModel> {
@@ -220,6 +233,16 @@ export class StateManager {
         authenticate(authPayload).then(authResponse => {
             const googleUser = new GoogleUser(response, authResponse.user, authResponse.id_token);
             this.user = googleUser;
+        });
+    }
+
+    signup(type: string, info: SignupInfo): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            return signup(info).then(success => {
+                resolve(true);
+            }).catch((error: Error) => {
+                reject(error);
+            });
         });
     }
 }

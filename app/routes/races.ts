@@ -37,11 +37,13 @@ export const raceRoutes: IRouteConfiguration[] = [
                     const raceRows = await getRaces(season, raceKeys);
                     for (const raceRow of raceRows) {
                         const race = getRaceResponse(season, raceRow);
+                        const trackKeys = raceRow.track ? [raceRow.track] : [];
                         const tracks = await getTrackResponses([raceRow.track]);
                         if (tracks.length) {
                             race.track = tracks[0];
                         }
                         if (raceRow.winner) {
+                            const winnerKeys = raceRow.winner ? [raceRow.winner] : [];
                             const winners = await getDriverResponses(false, [raceRow.winner]);
                             if (winners.length) {
                                 race.winner = winners[0];

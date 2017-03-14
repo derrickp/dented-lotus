@@ -23,8 +23,10 @@ export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
         let selectStatement = `${raceSelect} where season = ${season}`;
         let whereStatement = "";
         if (keys && keys.length) {
-            whereStatement = "and key in ('" + keys.join("','") + "')";
+            const innerKeys = keys.join("','");
+            whereStatement = " and key IN ('" + innerKeys + "')";
         }
+        console.log(`${selectStatement} ${whereStatement}`);
         db.all(`${selectStatement} ${whereStatement}`, (err, rows) => {
             if (err) {
                 reject(err);

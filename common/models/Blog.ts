@@ -1,7 +1,9 @@
+import { UserResponse } from "./User";
+
 export interface BlogResponse {
-    date: string;
+    postDate: string;
     message: string;
-    author: string;
+    author: UserResponse;
     title: string;
     imageUrl?: string;
 }

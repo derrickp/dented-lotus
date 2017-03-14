@@ -6,7 +6,7 @@ import { UserComponent } from "./User";
 import { StateManager } from "../StateManager";
 import { BlogComponent } from "./BlogComponent";
 import { RaceCountdown } from "./widgets/RaceCountdown";
-import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages } from "./Pages";
+import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, Signup } from "./Pages";
 import { RaceModel } from "../../common/models/Race";
 import { PropsBase } from "../utilities/ComponentUtilities";
 import { getUrlParameters } from "../utilities/PageUtilities";
@@ -23,6 +23,7 @@ export interface DentedLotusState {
     sidebarOpen: boolean;
     race: Promise<RaceModel>;
     loggedIn: boolean;
+    signUpMethod?: string;
 }
 
 export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusState>{
@@ -127,24 +128,35 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
                 return <Tracks tracks={this.stateManager.tracks} />;
             case Pages.DRIVERS:
                 return <Drivers drivers={this.stateManager.drivers} allTeams={this.stateManager.teams} userIsAdmin={true} />
+            case Pages.SIGN_UP:
+                return <Signup onSubmit={this.stateManager.signup.bind(this.stateManager)} type={this.state.signUpMethod} />
             default:
                 return this.getHomePage();
         }
     }
 
     getHomePage() {
-        return <div>
-            <RaceCountdown onclick={this.launchRacePicks.bind(this)} stateManager={this.stateManager} race={this.stateManager.nextRace} />
-            <BlogComponent stateManager={this.stateManager} />
-        </div>;
+        const components: any[] = [];
+
+        if (this.stateManager.isLoggedIn) {
+            components.push(<RaceCountdown onclick={this.launchRacePicks.bind(this)} stateManager={this.stateManager} race={this.stateManager.nextRace} />);
+        }
+        components.push(<BlogComponent stateManager={this.stateManager} />);
+        return <div>{components}</div>
+    }
+
+    signUp(type: string) {
+        let parameters = this.state.parameters;
+        parameters.page = Pages.SIGN_UP;
+        this.setState({ parameters: parameters, signUpMethod: type });
     }
 
     render() {
         return <div>
-            <Banner logout={this.stateManager.signOut.bind(this.stateManager)} loggedIn={this.state.loggedIn} completeGoogleLogin={this.stateManager.completeGoogleLogin.bind(this.stateManager)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
-            
-                <div className="header-section"></div>
-                <div className="wrapper"> 
+            <Banner signUp={this.signUp.bind(this)} logout={this.stateManager.signOut.bind(this.stateManager)} loggedIn={this.state.loggedIn} completeGoogleLogin={this.stateManager.completeGoogleLogin.bind(this.stateManager)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
+
+            <div className="header-section"></div>
+            <div className="wrapper">
                 {this.getCurrentView()}
             </div>
         </div>

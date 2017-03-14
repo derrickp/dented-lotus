@@ -1,6 +1,10 @@
 'use strict';
 import { IRouteConfiguration } from "hapi";
-const db = require('../utilities/sqliteUtilities');
+import * as Boom from "boom";
+
+import { BlogResponse } from "../../common/models/Blog";
+import { Credentials } from "../../common/models/Authentication";
+import { getBlogResponses, saveNewBlog } from "../utilities/data/blogs";
 
 export const blogRoutes: IRouteConfiguration[] = [
     {
@@ -8,25 +12,34 @@ export const blogRoutes: IRouteConfiguration[] = [
         path: '/blogs',
         config: {
             cors: true,
-            handler: (request, reply) => {
-                db.getBasicUsers().then(basicUsers => {
-                    db.getBlogs().then(blogs => {
-                        if (blogs && blogs.length > 0 && basicUsers && basicUsers.length > 0)
-                        {
-                            blogs.forEach(blog => {
-                                
-                                var user = basicUsers.filter(basicUser => { return basicUser.key === blog.userKey })[0];
-                                console.log(user);
-                                if (user)
-                                {
-                                    blog.userDisplayName = user.displayName;
-                                    blog.userKey = undefined;
-                                }
-                            });
-                        }
-                        reply(blogs);
-                    });    
-                });
+            handler: async (request, reply: (blogResponses: BlogResponse[] | Boom.BoomError) => void) => {
+                try {
+                    const blogs = await getBlogResponses();
+                    reply(blogs);
+                } catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "/blogs",
+        config: {
+            cors: true,
+            handler: async (request, reply) => {
+                const credentials: Credentials = request.auth.credentials;
+                const blog: BlogResponse = request.payload;
+                try {
+                    const success = await saveNewBlog(blog);
+                    reply("done").code(201);
+                } catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
+            },
+            auth: {
+                strategies: ['jwt'],
+                scope: ['user']
             }
         }
     }

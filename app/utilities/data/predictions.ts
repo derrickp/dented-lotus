@@ -8,10 +8,10 @@ import { getTeamResponses } from "./teams";
 
 const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 
-export const predictionsSelect = "select * from predictions_vw";
-export const racePredictionSelect = "select * from racepredictions_vw";
-export const userPicksSelect = "select * from userpicks_vw";
-export const racePredictionsChoicesSelect = "select choice from racepredictionchoices";
+const predictionsSelect = "select * from predictions_vw";
+const racePredictionSelect = "select * from racepredictions_vw";
+const userPicksSelect = "select * from userpicks_vw";
+const racePredictionsChoicesSelect = "select choice from racepredictionchoices";
 
 export async function getPredictionResponses(raceKeys: string[], credentials: Credentials): Promise<PredictionResponse[]> {
     const predictionResponses: PredictionResponse[] = [];
@@ -184,9 +184,9 @@ export function getPredictions(keys?: string[]): Promise<PredictionResponse[]> {
         let whereStatement: string;
         if (keys && keys.length) {
             const innerKeys = keys.join("','");
-            whereStatement = `key IN ('${innerKeys}')`;
+            whereStatement = `where key IN ('${innerKeys}')`;
         }
-
+        console.log(predictionsSelect + " " + whereStatement);
         db.all(predictionsSelect + " " + whereStatement, (err, rows) => {
             if (err) {
                 reject(err);
@@ -202,7 +202,9 @@ export function getRacePredictions(raceKeys?: string[]): Promise<DbRacePredictio
     return new Promise<DbRacePrediction[]>((resolve, reject) => {
         let statement: string;
         if (raceKeys && raceKeys.length) {
-            statement = `${racePredictionSelect} WHERE race in ('${raceKeys.join("','")}')`;
+            const innerKeys = raceKeys.join("','");
+            statement = `${racePredictionSelect} WHERE race in ('${innerKeys}')`;
+            console.log(statement);
         }
         else {
             statement = racePredictionSelect;

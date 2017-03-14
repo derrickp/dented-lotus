@@ -70,8 +70,10 @@ export function getTracks(keys?: string[]): Promise<DbTrack[]> {
         let statement = trackSelect;
         
         if (keys && keys.length) {
-            statement = statement + ` where key IN ('${keys.join("','")}')`
+            const innerKeys = keys.join("','");
+            statement = statement + ` where key IN ('${innerKeys}')`
         }
+        console.log(statement);
         db.all(statement, (err, rows: DbTrack[]) => {
             if (err) {
                 reject(err);
