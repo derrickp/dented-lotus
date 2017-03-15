@@ -66,8 +66,9 @@ export const driverRoutes: IRouteConfiguration[] = [
         path: "/admin/drivers",
         config: {
             cors: true,
-            handler: function (request, reply) {
+            handler: async (request, reply) => {
                 const drivers: DriverResponse[] = request.payload;
+                console.log(drivers);
                 for (const driver of drivers) {
                     if (driver.key) {
                         reply(Boom.badRequest("cannot create a driver with a pre-defined key"));
@@ -79,15 +80,15 @@ export const driverRoutes: IRouteConfiguration[] = [
                     }
                     driver.key = driver.lastName.toLowerCase();
                 }
-
-                saveDrivers(drivers).then(success => {
-                    return getDrivers(true);
-                }).then(drivers => {
-                    console.log(drivers);
-                    reply(drivers).code(201);
-                }).catch((error: Error) => {
-                    reply(Boom.badRequest(error.message));
-                });
+                try {
+                    const success = await saveDrivers(drivers);
+                    const driverKeys = drivers.map(d => d.key);
+                    const newDrivers = await getDriverResponses(false, driverKeys);
+                    reply(newDrivers);
+                }
+                catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
             },
             auth: {
                 strategies: ['jwt'],

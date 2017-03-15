@@ -1,0 +1,13 @@
+[
+    {
+        "trivia": [],
+        "firstName": "Lewis",
+        "lastName": "Hamilton",
+        "nationality": "British",
+        "active": true,
+        "abbreviation": "HAM",
+        "team": {
+            "key": "mer"
+        }
+    }
+]
