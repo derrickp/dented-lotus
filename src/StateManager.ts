@@ -118,6 +118,9 @@ export class StateManager {
     }
 
     constructor() {
+        this.signup = this.signup.bind(this);
+        this.signOut = this.signOut.bind(this);
+        this.completeGoogleLogin = this.completeGoogleLogin.bind(this);
         // this._initFacebook();
     }
 
@@ -179,7 +182,7 @@ export class StateManager {
             return this.races.then((races: RaceModel[]) => {
                 let nextRace: RaceModel;
                 races.some(r => {
-                    if (r.complete) {
+                    if (!r.complete) {
                         nextRace = r;
                         return true;
                     }

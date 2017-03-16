@@ -24,6 +24,7 @@ html {
 }
 body .wrapper,
 html .wrapper {
+  padding-top: 1em;
   max-width: 75%;
   margin: auto;
 }
@@ -124,7 +125,7 @@ html .banner {
   /* IE6-9 */
   margin-top: 0;
   display: block;
-  height: 2rem;
+  height: 3em;
   width: 100%;
   color: #f2f2f2;
 }
@@ -132,18 +133,16 @@ body .banner h1,
 html .banner h1 {
   color: #f2f2f2;
   display: inline-block;
-  width: 25%;
   font-size: 1.2rem;
   margin-left: 1em;
-  line-height: 2rem;
+  font-size: 2em;
 }
 body .banner .login,
 html .banner .login,
 body .banner .logout,
 html .banner .logout {
   height: 100%;
-  width: 8.333333333333%;
-  line-height: 2rem;
+  line-height: 3em;
   box-sizing: border-box;
   background: #4CAF50;
   text-align: center;
@@ -157,8 +156,9 @@ html .banner .logout {
 body .banner .login > span,
 html .banner .login > span {
   height: 100%;
-  display: block;
   width: 100%;
+  font-size: 1.25em;
+  padding: 0.5em;
   font-family: 'Lato', sans-serif;
 }
 body .banner .menu,
@@ -371,7 +371,7 @@ html .small-user img.round {
   /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#4c4c4c', endColorstr='#595959', GradientType=0);
   /* IE6-9 */
-  padding: 2rem 0 0;
+  padding: 3em 0 0;
   height: 100%;
   width: 100%;
   box-sizing: border-box;

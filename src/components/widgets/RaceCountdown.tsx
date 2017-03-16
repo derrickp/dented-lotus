@@ -1,6 +1,6 @@
 import * as React from "react";
 import { RaceModel } from "../../../common/models/Race";
-import { DATE_FORMAT } from "../../../common/utils/date";
+import { DATE_FORMAT, getDurationFromNow } from "../../../common/utils/date";
 import { PropsBase } from "../../utilities/ComponentUtilities";
 import * as moment from "moment";
 
@@ -35,35 +35,17 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
     }
 
     tick() {
-
         if (!this.nextRace) {
             return;
         }
-        let cutoffTime = moment(this.nextRace.raceResponse.raceDate, DATE_FORMAT);
-        let now = moment();
-        let timeRemaining = cutoffTime.diff(now);
-        let duration = moment.duration(timeRemaining, "milliseconds");
-        let days = Math.floor(duration.asDays());
-        let hours = Math.floor(duration.subtract(days, "days").asHours());
-        let minutes = Math.floor(duration.subtract(hours, "hours").asMinutes());
-        let seconds = Math.floor(duration.subtract(minutes, "minutes").asSeconds());
-        let strHours = ("0" + hours.toString()).slice(-2);
-        let strMinutes = ("0" + minutes.toString()).slice(-2);
-        let strSeconds = ("0" + seconds.toString()).slice(-2);
-        let output = "";
-        if (days == 1) {
-            output += days.toString() + " day ";
-        } else if (days > 1) {
-            output += days.toString() + " days, ";
-        }
-        output += strHours + ":" + strMinutes + ":" + strSeconds;
-        this.setState({ timeRemaining: output });
+        const dFromNow = getDurationFromNow(this.nextRace.raceDate);
+        this.setState({ timeRemaining: dFromNow.fullDuration });
     }
     render() {
         if (!this.nextRace) {
             return <span className="race-countdown">Loading race countdown...</span>;
         }
-        return <div className="race-countdown"><span>{this.nextRace.raceResponse.displayName}</span>:&nbsp;<span className="timer">{this.state.timeRemaining}</span><span onClick={this.onclick} className="button">Make Your Picks</span></div>
+        return <div className="race-countdown"><span>{this.nextRace.raceResponse.displayName + " "}</span><span className="timer">{this.state.timeRemaining}</span><span onClick={this.onclick} className="button">Make Your Picks</span></div>
     }
 
 

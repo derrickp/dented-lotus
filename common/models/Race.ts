@@ -1,6 +1,7 @@
 import { TrackModel, TrackResponse } from "./Track";
 import { DriverModel, DriverResponse } from "./Driver";
 import { PredictionResponse, PredictionModel } from "./Prediction";
+import { getDurationFromNow } from "../utils/date";
 
 export interface RaceModelContext {
     getTrack?: (key: string) => Promise<TrackModel>;
@@ -16,9 +17,9 @@ export class RaceModel {
     track?: TrackModel;
     winner?: DriverModel;
     complete?: boolean;
-    raceDate?: Date;
-    qualiDate?: Date;
-    cutoff?: Date;
+    raceDate?: string;
+    qualiDate?: string;
+    cutoff?: string;
     predictions: PredictionModel[];
     imageUrl:string;
 
@@ -28,9 +29,12 @@ export class RaceModel {
         // Putting here for ease of use
         this.key = race.key;
         if (race.raceDate) {
-            this.raceDate = new Date(race.raceDate);
-            this.complete = this.raceDate.getMilliseconds() < new Date().getMilliseconds();
+            this.raceDate = race.raceDate;
+            const d = getDurationFromNow(this.raceDate);
+            this.complete = d.seconds <= 0;
         }
+        if (race.qualiDate) this.qualiDate = race.qualiDate;
+        if (race.cutoff) this.cutoff = race.cutoff;
         this.predictions = race.predictions.map((p)=>{return new PredictionModel(p);});
         if (race.qualiDate) this.qualiDate = new Date(race.qualiDate);
         if (race.cutoff) this.cutoff = new Date(race.cutoff);

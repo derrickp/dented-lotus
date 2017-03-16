@@ -11,7 +11,7 @@
 @headerFont: 'Orbitron', Georgia, Times, serif;  
 @textFont: 'Arimo', Helvetica, Arial, sans-serif;
 
-@bannerHeight: 2rem;
+@bannerHeight: 3em;
 @borderRadius: 3px;
 
 .gradient {
@@ -34,8 +34,8 @@ body, html{
     box-sizing:border-box;
     overflow-x: hidden;
 .wrapper{
-    
-    max-width:75%;
+    padding-top: 1em;
+    max-width: 75%;
     margin: auto;
 }
  .background{
@@ -112,15 +112,13 @@ li {
     h1{
         color: @lightPrimaryColor;
         display: inline-block;
-        width: 25%; 
         font-size: 1.2rem;
         margin-left: 1em;
-        line-height: 2rem;
+        font-size: 2em;
     }
     
     .login, .logout {
         height: 100%; 
-        width:8.333333333333%;
         line-height: @bannerHeight;
         box-sizing: border-box;
         background: @accentColor;
@@ -133,8 +131,9 @@ li {
     }
     .login>span{ 
     height:100%;
-    display: block;
     width: 100%;
+    font-size: 1.25em;
+    padding: 0.5em;
     font-family: 'Lato', sans-serif;
     }
     .menu{ 
