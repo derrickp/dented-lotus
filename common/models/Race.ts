@@ -20,6 +20,8 @@ export class RaceModel {
     qualiDate?: Date;
     cutoff?: Date;
     predictions: PredictionModel[];
+    imageUrl:string;
+
 
     constructor(race: RaceResponse, context?: RaceModelContext) {
         this.raceResponse = race;
@@ -29,8 +31,11 @@ export class RaceModel {
             this.raceDate = new Date(race.raceDate);
             this.complete = this.raceDate.getMilliseconds() < new Date().getMilliseconds();
         }
+        this.predictions = race.predictions.map((p)=>{return new PredictionModel(p);});
         if (race.qualiDate) this.qualiDate = new Date(race.qualiDate);
         if (race.cutoff) this.cutoff = new Date(race.cutoff);
+        this.track = new TrackModel(race.track);
+        this.imageUrl = race.imageUrl;
         this._context = context;
     }
 
@@ -56,7 +61,8 @@ export class RaceModel {
             raceDate: this.raceDate ? this.raceDate.toString() : null,
             displayName: this.raceResponse.displayName,
             winner: this.winner ? this.winner.json : null,
-            predictions: this.predictions.map(p => p.json)
+            predictions: this.predictions.map(p => p.json),
+            imageUrl:""
         };
         return raceResponse;
     }
@@ -74,4 +80,5 @@ export interface RaceResponse {
     cutoff?: string;
     winner?: DriverResponse;
     predictions: PredictionResponse[];
+    imageUrl:string;
 }

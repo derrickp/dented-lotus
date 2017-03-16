@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { PropsBase } from "../../utilities/ComponentUtilities";
 import { RaceModel as RaceModel } from "../../../common/models/Race";
+import { PredictionComponent} from "../widgets/Prediction";
 
 export interface RaceProps {
     race: Promise<RaceModel>;
@@ -42,11 +43,21 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
         </div>;
     }
 
+
     getFull() {
-        return <div onClick={this.toggleSize.bind(this)} className="panel">
-            <div>{this.state.race.raceResponse.displayName}</div>
-            <div>{this.state.race.raceDate.toDateString()}</div>
-            <div>{this.state.race.track.trackResponse.country}</div>
+        let predictions = this.state.race.predictions.map((p)=>{return <PredictionComponent key={p.json.key} prediction={p} />});
+        return <div  className="panel">
+            <div className="row">
+                <div className="col-1">
+                <div className="">{this.state.race.raceResponse.displayName}</div>
+                <div className="">{this.state.race.raceDate.toDateString()}</div>
+                <div className="">{this.state.race.track.trackResponse.country}</div>
+                </div>
+                <div className="col-1">
+                    <img src={this.state.race.imageUrl}/>
+                </div>
+                {predictions}
+            </div>
         </div>;
     }
 
