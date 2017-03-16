@@ -4,14 +4,13 @@ import { UserResponse } from "../../../common/models/User";
 import { SignupInfo } from "../../../common/models/Signup";
 const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
 
-const basicUserSelect = "select * from basic_user_vw";
-const fullUserSelect = "select * from full_user_vw";
+const userSelect = "select * from full_user_vw";
 
 const userInsert = "INSERT INTO users (key, email, displayname, firstname, lastname, role, points)";
 
 export function getUsersByEmail(emails?: string[]): Promise<UserResponse[]> {
 	return new Promise<UserResponse[]>((resolve, reject) => {
-		let statement = basicUserSelect;
+		let statement = userSelect;
 		if (emails && emails.length) {
             const innerEmails = emails.join("','");
 			statement = statement + ` where email IN ('${innerEmails}')`;
@@ -28,7 +27,7 @@ export function getUsersByEmail(emails?: string[]): Promise<UserResponse[]> {
 
 export function getFullUsers(keys?: string[]): Promise<UserResponse[]> {
     return new Promise((resolve, reject) => {
-        let statement = fullUserSelect;
+        let statement = userSelect;
         if (keys && keys.length) {
             const innerKeys = keys.join("','");
             statement = statement + ` where key IN ('${innerKeys}')"`;
@@ -45,7 +44,7 @@ export function getFullUsers(keys?: string[]): Promise<UserResponse[]> {
 
 export function getUsersByKeys(keys: string[]): Promise<UserResponse[]> {
     return new Promise((resolve, reject) => {
-        let statement = basicUserSelect;
+        let statement = userSelect;
         if (keys && keys.length) {
             const innerKeys = keys.join("','");
             statement = statement + ` where key IN ('${innerKeys}')"`;
