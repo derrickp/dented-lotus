@@ -7,7 +7,7 @@ export interface SelectOption {
 }
 
 export interface SelectProps {
-    isStrings: boolean;
+    isStrings?: boolean;
     label:string;
     strings: string[];
     options: SelectOption[];
@@ -39,11 +39,11 @@ export class SelectBox extends React.Component<SelectProps, SelectState>{
     }
 
     private createOptionFromString(option: string): JSX.Element {
-        return <option value={option} selected={this.state.selectedOption == option}>{option}</option>
+        return <option value={option} key={option} selected={this.state.selectedOption == option}>{option}</option>
     }
 
     private createOptionFromSelectOption(option: SelectOption): JSX.Element {
-        return <option value={option.value} >{option.display}</option>
+        return <option value={option.value} key={option.display} >{option.display}</option>
 
     }
 

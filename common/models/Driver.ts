@@ -6,7 +6,7 @@ export interface DriverModelContext {
     getTrack?: (key: string) => Promise<TrackModel>;
     getRace?: (key: string) => Promise<RaceModel>;
     saveDriver?: (model:DriverModel) => Promise<boolean>;
-}
+} 
 
 export class DriverModel {
     key: string;
@@ -38,11 +38,8 @@ export class DriverModel {
         this.abbreviation = driverResponse.abbreviation;
         this.active = driverResponse.active;
         this.trivia = driverResponse.trivia;
-        this.wins = driverResponse.wins;
-
-        if (context){
-            this.save = context.saveDriver;
-        }
+        this.wins = driverResponse.wins; 
+        this.team = new TeamModel(driverResponse.team);
 
         // TeamModel.getTeamByAbbreviation(driverResponse.team).then((team)=>{
         //     this.team = team;
@@ -51,8 +48,8 @@ export class DriverModel {
 
     } 
 
-    public update(){
-        this.save(this);
+    public update( ){
+       return this.save(this);
     }
 
 

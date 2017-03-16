@@ -11,7 +11,7 @@
     "baseUrl": "src",
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false,
-    "sourceMap": false, 
+    "sourceMap": true, 
     "jsx": "react",
     "forceConsistentCasingInFileNames": true
   },

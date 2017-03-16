@@ -3,7 +3,8 @@ import { BlogResponse } from "../common/models/Blog";
 import { User, GoogleUser, FacebookUser } from "../common/models/User";
 import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
-import { DriverModel, DriverResponse, DriverModelContext } from "../common/models/Driver";
+import { DriverModel, DriverModelContext } from "../common/models/Driver";
+import { TeamModel, TeamResponse } from "../common/models/Team";
 import { SignupInfo } from "../common/models/Signup";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
 import {
@@ -13,9 +14,11 @@ import {
     saveDrivers,
     getAllRaces,
     saveRaces,
+    getAllTeams,
     getTrack,
     getDriver,
     getRace,
+    saveTeams,
     signup
 } from "./utilities/ServerUtils"
 
@@ -43,7 +46,7 @@ export class StateManager {
     private _races: Promise<RaceModel[]>;
     private _user: User;
 
-    private _dummyTeams = ["fer", "mer", "fin"];
+    private _teams: Promise<TeamModel[]>;
     get user(): User {
         return this._user;
     }
@@ -96,7 +99,7 @@ export class StateManager {
 
     get drivers(): Promise<DriverModel[]> {
         return new Promise<DriverModel[]>((resolve, reject) => {
-            return getAllDrivers().then((driverResponses: DriverResponse[]) => {
+            return getAllDrivers().then((driverResponses: DriverModel[]) => {
                 const driverModels: DriverModel[] = driverResponses.map(dr => {
                     const context: DriverModelContext = {
                         saveDriver: (driver: DriverModel) => {
@@ -110,9 +113,8 @@ export class StateManager {
         });
     }
 
-    get teams(): Promise<string[]> {
-
-        return Promise.resolve(this._dummyTeams);
+    get teams(): Promise<TeamModel[]> {
+        return getAllTeams();
     }
 
     constructor() {
@@ -218,6 +220,13 @@ export class StateManager {
     saveDriver(model: DriverModel): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             return saveDrivers([model], this.user.id_token).then(() => {
+                resolve(true);
+            })
+        });
+    }
+    saveTeam(model: TeamModel): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            return saveTeams([model], this.user.id_token).then(() => {
                 resolve(true);
             })
         });

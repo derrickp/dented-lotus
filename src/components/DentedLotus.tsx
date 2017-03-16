@@ -127,7 +127,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             case Pages.TRACKS:
                 return <Tracks tracks={this.stateManager.tracks} />;
             case Pages.DRIVERS:
-                return <Drivers drivers={this.stateManager.drivers} allTeams={this.stateManager.teams} userIsAdmin={true} />
+                return <Drivers drivers={this.stateManager.drivers} allTeams={this.stateManager.teams} userIsAdmin={true} onDriverAdded={this.stateManager.saveDriver.bind(this.stateManager)} onTeamAdded={this.stateManager.saveTeam.bind(this.stateManager)} />
             case Pages.SIGN_UP:
                 return <Signup onSubmit={this.stateManager.signup.bind(this.stateManager)} type={this.state.signUpMethod} />
             default:

@@ -113,16 +113,40 @@ export function saveDrivers(drivers: DriverModel[], id_token: string): Promise<D
             const driver = dm.json;
             driversPayload.push(driver);
         });
-        return fetch('/drivers', {
+        return fetch('/admin/drivers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + id_token
             },
-            body: JSON.stringify(drivers)
+            body: JSON.stringify(driversPayload)
         }).then(response => {
             return response.json().then((driverResponse: DriverResponse[]) => {
                 resolve(driverResponse.map((d) => { return new DriverModel(d) }));
+            });
+        });
+    });
+}
+
+
+export function saveTeams(teams: TeamModel[], id_token: string): Promise<TeamModel[]> {
+    if (!id_token) return Promise.reject(new Error("Unauthorized"));
+    return new Promise<TeamModel[]>((resolve, reject) => {
+        const teamPayload: TeamResponse[] = [];
+        teams.forEach(dm => {
+            const team = dm.json;
+            teamPayload.push(team);
+        });
+        return fetch('/admin/teams', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + id_token
+            },
+            body: JSON.stringify(teams)
+        }).then(response => {
+            return response.json().then((teams: TeamResponse[]) => {
+                resolve(teams.map((d) => { return new TeamModel(d) }));
             });
         });
     });
@@ -133,6 +157,16 @@ export function getTeamByAbbreviation(abbreviation: string): Promise<TeamModel> 
         return fetch(baseUrl + "/teams/" + abbreviation).then(response => {
             return response.json().then((team: TeamResponse) => {
                 resolve(new TeamModel(team));
+            });
+        });
+    });
+}
+
+export function getAllTeams( ): Promise<TeamModel[]> {
+    return new Promise<TeamModel[]>((resolve, reject) => {
+        return fetch(baseUrl + "/teams/").then(response => {
+            return response.json().then((teams: TeamResponse[]) => {
+                resolve(teams.map((team)=>{return new TeamModel(team)}));
             });
         });
     });

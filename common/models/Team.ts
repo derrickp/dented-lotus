@@ -8,6 +8,8 @@ export class TeamModel {
     drivers: DriverModel[];
     key: string;
     trivia: string[];
+    display:string;
+    value:TeamModel;
 
     /**
      *
@@ -18,6 +20,8 @@ export class TeamModel {
         this.headquartersCity = teamResponse.headquartersCity;
         this.name = teamResponse.name;
         this.points = teamResponse.points;
+        this.display = this.name;
+        this.value = this;
     }
 
     /**
@@ -33,6 +37,10 @@ export class TeamModel {
             points: this.points
         };
         return team;
+    }
+
+    update(){
+
     }
 }
 

@@ -107,12 +107,14 @@ export async function getTeamResponses(keys?: string[]): Promise<TeamResponse[]>
     const teams: TeamResponse[] = [];
     const teamRows = await getTeams(keys);
     if (teamRows && teamRows.length) {
-        const team: TeamResponse = {
-            key: teamRows[0].key,
-            name: teamRows[0].name,
-            trivia: teamRows[0].trivia ? JSON.parse(teamRows[0].trivia) : []
-        };
-        teams.push(team);
+        teamRows.forEach((teamRow) => {
+            const team: TeamResponse = {
+                key: teamRow.key,
+                name: teamRow.name,
+                trivia: teamRow.trivia ? JSON.parse(teamRow.trivia) : []
+            };
+            teams.push(team);
+        });
     }
     return teams;
 }
