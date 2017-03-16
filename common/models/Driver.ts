@@ -5,7 +5,7 @@ import { RaceModel } from "./Race";
 export interface DriverModelContext {
     getTrack?: (key: string) => Promise<TrackModel>;
     getRace?: (key: string) => Promise<RaceModel>;
-    saveDriver?: (model:DriverModel) => Promise<boolean>;
+    saveDriver?: (model:DriverModel) => Promise<DriverModel[]>;
 } 
 
 export class DriverModel {

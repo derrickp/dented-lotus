@@ -38,38 +38,38 @@ export class SelectBox extends React.Component<SelectProps, SelectState>{
 
     }
 
-    private createOptionFromString(option: string): JSX.Element {
-        return <option value={option} key={option} selected={this.state.selectedOption == option}>{option}</option>
+    private createOptionFromString(option: string, i): JSX.Element {
+        return <option value={i} key={option} selected={this.state.selectedOption == option}>{option}</option>
     }
 
-    private createOptionFromSelectOption(option: SelectOption): JSX.Element {
-        return <option value={option.value} key={option.display} >{option.display}</option>
+    private createOptionFromSelectOption(option: SelectOption, i): JSX.Element {
+        return <option value={i} key={option.display} >{option.display}</option>
 
     }
 
-    private createOption(option: SelectOption | string): JSX.Element {
+    private createOption(option: SelectOption | string, i:number): JSX.Element {
         if (typeof (option) === 'string') {
-            return this.createOptionFromString(option);
+            return this.createOptionFromString(option,i);
         } else {
-            return this.createOptionFromSelectOption(option);
+            return this.createOptionFromSelectOption(option, i);
         }
     } 
 
     onChanged(x){
         let val = x.target.selectedOptions[0];
         if (this.props.isStrings){
-            return this.props.onStringChanged(val.text);
+            return this.props.onStringChanged(this.state.options[val.value]);
         }else{
             return this.props.onOptionChanged({
                 display:val.text,
-                value:val.value           
+                value:this.state.options[val.value]           
             });
         } 
 }
 
 
     render(){ 
-        let opts = this.state.options.map((option)=>{return this.createOption(option);});
+        let opts = this.state.options.map((option,i)=>{return this.createOption(option, i);});
         return <span><label className="select-box-label">{this.props.label}</label>:<select className={this.className} onChange={this.onChanged.bind(this)}>{opts}</select></span>
     }
 }

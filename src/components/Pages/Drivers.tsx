@@ -8,14 +8,14 @@ import { DriverComponent } from "../widgets/DriverComponent";
 import { TeamComponent } from "../widgets/TeamComponent";
 import { Form, Input } from "formsy-react-components";
 import { TeamModel, TeamResponse } from "../../../common/models/Team";
-import { SelectBox } from "../../../react-select-component/SelectBox";
+import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
 
 export interface DriverProps {
     drivers: Promise<DriverModel[]>;
     userIsAdmin: boolean;
     allTeams: Promise<TeamModel[]>;
-    onDriverAdded: (driver: DriverModel) => Promise<boolean>;
-    onTeamAdded: (team: TeamModel) => Promise<boolean>;
+    onDriverAdded: (driver: DriverModel) => Promise<DriverModel[]>;
+    onTeamAdded: (team: TeamModel) => Promise<TeamModel[]>;
 }
 
 export interface DriverState {
@@ -37,16 +37,22 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
 
         });
         this.props.drivers.then(drivers => {
-            drivers.sort((driver1, driver2) => {
-                if (driver1.getName() < driver2.getName()) {
-                    return -1;
-                }
-                if (driver1.getName() > driver2.getName()) {
-                    return 1;
-                }
-                return 0;
-            });
+            drivers.sort((driver1, driver2) => { return driver1.lastName.localeCompare(driver2.lastName);});
             this.setState({ drivers: drivers });
+        });
+    }
+
+    onDriverAdded(driver:DriverModel):Promise<boolean>{
+        return this.props.onDriverAdded(driver).then((drivers)=>{
+            this.setState({drivers:drivers});    
+            return true;       
+        });
+    }
+
+    onTeamAdded(team:TeamModel):Promise<boolean>{
+        return this.props.onTeamAdded(team).then((teams)=>{
+            this.setState({teams:teams});
+            return true
         });
     }
 
@@ -61,7 +67,7 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
             </li>
         });
         if (this.props.userIsAdmin) {
-            drivers.push(<li key="admin"><DriverAdmin onDriverAdded={this.props.onDriverAdded}  teams={this.state.teams} /></li>);
+            drivers.push(<li key="admin"><DriverAdmin onDriverAdded={this.onDriverAdded.bind(this)}  teams={this.state.teams} /></li>);
         }
 
         let teams = this.state.teams.map((team) => {
@@ -71,7 +77,7 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
         });
 
         if (this.props.userIsAdmin) {
-            teams.push(<li key="admin"><TeamAdmin onTeamAdded={this.props.onTeamAdded} /></li>);
+            teams.push(<li key="admin"><TeamAdmin onTeamAdded={this.onTeamAdded.bind(this)} /></li>);
         }
         return <div>
             <h1>Drivers</h1>
@@ -89,7 +95,7 @@ export interface DriverAdminProps {
 
 export class DriverAdmin extends React.Component<DriverAdminProps, any>{
     onDriverAdded: (newDriver: DriverResponse) => Promise<void>;
-    driver: DriverResponse = {
+    defaultDriver: DriverResponse = {
         abbreviation: "",
         active: false,
         birthdate: "",
@@ -104,8 +110,10 @@ export class DriverAdmin extends React.Component<DriverAdminProps, any>{
         trivia: [""],
         wins: 0
     }
+    driver:DriverResponse;
     constructor(props) {
         super(props);
+        this.driver = this.defaultDriver;
         this.driver.team = props.teams[0];
         this.state = {
             isAdding: false
@@ -120,13 +128,14 @@ export class DriverAdmin extends React.Component<DriverAdminProps, any>{
     saveClicked() {
         return this.props.onDriverAdded(new DriverModel(this.driver)).then(() => {
             this.setState({ isAdding: false })
+            this.driver = this.defaultDriver;
         })
     }
     onValueChanged(name: string, value: any) {
         this.driver[name] = value;
     }
-    teamChanged(team: TeamModel) {
-        this.driver.team = team.json;
+    teamChanged(option:SelectOption) {
+        this.driver.team = option.value.json;
     }
 
 

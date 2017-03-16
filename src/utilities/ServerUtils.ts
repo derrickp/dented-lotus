@@ -166,6 +166,7 @@ export function getAllTeams( ): Promise<TeamModel[]> {
     return new Promise<TeamModel[]>((resolve, reject) => {
         return fetch(baseUrl + "/teams/").then(response => {
             return response.json().then((teams: TeamResponse[]) => {
+                teams.sort((a,b)=>{ return a.name.localeCompare(b.name);});
                 resolve(teams.map((team)=>{return new TeamModel(team)}));
             });
         });

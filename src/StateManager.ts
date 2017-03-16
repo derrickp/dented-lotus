@@ -108,7 +108,7 @@ export class StateManager {
                     };
                     return new DriverModel(dr, context);
                 });
-                resolve(driverModels);
+                resolve(driverModels.sort((a,b)=>{return a.team.name.localeCompare(b.team.name);}));
             });
         });
     }
@@ -217,10 +217,10 @@ export class StateManager {
         });
     }
 
-    saveDriver(model: DriverModel): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            return saveDrivers([model], this.user.id_token).then(() => {
-                resolve(true);
+    saveDriver(model: DriverModel): Promise<DriverModel[]> {
+        return new Promise<DriverModel[]>((resolve, reject) => {
+            return saveDrivers([model], this.user.id_token).then((drivers) => {
+                resolve(this.drivers);
             })
         });
     }
