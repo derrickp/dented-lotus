@@ -35,7 +35,7 @@ export async function getPredictionResponses(raceKeys: string[], credentials: Cr
             value: racePredictionRow.value,
             modifier: racePredictionRow.modifier,
             description: thisPrediction.description,
-            title: thisPrediction.type,
+            title: thisPrediction.title,
             numChoices: thisPrediction.numChoices,
             type: thisPrediction.type,
             outcome: [],
@@ -44,7 +44,7 @@ export async function getPredictionResponses(raceKeys: string[], credentials: Cr
         };
 
         // Get all of the user picks for this prediction
-        const theseUserPicks = userPicks.filter(up => {
+        prediction.userPicks = userPicks.filter(up => {
             return up.prediction === prediction.key;
         }).map(up => {
             return up.choice;
@@ -63,12 +63,6 @@ export async function getPredictionResponses(raceKeys: string[], credentials: Cr
                 else {
                     prediction.choices = teams;
                 }
-                if (theseUserPicks.length) {
-                    const teamPicks = teams.filter(t => {
-                        return theseUserPicks.indexOf(t.key) > -1;
-                    });
-                    prediction.userPicks = teamPicks;
-                }
                 break;
             case "driver":
             default:
@@ -79,12 +73,6 @@ export async function getPredictionResponses(raceKeys: string[], credentials: Cr
                 }
                 else {
                     prediction.choices = drivers;
-                }
-                if (theseUserPicks.length) {
-                    const driverPicks = drivers.filter(d => {
-                        return theseUserPicks.indexOf(d.key) > -1;
-                    });
-                    prediction.userPicks = driverPicks;
                 }
                 break;
         }

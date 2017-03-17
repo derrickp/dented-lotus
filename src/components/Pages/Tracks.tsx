@@ -37,7 +37,7 @@ export class Tracks extends React.Component<TracksProps, TracksState> {
             return <div>Loading...</div>;
         }
         const entries = this.state.tracks.map(track => {
-            return <li key={track.key} className="panel"><TrackPage key={track.key} track={track} small={true}/></li>
+            return <li key={track.key} className="dl-panel"><TrackPage key={track.key} track={track} small={true}/></li>
         });
         return <ul>{entries}</ul>
     }

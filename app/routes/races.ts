@@ -192,7 +192,8 @@ function getRaceResponse(season: number, raceRow: DbRace): RaceResponse {
         track: undefined,
         trivia: raceRow.trivia ? JSON.parse(raceRow.trivia) : [],
         predictions: [],
-        winner: undefined
+        winner: undefined,
+        imageUrl:""
     };
     return race;
 }

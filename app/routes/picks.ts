@@ -31,7 +31,7 @@ export const pickRoutes: IRouteConfiguration[] = [
                     }
                     const success = await saveUserPicks(dbUserPicks);
                 }
-                reply("done").code(201);
+                reply({ status: "done"}).code(201);
             },
             auth: {
                 strategies: ['jwt'],

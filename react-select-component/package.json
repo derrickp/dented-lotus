@@ -1,0 +1,13 @@
+{
+  "name": "react-select-component",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "tsc && webpack"
+  },
+  "dependencies": {
+    "react": "^15.4.2",
+    "typescript": "^2.2.1",
+    "webpack": "^2.2.1"
+  }
+}

@@ -1,14 +1,15 @@
 
-import { TeamModel, getTeamByAbbreviation, TeamResponse } from "./Team";
+import { TeamModel, TeamResponse } from "./Team";
 import { TrackModel } from "./Track";
 import { RaceModel } from "./Race";
-export interface DriverModelContext {
-    getTrack?: (key: string) => Promise<TrackModel>;
-    getRace?: (key: string) => Promise<RaceModel>;
-    saveDriver?: (model:DriverModel) => Promise<boolean>;
-}
+import { Selectable } from "./Selectable";
 
-export class DriverModel {
+export interface DriverModelContext {
+    saveDriver?: (model:DriverModel) => Promise<DriverModel[]>;
+    getTeam?: (response: TeamResponse) => TeamModel;
+} 
+
+export class DriverModel implements Selectable {
     key: string;
     active: boolean;
     firstName: string;
@@ -38,11 +39,8 @@ export class DriverModel {
         this.abbreviation = driverResponse.abbreviation;
         this.active = driverResponse.active;
         this.trivia = driverResponse.trivia;
-        this.wins = driverResponse.wins;
-
-        if (context){
-            this.save = context.saveDriver;
-        }
+        this.wins = driverResponse.wins; 
+        this.team = new TeamModel(driverResponse.team);
 
         // TeamModel.getTeamByAbbreviation(driverResponse.team).then((team)=>{
         //     this.team = team;
@@ -51,12 +49,15 @@ export class DriverModel {
 
     } 
 
-    public update(){
-        this.save(this);
+    public update( ){
+       return this.save(this);
     }
 
+    get display() {
+        return this.name + (this.team && " - " + this.team.name);
+    }
 
-    public getName(): string {
+    get name(): string {
         return this.firstName + " " + this.lastName;
     }
 

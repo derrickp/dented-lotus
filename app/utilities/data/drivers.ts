@@ -22,7 +22,7 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
                         2: driver.active ? 1 : 0,
                         3: driver.firstName ? driver.firstName : "",
                         4: driver.lastName,
-                        5: driver.team ? driver.team : "",
+                        5: driver.team ? driver.team.key : "",
                         6: driver.trivia ? JSON.stringify(driver.trivia) : "",
                         7: driver.nationality ? driver.nationality : "",
                         8: driver.flag ? driver.flag : "",

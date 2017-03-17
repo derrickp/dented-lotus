@@ -71,6 +71,7 @@ export function verifyCredentials(req, res) {
                 var user = users[0];
                 // If we have a user at this point, everything is good to go.
                 // We've already verified their token previously.
+                console.log(user);
                 if (user) {
                     res(user);
                     return;

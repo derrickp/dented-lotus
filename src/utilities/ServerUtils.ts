@@ -2,6 +2,7 @@
 import { TrackResponse } from "../../common/models/Track";
 import { DriverModel, DriverResponse } from "../../common/models/Driver";
 import { RaceResponse } from "../../common/models/Race";
+import { UserPickPayload } from "../../common/models/Prediction";
 import { TeamModel, TeamResponse } from "../../common/models/Team";
 import { UserResponse } from "../../common/models/User";
 import { SignupInfo } from "../../common/models/Signup";
@@ -113,16 +114,40 @@ export function saveDrivers(drivers: DriverModel[], id_token: string): Promise<D
             const driver = dm.json;
             driversPayload.push(driver);
         });
-        return fetch('/drivers', {
+        return fetch('/admin/drivers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + id_token
             },
-            body: JSON.stringify(drivers)
+            body: JSON.stringify(driversPayload)
         }).then(response => {
             return response.json().then((driverResponse: DriverResponse[]) => {
                 resolve(driverResponse.map((d) => { return new DriverModel(d) }));
+            });
+        });
+    });
+}
+
+
+export function saveTeams(teams: TeamModel[], id_token: string): Promise<TeamModel[]> {
+    if (!id_token) return Promise.reject(new Error("Unauthorized"));
+    return new Promise<TeamModel[]>((resolve, reject) => {
+        const teamPayload: TeamResponse[] = [];
+        teams.forEach(dm => {
+            const team = dm.json;
+            teamPayload.push(team);
+        });
+        return fetch('/admin/teams', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + id_token
+            },
+            body: JSON.stringify(teams)
+        }).then(response => {
+            return response.json().then((teams: TeamResponse[]) => {
+                resolve(teams.map((d) => { return new TeamModel(d) }));
             });
         });
     });
@@ -133,6 +158,17 @@ export function getTeamByAbbreviation(abbreviation: string): Promise<TeamModel> 
         return fetch(baseUrl + "/teams/" + abbreviation).then(response => {
             return response.json().then((team: TeamResponse) => {
                 resolve(new TeamModel(team));
+            });
+        });
+    });
+}
+
+export function getAllTeams( ): Promise<TeamModel[]> {
+    return new Promise<TeamModel[]>((resolve, reject) => {
+        return fetch(baseUrl + "/teams/").then(response => {
+            return response.json().then((teams: TeamResponse[]) => {
+                teams.sort((a,b)=>{ return a.name.localeCompare(b.name);});
+                resolve(teams.map((team)=>{return new TeamModel(team)}));
             });
         });
     });
@@ -150,6 +186,30 @@ export function authenticate(authPayload: AuthenticationPayload): Promise<Authen
             return response.json().then((authResponse: AuthenticationResponse) => {
                 resolve(authResponse);
             });
+        });
+    });
+}
+
+export function saveUserPicks(picks: UserPickPayload[], id_token: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+        return fetch("/picks", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + id_token
+            },
+            body: JSON.stringify(picks)
+        }).then(response => {
+            return response.json().then(json => {
+                if (response.ok) {
+                    resolve(true);
+                }
+                else {
+                    reject(new Error(json.message));
+                }
+            });
+        }).catch(error => {
+            reject(error);  
         });
     });
 }

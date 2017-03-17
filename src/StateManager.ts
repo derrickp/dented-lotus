@@ -3,7 +3,9 @@ import { BlogResponse } from "../common/models/Blog";
 import { User, GoogleUser, FacebookUser } from "../common/models/User";
 import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
-import { DriverModel, DriverResponse, DriverModelContext } from "../common/models/Driver";
+import { DriverModel, DriverModelContext, DriverResponse } from "../common/models/Driver";
+import { PredictionResponse, PredictionModel, PredictionContext, UserPickPayload } from "../common/models/Prediction";
+import { TeamModel, TeamResponse } from "../common/models/Team";
 import { SignupInfo } from "../common/models/Signup";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
 import {
@@ -13,9 +15,12 @@ import {
     saveDrivers,
     getAllRaces,
     saveRaces,
+    saveUserPicks,
+    getAllTeams,
     getTrack,
     getDriver,
     getRace,
+    saveTeams,
     signup
 } from "./utilities/ServerUtils"
 
@@ -43,7 +48,7 @@ export class StateManager {
     private _races: Promise<RaceModel[]>;
     private _user: User;
 
-    private _dummyTeams = ["fer", "mer", "fin"];
+    private _teams: Promise<TeamModel[]>;
     get user(): User {
         return this._user;
     }
@@ -67,15 +72,29 @@ export class StateManager {
                         saveRace: (raceModel: RaceModel) => {
                             return this.saveRace(raceModel);
                         },
-                        getTrack: (key: string): Promise<TrackModel> => {
-                            return getTrack(key).then(trackResponse => {
-                                return Promise.resolve(new TrackModel(trackResponse));
-                            });
+                        getTrack: (response: TrackResponse): TrackModel => {
+                            return new TrackModel(response);
                         },
-                        getDriver: (key: string): Promise<DriverModel> => {
-                            return getDriver(key).then(driverResponse => {
-                                return Promise.resolve(new DriverModel(driverResponse));
-                            });
+                        getDriver: (response: DriverResponse): DriverModel => {
+                            return new DriverModel(response, this.driverContext)
+                        },
+                        getPrediction: (response: PredictionResponse): PredictionModel => {
+                            return new PredictionModel(response, this.predictionContext);
+                        },
+                        saveUserPicks: (raceKey: string, prediction: PredictionModel) => {
+                            if (!this.isLoggedIn) {
+                                return Promise.reject("Need to be logged in");
+                            }
+                            const payloads: UserPickPayload[] = [];
+                            for (const pick of prediction.userPicks) {
+                                const pickPayload: UserPickPayload = {
+                                    race: raceKey,
+                                    prediction: prediction.json.key,
+                                    choice: pick
+                                };
+                                payloads.push(pickPayload);
+                            }
+                            return saveUserPicks(payloads, this.user.id_token);
                         }
                     };
                     return new RaceModel(rr, context);
@@ -83,6 +102,31 @@ export class StateManager {
                 resolve(raceModels);
             });
         });
+    }
+
+    get predictionContext(): PredictionContext {
+        return {
+            saveUserPicks: (model: PredictionModel) => {
+                return Promise.resolve(true);
+            },
+            getDriver: (response: DriverResponse) => {
+                return new DriverModel(response, this.driverContext);
+            },
+            getTeam: (response: TeamResponse) => {
+                return new TeamModel(response);
+            }
+        }
+    }
+
+    get driverContext(): DriverModelContext {
+        return {
+            saveDriver: (driver: DriverModel) => {
+                return this.saveDriver(driver);
+            },
+            getTeam: (response: TeamResponse) => {
+                return new TeamModel(response);
+            }
+        };
     }
 
     get tracks(): Promise<TrackResponse[]> {
@@ -96,26 +140,24 @@ export class StateManager {
 
     get drivers(): Promise<DriverModel[]> {
         return new Promise<DriverModel[]>((resolve, reject) => {
-            return getAllDrivers().then((driverResponses: DriverResponse[]) => {
+            return getAllDrivers().then((driverResponses: DriverModel[]) => {
                 const driverModels: DriverModel[] = driverResponses.map(dr => {
-                    const context: DriverModelContext = {
-                        saveDriver: (driver: DriverModel) => {
-                            return this.saveDriver(driver);
-                        }
-                    };
+                    const context: DriverModelContext = this.driverContext;
                     return new DriverModel(dr, context);
                 });
-                resolve(driverModels);
+                resolve(driverModels.sort((a, b) => { return a.team.name.localeCompare(b.team.name); }));
             });
         });
     }
 
-    get teams(): Promise<string[]> {
-
-        return Promise.resolve(this._dummyTeams);
+    get teams(): Promise<TeamModel[]> {
+        return getAllTeams();
     }
 
     constructor() {
+        this.signup = this.signup.bind(this);
+        this.signOut = this.signOut.bind(this);
+        this.completeGoogleLogin = this.completeGoogleLogin.bind(this);
         // this._initFacebook();
     }
 
@@ -177,7 +219,7 @@ export class StateManager {
             return this.races.then((races: RaceModel[]) => {
                 let nextRace: RaceModel;
                 races.some(r => {
-                    if (r.complete) {
+                    if (!r.complete) {
                         nextRace = r;
                         return true;
                     }
@@ -215,9 +257,16 @@ export class StateManager {
         });
     }
 
-    saveDriver(model: DriverModel): Promise<boolean> {
+    saveDriver(model: DriverModel): Promise<DriverModel[]> {
+        return new Promise<DriverModel[]>((resolve, reject) => {
+            return saveDrivers([model], this.user.id_token).then((drivers) => {
+                resolve(this.drivers);
+            })
+        });
+    }
+    saveTeam(model: TeamModel): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            return saveDrivers([model], this.user.id_token).then(() => {
+            return saveTeams([model], this.user.id_token).then(() => {
                 resolve(true);
             })
         });

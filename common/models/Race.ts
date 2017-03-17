@@ -1,11 +1,14 @@
 import { TrackModel, TrackResponse } from "./Track";
 import { DriverModel, DriverResponse } from "./Driver";
 import { PredictionResponse, PredictionModel } from "./Prediction";
+import { getDurationFromNow } from "../utils/date";
 
 export interface RaceModelContext {
-    getTrack?: (key: string) => Promise<TrackModel>;
-    getDriver?: (key: string) => Promise<DriverModel>;
+    getTrack?: (response: TrackResponse) => TrackModel;
+    getDriver?: (response: DriverResponse) => DriverModel;
     saveRace?: (model: RaceModel) => Promise<boolean>;
+    saveUserPicks?: (raceKey: string, prediction: PredictionModel) => Promise<boolean>;
+    getPrediction?: (response: PredictionResponse) => PredictionModel;
 }
 
 export class RaceModel {
@@ -16,22 +19,37 @@ export class RaceModel {
     track?: TrackModel;
     winner?: DriverModel;
     complete?: boolean;
-    raceDate?: Date;
-    qualiDate?: Date;
-    cutoff?: Date;
+    raceDate?: string;
+    qualiDate?: string;
+    cutoff?: string;
     predictions: PredictionModel[];
+    imageUrl:string;
+
 
     constructor(race: RaceResponse, context?: RaceModelContext) {
         this.raceResponse = race;
         // Putting here for ease of use
         this.key = race.key;
         if (race.raceDate) {
-            this.raceDate = new Date(race.raceDate);
-            this.complete = this.raceDate.getMilliseconds() < new Date().getMilliseconds();
+            this.raceDate = race.raceDate;
+            const d = getDurationFromNow(this.raceDate);
+            this.complete = d.seconds <= 0;
         }
-        if (race.qualiDate) this.qualiDate = new Date(race.qualiDate);
-        if (race.cutoff) this.cutoff = new Date(race.cutoff);
+        if (race.qualiDate) this.qualiDate = race.qualiDate;
+        if (race.cutoff) {
+            this.cutoff = race.cutoff;
+        }
+        else {
+            this.cutoff = this.raceDate;
+        }
+        this.predictions = race.predictions.map((p)=>{return context.getPrediction(p);});
+        this.imageUrl = race.imageUrl;
         this._context = context;
+        this.track = this._context.getTrack(race.track);
+        if (race.winner) {
+            this.winner = this._context.getDriver(race.winner);
+        }
+        this.saveUserPicks = this.saveUserPicks.bind(this);
     }
 
     async initialize(): Promise<void> {
@@ -45,6 +63,13 @@ export class RaceModel {
         return this._context.saveRace(this);
     }
 
+    saveUserPicks(prediction: PredictionModel): Promise<boolean> {
+        if (!this._context) {
+            return Promise.reject(new Error("Need valid context to save"));
+        }
+        return this._context.saveUserPicks(this.key, prediction);
+    }
+
     get json(): RaceResponse {
         const raceResponse: RaceResponse = {
             key: this.raceResponse.key,
@@ -56,7 +81,8 @@ export class RaceModel {
             raceDate: this.raceDate ? this.raceDate.toString() : null,
             displayName: this.raceResponse.displayName,
             winner: this.winner ? this.winner.json : null,
-            predictions: this.predictions.map(p => p.json)
+            predictions: this.predictions.map(p => p.json),
+            imageUrl:""
         };
         return raceResponse;
     }
@@ -74,4 +100,5 @@ export interface RaceResponse {
     cutoff?: string;
     winner?: DriverResponse;
     predictions: PredictionResponse[];
+    imageUrl:string;
 }

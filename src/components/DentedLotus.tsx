@@ -18,8 +18,12 @@ export interface DentedLotusProps extends PropsBase {
 
 }
 
+interface Parameters {
+    page: string;
+}
+
 export interface DentedLotusState {
-    parameters: any;
+    parameters: Parameters;
     sidebarOpen: boolean;
     race: Promise<RaceModel>;
     loggedIn: boolean;
@@ -83,7 +87,10 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         const parameters = getUrlParameters();
         this.stateManager = props.stateManager;
         this.state = { loggedIn: false, race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
-
+        this.launchRacePicks = this.launchRacePicks.bind(this);
+        this.signUp = this.signUp.bind(this);
+        this.onPageChange = this.onPageChange.bind(this);
+        this.changeRace = this.changeRace.bind(this);
         this.stateManager.watch("user", (user: User) => {
             this.onUserChange();
         });
@@ -116,20 +123,27 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         this.setState({ parameters: parameters });
     }
 
+    changeRace(race: RaceModel) {
+        const parameters = this.state.parameters;
+        parameters.page = Pages.RACE;
+        this.setState({ parameters: parameters, race: Promise.resolve(race) })
+    }
+
     getCurrentView() {
         switch (this.state.parameters.page) {
             case Pages.RACE:
                 return <RacePage race={this.state.race} small={false} ></RacePage>;
+                // return <div></div>;
             case Pages.USER:
                 return <div>User!!!!</div>;
             case Pages.ALL_RACES:
-                return <AllRaces races={this.stateManager.races} />;
+                return <AllRaces raceClick={this.changeRace} races={this.stateManager.races} selectedRace={this.state.race} />;
             case Pages.TRACKS:
                 return <Tracks tracks={this.stateManager.tracks} />;
             case Pages.DRIVERS:
-                return <Drivers drivers={this.stateManager.drivers} allTeams={this.stateManager.teams} userIsAdmin={true} />
+                return <Drivers drivers={this.stateManager.drivers} allTeams={this.stateManager.teams} userIsAdmin={true} onDriverAdded={this.stateManager.saveDriver.bind(this.stateManager)} onTeamAdded={this.stateManager.saveTeam.bind(this.stateManager)} />
             case Pages.SIGN_UP:
-                return <Signup onSubmit={this.stateManager.signup.bind(this.stateManager)} type={this.state.signUpMethod} />
+                return <Signup onSubmit={this.stateManager.signup} type={this.state.signUpMethod} />
             default:
                 return this.getHomePage();
         }
@@ -139,7 +153,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         const components: any[] = [];
 
         if (this.stateManager.isLoggedIn) {
-            components.push(<RaceCountdown onclick={this.launchRacePicks.bind(this)} stateManager={this.stateManager} race={this.stateManager.nextRace} />);
+            components.push(<RaceCountdown onclick={this.launchRacePicks} stateManager={this.stateManager} race={this.stateManager.nextRace} />);
         }
         components.push(<BlogComponent stateManager={this.stateManager} />);
         return <div>{components}</div>
@@ -152,13 +166,16 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     }
 
     render() {
-        return <div>
-            <Banner signUp={this.signUp.bind(this)} logout={this.stateManager.signOut.bind(this.stateManager)} loggedIn={this.state.loggedIn} completeGoogleLogin={this.stateManager.completeGoogleLogin.bind(this.stateManager)} onPageChange={this.onPageChange.bind(this)} stateManager={this.stateManager} title="Project Dented Lotus" />
+        let mainContent: JSX.Element[] = [];
+        if (this.state.parameters.page === Pages.HOME) {
+            mainContent.push(<div className="header-section"></div>);
+        }
+        mainContent.push(<div className="wrapper">{this.getCurrentView()}</div>);
 
-            <div className="header-section"></div>
-            <div className="wrapper">
-                {this.getCurrentView()}
-            </div>
-        </div>
+        return <div>
+            <Banner signUp={this.signUp} logout={this.stateManager.signOut} loggedIn={this.state.loggedIn} completeGoogleLogin={this.stateManager.completeGoogleLogin} onPageChange={this.onPageChange} stateManager={this.stateManager} title="Project Dented Lotus" />
+            {mainContent}
+        </div>;
+
     }
 }

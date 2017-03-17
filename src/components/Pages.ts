@@ -15,4 +15,5 @@ export class Pages {
     static TRACKS = "tracks";
     static ALL_RACES = "all-races";
     static SIGN_UP = "signup";
+    static PICKS = "picks";
 }

@@ -1,4 +1,5 @@
-﻿{
+
+{
   "compilerOptions": {
     "module": "commonjs",
     "target": "es5",
@@ -8,17 +9,14 @@
       "dom.iterable"
     ],
     "moduleResolution": "node",
-    "baseUrl": "src",
+    "baseUrl": "./",
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false,
-    "sourceMap": true, 
+    "sourceMap": false, 
     "jsx": "react",
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "src",
-    "app",
-    "app.ts"
+  "include": [ "./"
   ],
   "exclude": [
     "node_modules"
