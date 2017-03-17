@@ -4,9 +4,15 @@ import { DATE_FORMAT, getDurationFromNow } from "../../../common/utils/date";
 import { PropsBase } from "../../utilities/ComponentUtilities";
 import * as moment from "moment";
 
+import { Jumbotron, Button } from "react-bootstrap";
+
 export interface RaceCountdownProps extends PropsBase {
     race: Promise<RaceModel>;
     onclick: () => void;
+}
+
+export interface RaceCountdownState {
+    timeRemaining: string;
 }
 
 export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
@@ -18,7 +24,7 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
      */
     constructor(props: RaceCountdownProps) {
         super(props);
-        this.state = { timeRemaining: 0 };
+        this.state = { timeRemaining: "" };
         this.tick = this.tick.bind(this);
         props.race.then(race => {
             this.nextRace = race;
@@ -45,7 +51,13 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
         if (!this.nextRace) {
             return <span className="race-countdown">Loading race countdown...</span>;
         }
-        return <div className="race-countdown"><span>{this.nextRace.raceResponse.displayName + " "}</span><span className="timer">{this.state.timeRemaining}</span><span onClick={this.onclick} className="button">Make Your Picks</span></div>
+        const jumbo =
+            <Jumbotron id="race-countdown-jumbo">
+                <h1>Next Race!</h1>
+                <p>{this.nextRace.raceResponse.displayName + " " + this.state.timeRemaining}</p>
+                <Button onClick={this.onclick} bsSize="large" bsStyle="primary" >Make Your Picks</Button>
+            </Jumbotron>;
+        return jumbo;
     }
 
 
