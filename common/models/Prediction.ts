@@ -8,7 +8,7 @@ export interface PredictionResponse {
     type: string;
     allSeason: boolean;
     numChoices: number;
-    choices: any[]; //DriverResponse[] | TeamResponse[];
+    choices: DriverResponse[] | TeamResponse[];
     value: number;
     modifier: number;
     outcome?: DriverResponse[] | TeamResponse[];

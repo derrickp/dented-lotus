@@ -17,6 +17,7 @@ export function getDurationFromNow(date: string): DurationFromNow {
     const dayString = days === 1 ? "day" : "days";
     const output = `${days} ${dayString} : ${strMinutes} : ${strSeconds}`;
     return {
+        timeRemaining: timeRemaining,
         duration: duration,
         days: days,
         hours: hours,
@@ -27,6 +28,7 @@ export function getDurationFromNow(date: string): DurationFromNow {
 }
 
 export interface DurationFromNow {
+    timeRemaining: number;
     duration: moment.Duration;
     days: number;
     hours: number;

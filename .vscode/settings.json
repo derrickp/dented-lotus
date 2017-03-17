@@ -7,11 +7,10 @@
         "**/.DS_Store": true, 
         "**/*.jsx": true,
         "compiled": true,
-        "dist": false,
+        "dist": true,
         "node_modules": true,
         "config": true, 
-        "app/**/*.js": true,
-        "src/**/*.js": true,
-        "common/**/*.js": true
+        "**/*.js": true,
+        "**/*.js.map": true
     }
 }

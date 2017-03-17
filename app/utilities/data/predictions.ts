@@ -35,7 +35,7 @@ export async function getPredictionResponses(raceKeys: string[], credentials: Cr
             value: racePredictionRow.value,
             modifier: racePredictionRow.modifier,
             description: thisPrediction.description,
-            title: thisPrediction.type,
+            title: thisPrediction.title,
             numChoices: thisPrediction.numChoices,
             type: thisPrediction.type,
             outcome: [],

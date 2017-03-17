@@ -3,7 +3,8 @@ import { BlogResponse } from "../common/models/Blog";
 import { User, GoogleUser, FacebookUser } from "../common/models/User";
 import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
-import { DriverModel, DriverModelContext } from "../common/models/Driver";
+import { DriverModel, DriverModelContext, DriverResponse } from "../common/models/Driver";
+import { PredictionResponse, PredictionModel } from "../common/models/Prediction";
 import { TeamModel, TeamResponse } from "../common/models/Team";
 import { SignupInfo } from "../common/models/Signup";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
@@ -70,22 +71,29 @@ export class StateManager {
                         saveRace: (raceModel: RaceModel) => {
                             return this.saveRace(raceModel);
                         },
-                        getTrack: (key: string): Promise<TrackModel> => {
-                            return getTrack(key).then(trackResponse => {
-                                return Promise.resolve(new TrackModel(trackResponse));
-                            });
+                        getTrack: (response: TrackResponse): TrackModel => {
+                            return new TrackModel(response);
                         },
-                        getDriver: (key: string): Promise<DriverModel> => {
-                            return getDriver(key).then(driverResponse => {
-                                return Promise.resolve(new DriverModel(driverResponse));
-                            });
-                        }
+                        getDriver: (response: DriverResponse): DriverModel => {
+                            return new DriverModel(response, this.driverContext)
+                        },
+                        getPrediction: (response: PredictionResponse): PredictionModel => {
+                            return new PredictionModel(response);
+                        } 
                     };
                     return new RaceModel(rr, context);
                 });
                 resolve(raceModels);
             });
         });
+    }
+
+    get driverContext(): DriverModelContext {
+        return {
+            saveDriver: (driver: DriverModel) => {
+                return this.saveDriver(driver);
+            }
+        };
     }
 
     get tracks(): Promise<TrackResponse[]> {
@@ -101,14 +109,10 @@ export class StateManager {
         return new Promise<DriverModel[]>((resolve, reject) => {
             return getAllDrivers().then((driverResponses: DriverModel[]) => {
                 const driverModels: DriverModel[] = driverResponses.map(dr => {
-                    const context: DriverModelContext = {
-                        saveDriver: (driver: DriverModel) => {
-                            return this.saveDriver(driver);
-                        }
-                    };
+                    const context: DriverModelContext = this.driverContext;
                     return new DriverModel(dr, context);
                 });
-                resolve(driverModels.sort((a,b)=>{return a.team.name.localeCompare(b.team.name);}));
+                resolve(driverModels.sort((a, b) => { return a.team.name.localeCompare(b.team.name); }));
             });
         });
     }
