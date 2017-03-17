@@ -2,16 +2,18 @@ import * as React from "react";
 import * as ReactDom from "react-dom";
 import { DriverModel, DriverResponse } from "../../../common/models/Driver";
 import { TeamModel, TeamResponse } from "../../../common/models/Team";
+import { Selectable } from "../../../common/models/Selectable";
 import { PredictionModel, PredictionResponse } from "../../../common/models/Prediction";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
-import { MenuItem, DropdownButton, Well, SelectCallback } from "react-bootstrap";
+import { MenuItem, FormControl, Well, FormGroup } from "react-bootstrap";
 
 export interface PredictionProps {
     prediction: PredictionModel;
+    save: (prediction: PredictionModel) => Promise<boolean>;
 }
 
 export interface PredictionState {
-
+    validationState: "success" | "warning" | "error";
 }
 
 export class PredictionComponent extends React.Component<PredictionProps, PredictionState>{
@@ -20,55 +22,50 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
      */
     constructor(props: PredictionProps) {
         super(props);
-        this.onDropdownSelect = this.onDropdownSelect.bind(this);
+        this.onChange = this.onChange.bind(this);
+        this.state = {
+            validationState: null
+        };
     }
 
-    onDropdownSelect(eventKey) {
-        alert(eventKey);
+    onChange(event: React.ChangeEvent<any>) {
+        const value = event.target.value !== "not-app" ? event.target.value : null;
+        this.props.prediction.userPicks.splice(0, 1, value);
+        this.setState({ validationState: "warning" });
+        this.props.save(this.props.prediction).then(success => {
+            this.setState({ validationState: success ? "success" : "error" });
+            if (!success) {
+                alert("Failed to save pick. Try again");
+            }
+            setTimeout(() => {
+                this.setState({ validationState: null });
+            }, 1000);
+        });
     }
 
-    onSelectionChanged(option: SelectOption) {
-        alert(option.display + " - " + option.value);
-    }
-
-    getSelectOption(c): SelectOption {
-        return c.hasOwnProperty("firstName") ? { display: c["firstName"] + " " + c["lastName"], value: c } : { display: c["name"], value: c }
-    }
-
-    getMenuItem(option: DriverResponse | TeamResponse): JSX.Element {
-        if ((option as DriverResponse).firstName) {
-            const driverOption = option as DriverResponse;
-            const selectText = driverOption.firstName + " " + driverOption.lastName;
-            return <MenuItem key={driverOption.key} eventKey={driverOption.key} >{selectText}</MenuItem>;
-        }
-        else {
-            const teamOption = option as TeamResponse;
-            const selectText = teamOption.name;
-            return <MenuItem key={teamOption.key} eventKey={teamOption.key} >{selectText}</MenuItem>;
-        }
+    getOption(selectable: Selectable, choice: string): JSX.Element {
+        return <option key={selectable.key} value={selectable.key}>{selectable.display}</option>;
     }
 
     render() {
         const prediction = this.props.prediction;
-        const menuItems: JSX.Element[] = [];
-        for (const c of prediction.json.choices) {
-            menuItems.push(this.getMenuItem(c));
+        const options: JSX.Element[] = [];
+        const placeholder = <option key={"not-app"} value={"not-app"} >Make your pick</option>;
+        options.push(placeholder);
+        const userChoice = prediction.json.userPicks[0];
+        for (const c of prediction.choices) {
+            options.push(this.getOption(c, userChoice));
         }
-        const dropdown = <DropdownButton onSelect={this.onDropdownSelect} id={prediction.json.key} bsSize="large" title="Make your pick">
-            {menuItems}
-        </DropdownButton>;
-        {/*return <div className="prediction-box">
-            <h1>{this.props.prediction.json.title}</h1>
-            <span>{this.props.prediction.json.description}</span>
-            <div>
-                <SelectBox isStrings={false} label="Your selection" onOptionChanged={this.onSelectionChanged.bind(this)} options={options} selectMessage="Make Your Pick" strings={[]} />
-            </div>
-        </div>*/}
-        return <Well>
+        const formControl =
+            <FormGroup key={prediction.json.key} validationState={this.state.validationState} bsSize="large">
+                <FormControl defaultValue={userChoice} onChange={this.onChange} id={prediction.json.key} componentClass="select" placeholder="Make your pick">
+                    {options}
+                </FormControl>
+            </FormGroup>;
+        return <Well bsSize="small">
             <h4>{prediction.json.title}</h4>
             <p>{prediction.json.description}</p>
-            {dropdown}
+            {formControl}
         </Well>;
-
     }
 }

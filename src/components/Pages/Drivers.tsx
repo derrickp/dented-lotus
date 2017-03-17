@@ -62,7 +62,7 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
         }
         let output = null;
         let drivers = this.state.drivers.map(driver => {
-            return <li key={driver.key} className="panel">
+            return <li key={driver.key} className="dl-panel">
                 <DriverComponent userIsAdmin={this.state.userIsAdmin} allTeams={this.state.teams} key={driver.abbreviation} driver={driver} small={true} />
             </li>
         });
@@ -71,7 +71,7 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
         }
 
         let teams = this.state.teams.map((team) => {
-            return <li key={team.abbreviation} className="panel">
+            return <li key={team.abbreviation} className="dl-panel">
                 <TeamComponent userIsAdmin={this.state.userIsAdmin} allTeams={this.state.teams} key={team.abbreviation} team={team} small={true} />
             </li>
         });
@@ -158,7 +158,7 @@ export class DriverAdmin extends React.Component<DriverAdminProps, any>{
         } else {
             output = <button onClick={this.addNewClicked.bind(this)}>Add new driver</button>;
         }
-        return <div className="panel">{output}</div>;
+        return <div className="dl-panel">{output}</div>;
     }
 }
 
@@ -216,6 +216,6 @@ export class TeamAdmin extends React.Component<TeamAdminProps, TeamAdminState>{
         } else {
             output = <button onClick={this.addNewTeamClicked.bind(this)}>Add new team</button>;
         }
-        return <div className="panel">{output}</div>;
+        return <div className="dl-panel">{output}</div>;
     }
 }

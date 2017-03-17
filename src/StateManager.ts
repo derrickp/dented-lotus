@@ -4,7 +4,7 @@ import { User, GoogleUser, FacebookUser } from "../common/models/User";
 import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
 import { DriverModel, DriverModelContext, DriverResponse } from "../common/models/Driver";
-import { PredictionResponse, PredictionModel } from "../common/models/Prediction";
+import { PredictionResponse, PredictionModel, PredictionContext, UserPickPayload } from "../common/models/Prediction";
 import { TeamModel, TeamResponse } from "../common/models/Team";
 import { SignupInfo } from "../common/models/Signup";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
@@ -15,6 +15,7 @@ import {
     saveDrivers,
     getAllRaces,
     saveRaces,
+    saveUserPicks,
     getAllTeams,
     getTrack,
     getDriver,
@@ -78,8 +79,23 @@ export class StateManager {
                             return new DriverModel(response, this.driverContext)
                         },
                         getPrediction: (response: PredictionResponse): PredictionModel => {
-                            return new PredictionModel(response);
-                        } 
+                            return new PredictionModel(response, this.predictionContext);
+                        },
+                        saveUserPicks: (raceKey: string, prediction: PredictionModel) => {
+                            if (!this.isLoggedIn) {
+                                return Promise.reject("Need to be logged in");
+                            }
+                            const payloads: UserPickPayload[] = [];
+                            for (const pick of prediction.userPicks) {
+                                const pickPayload: UserPickPayload = {
+                                    race: raceKey,
+                                    prediction: prediction.json.key,
+                                    choice: pick
+                                };
+                                payloads.push(pickPayload);
+                            }
+                            return saveUserPicks(payloads, this.user.id_token);
+                        }
                     };
                     return new RaceModel(rr, context);
                 });
@@ -88,10 +104,27 @@ export class StateManager {
         });
     }
 
+    get predictionContext(): PredictionContext {
+        return {
+            saveUserPicks: (model: PredictionModel) => {
+                return Promise.resolve(true);
+            },
+            getDriver: (response: DriverResponse) => {
+                return new DriverModel(response, this.driverContext);
+            },
+            getTeam: (response: TeamResponse) => {
+                return new TeamModel(response);
+            }
+        }
+    }
+
     get driverContext(): DriverModelContext {
         return {
             saveDriver: (driver: DriverModel) => {
                 return this.saveDriver(driver);
+            },
+            getTeam: (response: TeamResponse) => {
+                return new TeamModel(response);
             }
         };
     }

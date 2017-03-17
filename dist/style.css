@@ -44,8 +44,8 @@ body li,
 html li {
   list-style: none;
 }
-body .panel,
-html .panel {
+body .dl-panel,
+html .dl-panel {
   border: 1px solid #b5b3b4;
   box-shadow: 0 2px 1px rgba(130, 128, 129, 0.2);
   border-radius: 3px;

@@ -7,6 +7,7 @@ export interface RaceModelContext {
     getTrack?: (response: TrackResponse) => TrackModel;
     getDriver?: (response: DriverResponse) => DriverModel;
     saveRace?: (model: RaceModel) => Promise<boolean>;
+    saveUserPicks?: (raceKey: string, prediction: PredictionModel) => Promise<boolean>;
     getPrediction?: (response: PredictionResponse) => PredictionModel;
 }
 
@@ -41,13 +42,14 @@ export class RaceModel {
         else {
             this.cutoff = this.raceDate;
         }
-        this.predictions = race.predictions.map((p)=>{return new PredictionModel(p);});
+        this.predictions = race.predictions.map((p)=>{return context.getPrediction(p);});
         this.imageUrl = race.imageUrl;
         this._context = context;
         this.track = this._context.getTrack(race.track);
         if (race.winner) {
             this.winner = this._context.getDriver(race.winner);
         }
+        this.saveUserPicks = this.saveUserPicks.bind(this);
     }
 
     async initialize(): Promise<void> {
@@ -59,6 +61,13 @@ export class RaceModel {
             return Promise.reject(new Error("Need valid context to save"));
         }
         return this._context.saveRace(this);
+    }
+
+    saveUserPicks(prediction: PredictionModel): Promise<boolean> {
+        if (!this._context) {
+            return Promise.reject(new Error("Need valid context to save"));
+        }
+        return this._context.saveUserPicks(this.key, prediction);
     }
 
     get json(): RaceResponse {

@@ -27,7 +27,7 @@
 body, html{
     padding:0;
     margin: 0;
-        color:@lightPrimaryColor;
+    color:@lightPrimaryColor;
     background-color: @lightPrimaryColor;
     background-image: url("/images/brushed.png");     
     font-family: @textFont;
@@ -51,7 +51,7 @@ h1 {
 li {
     list-style: none; 
 }
-.panel{
+.dl-panel{
         border: 1px solid lighten(@panelColor,20%);
         box-shadow: 0 2px 1px fade(@panelColor,20%);
         border-radius:@borderRadius; 
@@ -60,11 +60,11 @@ li {
 .blog-posts{
     padding: 0;
     .blog-entry{
-        .panel;
+        .dl-panel;
         max-width:60em;  
         margin-bottom:1em;
         padding:1em; 
-        box-sizing:border-box;      
+        box-sizing:border-box;    
         .date{
             width:100%;  
         } 
@@ -78,7 +78,7 @@ li {
     height:2.5rem;
     line-height:2.5rem; 
     padding-left:1em;
-    .panel;
+    .dl-panel;
     .timer{
         margin-right:1rem;
     }

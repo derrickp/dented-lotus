@@ -2,6 +2,7 @@
 import { TrackResponse } from "../../common/models/Track";
 import { DriverModel, DriverResponse } from "../../common/models/Driver";
 import { RaceResponse } from "../../common/models/Race";
+import { UserPickPayload } from "../../common/models/Prediction";
 import { TeamModel, TeamResponse } from "../../common/models/Team";
 import { UserResponse } from "../../common/models/User";
 import { SignupInfo } from "../../common/models/Signup";
@@ -185,6 +186,30 @@ export function authenticate(authPayload: AuthenticationPayload): Promise<Authen
             return response.json().then((authResponse: AuthenticationResponse) => {
                 resolve(authResponse);
             });
+        });
+    });
+}
+
+export function saveUserPicks(picks: UserPickPayload[], id_token: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+        return fetch("/picks", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + id_token
+            },
+            body: JSON.stringify(picks)
+        }).then(response => {
+            return response.json().then(json => {
+                if (response.ok) {
+                    resolve(true);
+                }
+                else {
+                    reject(new Error(json.message));
+                }
+            });
+        }).catch(error => {
+            reject(error);  
         });
     });
 }

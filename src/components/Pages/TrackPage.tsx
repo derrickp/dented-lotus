@@ -30,14 +30,14 @@ export class TrackPage extends React.Component<TrackProps, TrackState> {
     }
 
     getSmall() {
-        return <div onClick={this.toggleSize.bind(this)} className="panel">
+        return <div onClick={this.toggleSize.bind(this)} className="dl-panel">
             <div>{this.state.track.name} - SMALL</div>
             <div>{this.state.track.country}</div>
         </div>;
     }
 
     getFull() {
-        return <div onClick={this.toggleSize.bind(this)} className="panel">
+        return <div onClick={this.toggleSize.bind(this)} className="dl-panel">
             <div>{this.state.track.name}</div>
             <div>{this.state.track.country}</div>
         </div>;

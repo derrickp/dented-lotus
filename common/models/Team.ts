@@ -1,6 +1,7 @@
 import { DriverModel, DriverResponse } from "./Driver";
-import { getTeamByAbbreviation } from "../../src/utilities/ServerUtils";
-export class TeamModel {
+import { Selectable } from "./Selectable";
+
+export class TeamModel implements Selectable {
     name: string;
     abbreviation: string;
     headquartersCity: string;
@@ -8,7 +9,6 @@ export class TeamModel {
     drivers: DriverModel[];
     key: string;
     trivia: string[];
-    display:string;
     value:TeamModel;
 
     /**
@@ -20,8 +20,11 @@ export class TeamModel {
         this.headquartersCity = teamResponse.headquartersCity;
         this.name = teamResponse.name;
         this.points = teamResponse.points;
-        this.display = this.name;
         this.value = this;
+    }
+
+    get display() {
+        return this.name;
     }
 
     /**
@@ -43,8 +46,6 @@ export class TeamModel {
 
     }
 }
-
-export { getTeamByAbbreviation };
 
 export interface TeamResponse {
     key: string;
