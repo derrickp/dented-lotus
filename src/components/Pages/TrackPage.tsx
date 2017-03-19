@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { PropsBase } from "../../utilities/ComponentUtilities";
 import { TrackResponse as TrackModel } from "../../../common/models/Track";
 
 export interface TrackProps {

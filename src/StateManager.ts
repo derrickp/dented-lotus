@@ -10,9 +10,11 @@ import { SignupInfo } from "../common/models/Signup";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
 import {
     getAllTracks,
+    getBlogs,
     getAllDrivers,
     authenticate,
     saveDrivers,
+    createDriver as serverCreateDriver,
     getAllRaces,
     saveRaces,
     saveUserPicks,
@@ -26,29 +28,37 @@ import {
 
 
 export class StateManager {
-    blogs: BlogResponse[] = [
-        {
-            author: "Craig",
-            postDate: "Sept. 33rd",
-            message: "Today shouldn't exist!",
-            title: "but Why!?"
-        },
-        {
-            author: "Derrick",
-            postDate: "Sept. 34th",
-            message: "What have we done?!",
-            title: "SEPTEMBER!!!"
-        }
-    ];
 
     private _watches: Map<string, Function[]> = new Map<string, Function[]>();
 
     private _tracks: Promise<TrackResponse[]>;
     private _drivers: Promise<DriverModel[]>;
     private _races: Promise<RaceModel[]>;
+    private _blogs: Promise<BlogResponse[]>;
     private _user: User;
 
+    private _raceMap: Map<string, RaceModel> = new Map<string, RaceModel>();
+    private _driverMap: Map<string, DriverModel> = new Map<string, DriverModel>();
+    private _teamMap: Map<string, TeamModel> = new Map<string, TeamModel>();
+
+
+
     private _teams: Promise<TeamModel[]>;
+    get teams(): Promise<TeamModel[]> {
+        this._teams = this._teams ? this._teams : new Promise<TeamModel[]>((resolve, reject) => {
+            return getAllTeams().then(teamResponses => {
+                const teams: TeamModel[] = [];
+                for (const teamResponse of teamResponses) {
+                    const team = this.getTeam(teamResponse);
+                    teams.push(team);
+                }
+                resolve(teams);
+            });
+        });
+        return this._teams;
+    }
+
+
     get user(): User {
         return this._user;
     }
@@ -76,7 +86,7 @@ export class StateManager {
                             return new TrackModel(response);
                         },
                         getDriver: (response: DriverResponse): DriverModel => {
-                            return new DriverModel(response, this.driverContext)
+                            return this.getDriver(response);
                         },
                         getPrediction: (response: PredictionResponse): PredictionModel => {
                             return new PredictionModel(response, this.predictionContext);
@@ -99,6 +109,10 @@ export class StateManager {
                     };
                     return new RaceModel(rr, context);
                 });
+                for (const raceModel of raceModels) {
+                    if (!this._raceMap.has(raceModel.key)) this._raceMap.set(raceModel.key, raceModel);
+                }
+                this._publishWatches("races");
                 resolve(raceModels);
             });
         });
@@ -110,12 +124,20 @@ export class StateManager {
                 return Promise.resolve(true);
             },
             getDriver: (response: DriverResponse) => {
-                return new DriverModel(response, this.driverContext);
+                return this.getDriver(response);
             },
             getTeam: (response: TeamResponse) => {
                 return new TeamModel(response);
             }
         }
+    }
+
+    getDriver(response: DriverResponse): DriverModel {
+        if (this._driverMap.has(response.key)) return this._driverMap.get(response.key);
+        const driverModel = new DriverModel(response, this.driverContext);
+        this._driverMap.set(response.key, driverModel);
+        this._publishWatches("drivers");
+        return driverModel;
     }
 
     get driverContext(): DriverModelContext {
@@ -124,7 +146,7 @@ export class StateManager {
                 return this.saveDriver(driver);
             },
             getTeam: (response: TeamResponse) => {
-                return new TeamModel(response);
+                return this.getTeam(response);
             }
         };
     }
@@ -139,25 +161,35 @@ export class StateManager {
     }
 
     get drivers(): Promise<DriverModel[]> {
-        return new Promise<DriverModel[]>((resolve, reject) => {
+        this._drivers = this._drivers ? this._drivers : new Promise<DriverModel[]>((resolve, reject) => {
             return getAllDrivers().then((driverResponses: DriverModel[]) => {
                 const driverModels: DriverModel[] = driverResponses.map(dr => {
-                    const context: DriverModelContext = this.driverContext;
-                    return new DriverModel(dr, context);
+                    return this.getDriver(dr);
                 });
                 resolve(driverModels.sort((a, b) => { return a.team.name.localeCompare(b.team.name); }));
             });
         });
+
+        return this._drivers;
     }
 
-    get teams(): Promise<TeamModel[]> {
-        return getAllTeams();
+    get blogs(): Promise<BlogResponse[]> {
+        this._blogs = this._blogs ? this._blogs : new Promise((resolve, reject) => {
+            return getBlogs().then(blogResponses => {
+                blogResponses.sort((a: BlogResponse, b: BlogResponse) => { return b.postDate.localeCompare(a.postDate) })
+                resolve(blogResponses);
+            });
+        });
+        return this._blogs;
     }
 
     constructor() {
         this.signup = this.signup.bind(this);
         this.signOut = this.signOut.bind(this);
         this.completeGoogleLogin = this.completeGoogleLogin.bind(this);
+        this.saveDriver = this.saveDriver.bind(this);
+        this.saveRace = this.saveRace.bind(this);
+        this.saveTeam = this.saveTeam.bind(this);
         // this._initFacebook();
     }
 
@@ -200,18 +232,14 @@ export class StateManager {
     private _publishWatches(path: string) {
         if (this._watches.has(path)) {
             const callbacks = this._watches.get(path);
-            callbacks.forEach(callback => {
-                callback(this._user);
-            });
-        }
-    }
+            if (this[path]) {
+                const watchedValue = this[path];
+                callbacks.forEach(callback => {
+                    callback();
+                });
+            }
 
-    /**
-     *  Query for blog posts.
-     *  returns Blog[]
-     */
-    getBlogs(whereClause?: string): Promise<BlogResponse[]> {
-        return Promise.resolve(this.blogs.sort((a: BlogResponse, b: BlogResponse) => { return b.postDate.localeCompare(a.postDate) }));
+        }
     }
 
     get nextRace(): Promise<RaceModel> {
@@ -241,10 +269,17 @@ export class StateManager {
             return Promise.reject(new Error("Unauthorized"));
         }
         return new Promise<DriverModel>((resolve, reject) => {
-            return saveDrivers([driverModel], this.user.id_token).then(newModels => {
-                if (newModels.length) {
-                    resolve(newModels[0]);
+            return saveDrivers([driverModel], this.user.id_token).then(newDriverResponses => {
+                const newDriverModels: DriverModel[] = [];
+                if (newDriverResponses.length) {
+                    for (const newDriverResponse of newDriverResponses) {
+                        if (this._driverMap.has(newDriverResponse.key)) {
+                            this._driverMap.delete(newDriverResponse.key);
+                        }
+                        newDriverModels.push(this.getDriver(newDriverResponse));
+                    }
                 }
+                resolve(newDriverModels[0]);
             });
         });
     }
@@ -257,21 +292,84 @@ export class StateManager {
         });
     }
 
-    saveDriver(model: DriverModel): Promise<DriverModel[]> {
-        return new Promise<DriverModel[]>((resolve, reject) => {
-            return saveDrivers([model], this.user.id_token).then((drivers) => {
-                resolve(this.drivers);
-            })
-        });
-    }
-    saveTeam(model: TeamModel): Promise<boolean> {
+    createDriver(dr: DriverResponse): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            return saveTeams([model], this.user.id_token).then(() => {
+            // Ensure the key is nulled out for a new driver
+            dr.key = null;
+            return serverCreateDriver(dr, this.user.id_token).then((newDriverResponse) => {
+                const newDriverModel: DriverModel = null;
+                if (newDriverResponse) {
+                    if (this._driverMap.has(newDriverResponse.key)) {
+                        this._driverMap.delete(newDriverResponse.key);
+                    }
+                    const newDriverModel = this.getDriver(newDriverResponse);
+                }
                 resolve(true);
-            })
+            });
         });
     }
 
+    saveDriver(model: DriverModel): Promise<DriverModel[]> {
+        return new Promise<DriverModel[]>((resolve, reject) => {
+            const payload = [model.json];
+            return saveDrivers(payload, this.user.id_token).then((newDriverResponses) => {
+                const newDriverModels: DriverModel[] = [];
+                if (newDriverResponses.length) {
+                    for (const newDriverResponse of newDriverResponses) {
+                        if (this._driverMap.has(newDriverResponse.key)) {
+                            this._driverMap.delete(newDriverResponse.key);
+                        }
+                        newDriverModels.push(this.getDriver(newDriverResponse));
+                    }
+                }
+                resolve(newDriverModels);
+            });
+        });
+    }
+
+    createTeam(tr: TeamResponse): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            const payload = [tr];
+            return saveTeams(payload, this.user.id_token).then((newResponses) => {
+                const newTeamModels: TeamModel[] = [];
+                if (newResponses.length) {
+                    for (const newTeamResponse of newResponses) {
+                        if (this._teamMap.has(newTeamResponse.key)) {
+                            this._teamMap.delete(newTeamResponse.key);
+                        }
+                        newTeamModels.push(this.getTeam(newTeamResponse));
+                    }
+                }
+                resolve(true);
+            });
+        });
+    }
+
+    saveTeam(model: TeamModel): Promise<TeamModel[]> {
+        return new Promise<TeamModel[]>((resolve, reject) => {
+            const payload = [model.json];
+            return saveTeams(payload, this.user.id_token).then((newResponses) => {
+                const newTeamModels: TeamModel[] = [];
+                if (newResponses.length) {
+                    for (const newTeamResponse of newResponses) {
+                        if (this._teamMap.has(newTeamResponse.key)) {
+                            this._teamMap.delete(newTeamResponse.key);
+                        }
+                        newTeamModels.push(this.getTeam(newTeamResponse));
+                    }
+                }
+                resolve(newTeamModels);
+            });
+        });
+    }
+
+    getTeam(teamResponse: TeamResponse): TeamModel {
+        if (this._teamMap.has(teamResponse.key)) return this._teamMap.get(teamResponse.key);
+        const model = new TeamModel(teamResponse);
+        this._teamMap.set(teamResponse.key, model);
+        this._publishWatches("teams");
+        return model;
+    }
 
     completeGoogleLogin(response: gapi.auth2.GoogleUser) {
         const authPayload: AuthenticationPayload = {

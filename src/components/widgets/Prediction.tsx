@@ -63,8 +63,8 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
                 </FormControl>
             </FormGroup>;
         return <Well bsSize="small">
-            <h4>{prediction.json.title}</h4>
-            <p>{prediction.json.description}</p>
+            <h3>{prediction.json.title}</h3>
+            <h4>{prediction.json.description}</h4>
             {formControl}
         </Well>;
     }

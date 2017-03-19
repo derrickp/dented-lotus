@@ -70,10 +70,6 @@ export const driverRoutes: IRouteConfiguration[] = [
                 const drivers: DriverResponse[] = request.payload;
                 console.log(drivers);
                 for (const driver of drivers) {
-                    if (driver.key) {
-                        reply(Boom.badRequest("cannot create a driver with a pre-defined key"));
-                        return;
-                    }
                     if (!driver.lastName) {
                         reply(Boom.badRequest("need a driver last name"));
                         return;

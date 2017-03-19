@@ -1,9 +1,8 @@
 import * as React from "react";
 
-import { PropsBase } from "../../utilities/ComponentUtilities";
 import { GoogleLoginResponse } from "../../../common/models/GoogleLoginResponse";
 
-export interface GoogleLoginProps extends PropsBase {
+export interface GoogleLoginProps {
     completeGoogleLogin: (args) => void;
     onLogin: () => void;
     loggedIn: boolean;

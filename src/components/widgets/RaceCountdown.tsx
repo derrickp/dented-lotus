@@ -1,12 +1,11 @@
 import * as React from "react";
 import { RaceModel } from "../../../common/models/Race";
 import { DATE_FORMAT, getDurationFromNow } from "../../../common/utils/date";
-import { PropsBase } from "../../utilities/ComponentUtilities";
 import * as moment from "moment";
 
 import { Jumbotron, Button } from "react-bootstrap";
 
-export interface RaceCountdownProps extends PropsBase {
+export interface RaceCountdownProps {
     race: Promise<RaceModel>;
     onclick: () => void;
 }

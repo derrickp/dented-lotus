@@ -1,14 +1,32 @@
 
 import { TrackResponse } from "../../common/models/Track";
-import { DriverModel, DriverResponse } from "../../common/models/Driver";
+import { DriverResponse } from "../../common/models/Driver";
 import { RaceResponse } from "../../common/models/Race";
 import { UserPickPayload } from "../../common/models/Prediction";
-import { TeamModel, TeamResponse } from "../../common/models/Team";
+import { TeamResponse } from "../../common/models/Team";
 import { UserResponse } from "../../common/models/User";
 import { SignupInfo } from "../../common/models/Signup";
+import { BlogResponse } from "../../common/models/Blog";
 import { AuthenticationPayload, AuthenticationResponse } from "../../common/models/Authentication";
 
 const baseUrl = window.location.origin;
+
+export function getBlogs(): Promise<BlogResponse[]> {
+    return new Promise<BlogResponse[]>((resolve, reject) => {
+        return fetch("/blogs").then(response => {
+            return response.json().then((blogResponse: BlogResponse[]) => {
+                if (response.ok) {
+                    resolve(blogResponse);
+                }
+                else {
+                    reject(new Error((blogResponse as any).message));
+                }
+            });
+        }).catch(error => {
+            reject(error);  
+        });
+    });
+}
 
 export function getAllTracks(): Promise<TrackResponse[]> {
     return new Promise<TrackResponse[]>((resolve, reject) => {
@@ -77,7 +95,6 @@ export function getRace(key: string): Promise<RaceResponse> {
     });
 }
 
-
 export function getAllDrivers(activeOnly: boolean = true): Promise<DriverResponse[]> {
     return new Promise<DriverResponse[]>((resolve, reject) => {
         let suffix = "/drivers";
@@ -106,14 +123,9 @@ export function getDriver(key: string): Promise<DriverResponse> {
     });
 }
 
-export function saveDrivers(drivers: DriverModel[], id_token: string): Promise<DriverModel[]> {
+export function saveDrivers(driversPayload: DriverResponse[], id_token: string): Promise<DriverResponse[]> {
     if (!id_token) return Promise.reject(new Error("Unauthorized"));
-    return new Promise<DriverModel[]>((resolve, reject) => {
-        const driversPayload: DriverResponse[] = [];
-        drivers.forEach(dm => {
-            const driver = dm.json;
-            driversPayload.push(driver);
-        });
+    return new Promise<DriverResponse[]>((resolve, reject) => {
         return fetch('/admin/drivers', {
             method: 'POST',
             headers: {
@@ -123,52 +135,64 @@ export function saveDrivers(drivers: DriverModel[], id_token: string): Promise<D
             body: JSON.stringify(driversPayload)
         }).then(response => {
             return response.json().then((driverResponse: DriverResponse[]) => {
-                resolve(driverResponse.map((d) => { return new DriverModel(d) }));
+                resolve(driverResponse);
             });
         });
     });
 }
 
-
-export function saveTeams(teams: TeamModel[], id_token: string): Promise<TeamModel[]> {
+export function createDriver(driverPayload: DriverResponse, id_token: string): Promise<DriverResponse> {
     if (!id_token) return Promise.reject(new Error("Unauthorized"));
-    return new Promise<TeamModel[]>((resolve, reject) => {
-        const teamPayload: TeamResponse[] = [];
-        teams.forEach(dm => {
-            const team = dm.json;
-            teamPayload.push(team);
+    return new Promise<DriverResponse>((resolve, reject) => {
+        return fetch('/admin/drivers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + id_token
+            },
+            body: JSON.stringify(driverPayload)
+        }).then(response => {
+            return response.json().then((driverResponse: DriverResponse) => {
+                resolve(driverResponse);
+            });
         });
+    });
+}
+
+export function saveTeams(teamPayload: TeamResponse[], id_token: string): Promise<TeamResponse[]> {
+    if (!id_token) return Promise.reject(new Error("Unauthorized"));
+    return new Promise<TeamResponse[]>((resolve, reject) => {
         return fetch('/admin/teams', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + id_token
             },
-            body: JSON.stringify(teams)
+            body: JSON.stringify(teamPayload)
         }).then(response => {
             return response.json().then((teams: TeamResponse[]) => {
-                resolve(teams.map((d) => { return new TeamModel(d) }));
+                resolve(teams);
             });
         });
     });
 }
 
-export function getTeamByAbbreviation(abbreviation: string): Promise<TeamModel> {
-    return new Promise<TeamModel>((resolve, reject) => {
+export function getTeamByAbbreviation(abbreviation: string): Promise<TeamResponse> {
+    return new Promise<TeamResponse>((resolve, reject) => {
         return fetch(baseUrl + "/teams/" + abbreviation).then(response => {
             return response.json().then((team: TeamResponse) => {
-                resolve(new TeamModel(team));
+                resolve(team);
             });
         });
     });
 }
 
-export function getAllTeams( ): Promise<TeamModel[]> {
-    return new Promise<TeamModel[]>((resolve, reject) => {
+export function getAllTeams( ): Promise<TeamResponse[]> {
+    return new Promise<TeamResponse[]>((resolve, reject) => {
         return fetch(baseUrl + "/teams/").then(response => {
             return response.json().then((teams: TeamResponse[]) => {
                 teams.sort((a,b)=>{ return a.name.localeCompare(b.name);});
-                resolve(teams.map((team)=>{return new TeamModel(team)}));
+                resolve(teams);
             });
         });
     });

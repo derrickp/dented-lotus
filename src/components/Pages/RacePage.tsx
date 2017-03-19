@@ -1,13 +1,12 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { PropsBase } from "../../utilities/ComponentUtilities";
 import { RaceModel as RaceModel } from "../../../common/models/Race";
 import { getDurationFromNow } from "../../../common/utils/date";
 import { PredictionComponent } from "../widgets/Prediction";
 import { Panel, Button, PanelGroup } from "react-bootstrap";
 
 export interface RaceProps {
-    race: Promise<RaceModel>;
+    race: RaceModel;
     small: boolean;
 }
 
@@ -33,12 +32,6 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
             activeKey: ActiveKeys.PREDICTIONS
         };
         this.handleSelect = this.handleSelect.bind(this);
-    }
-
-    componentWillMount() {
-        this.props.race.then(raceModel => {
-            this.setState({ race: raceModel });
-        });
     }
 
     toggleSize() {

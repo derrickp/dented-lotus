@@ -1,9 +1,9 @@
-import * as React from "react"; 
-import {PropsBase} from "../utilities/ComponentUtilities"
+import * as React from "react";
+import { User } from "../../common/models/User";
 
-export interface UserProps extends PropsBase { 
+export interface UserProps { 
     small?:boolean;
-
+    user: User;
 }
 
 export interface SmallNameProps  {
@@ -32,9 +32,9 @@ export class UserComponent extends React.Component<UserProps, any>{
 
     render(): JSX.Element | null { 
         if (this.props.small){
-            return <SmallUser imgUrl={this.props.stateManager.user.imageUrl} name={this.props.stateManager.user.name}/>
+            return <SmallUser imgUrl={this.props.user.imageUrl} name={this.props.user.name}/>
         }
-        return <FullUser stateManager={this.props.stateManager}/>
+        return <FullUser user={this.props.user}/>
     }
 }
 
