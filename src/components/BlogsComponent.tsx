@@ -2,11 +2,16 @@ import * as React from "react";
 import { BlogResponse } from "../../common/models/Blog";
 
 export interface BlogsProps {
-    blogs: Promise<BlogResponse[]>;
+    blogs: BlogResponse[];
+    numberBlogs?: number;
 }
 
 export interface BlogsState {
-    blogs: BlogResponse[];
+}
+
+export namespace BlogSortType {
+    export const DATE = "date";
+    export const AUTHOR = "author";
 }
 
 export class BlogsComponent extends React.Component<BlogsProps, BlogsState>{
@@ -19,24 +24,13 @@ export class BlogsComponent extends React.Component<BlogsProps, BlogsState>{
         this.state = { blogs: null };
     }
 
-    componentDidMount() {
-        this._unmounted = false;
-        this.props.blogs.then((blogs) => {
-            if (!this._unmounted) this.setState({ blogs: blogs });
-        });
-    }
-
-    componentWillUnmount() {
-        this._unmounted = true;
-    }
-
     render() {
-        if (!this.state.blogs) {
+        if (!this.props.blogs) {
             return <div></div>;
         }
         let out: JSX.Element[] = [];
-        for (let i = 0; i < this.state.blogs.length; i++) {
-            const blog = this.state.blogs[i];
+        for (let i = 0; i < this.props.blogs.length; i++) {
+            const blog = this.props.blogs[i];
             out.push(
                 <li key={i} className="blog-entry">
                     <div className="header">

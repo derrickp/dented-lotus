@@ -10,6 +10,7 @@ import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, Signup } from ".
 import { RaceModel } from "../../common/models/Race";
 import { TeamModel } from "../../common/models/Team";
 import { DriverModel } from "../../common/models/Driver";
+import { BlogResponse } from "../../common/models/Blog";
 import { getUrlParameters } from "../utilities/PageUtilities";
 import { User } from "../../common/models/User";
 
@@ -32,6 +33,7 @@ export interface DentedLotusState {
     races: RaceModel[];
     race: RaceModel;
     drivers: DriverModel[];
+    blogs: BlogResponse[];
 }
 
 export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusState>{
@@ -50,7 +52,8 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             sidebarOpen: false,
             drivers: [],
             races: [],
-            teams: []
+            teams: [],
+            blogs: []
         };
         this.launchRacePicks = this.launchRacePicks.bind(this);
         this.signUp = this.signUp.bind(this);
@@ -72,6 +75,11 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         this.stateManager.watch("drivers", () => {
             this.stateManager.drivers.then(drivers => {
                 this.setState({ drivers: drivers });
+            });
+        });
+        this.stateManager.watch("blogs", () => {
+            this.stateManager.blogs.then(blogs => {
+                this.setState({ blogs: blogs });
             });
         });
     }
@@ -137,7 +145,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         if (this.stateManager.isLoggedIn) {
             components.push(<RaceCountdown key={1} onclick={this.launchRacePicks} race={this.stateManager.nextRace} />);
         }
-        components.push(<BlogsComponent key={2} blogs={this.stateManager.blogs} />);
+        components.push(<BlogsComponent key={2} blogs={this.state.blogs} numberBlogs={3} />);
         return <div>{components}</div>
     }
 

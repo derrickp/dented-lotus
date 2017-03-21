@@ -41,8 +41,6 @@ export class StateManager {
     private _driverMap: Map<string, DriverModel> = new Map<string, DriverModel>();
     private _teamMap: Map<string, TeamModel> = new Map<string, TeamModel>();
 
-
-
     private _teams: Promise<TeamModel[]>;
     get teams(): Promise<TeamModel[]> {
         this._teams = this._teams ? this._teams : new Promise<TeamModel[]>((resolve, reject) => {
@@ -176,7 +174,8 @@ export class StateManager {
     get blogs(): Promise<BlogResponse[]> {
         this._blogs = this._blogs ? this._blogs : new Promise((resolve, reject) => {
             return getBlogs().then(blogResponses => {
-                blogResponses.sort((a: BlogResponse, b: BlogResponse) => { return b.postDate.localeCompare(a.postDate) })
+                blogResponses.sort((a: BlogResponse, b: BlogResponse) => { return b.postDate.localeCompare(a.postDate) });
+                this._publishWatches("blogs");
                 resolve(blogResponses);
             });
         });
@@ -191,6 +190,13 @@ export class StateManager {
         this.saveRace = this.saveRace.bind(this);
         this.saveTeam = this.saveTeam.bind(this);
         // this._initFacebook();
+
+        this.teams.then(() => {
+            console.log("got teams");
+        });
+        this.drivers.then(() => {
+            console.log("got drivers");
+        });
     }
 
 
