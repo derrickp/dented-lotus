@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { RaceModel as RaceModel } from "../../../common/models/Race";
+import { RaceModel } from "../../../common/models/Race";
+import { PredictionModel } from "../../../common/models/Prediction";
 import { getDurationFromNow } from "../../../common/utils/date";
 import { PredictionComponent } from "../widgets/Prediction";
 import { Panel, Button, PanelGroup } from "react-bootstrap";
@@ -11,7 +12,6 @@ export interface RaceProps {
 }
 
 export interface RaceState {
-    race: RaceModel;
     small: boolean;
     activeKey: string;
 }
@@ -22,16 +22,15 @@ namespace ActiveKeys {
 }
 
 export class RacePage extends React.Component<RaceProps, RaceState> {
-    race: RaceModel;
 
     constructor(props: RaceProps) {
         super(props);
         this.state = {
-            race: null,
             small: this.props.small,
             activeKey: ActiveKeys.PREDICTIONS
         };
         this.handleSelect = this.handleSelect.bind(this);
+        this.saveUserPicks = this.saveUserPicks.bind(this);
     }
 
     toggleSize() {
@@ -41,9 +40,9 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
 
     getSmall() {
         return <div onClick={this.toggleSize.bind(this)} className="dl-panel">
-            <div>{this.state.race.raceResponse.displayName} - SMALL</div>
-            <div>{this.state.race.raceDate}</div>
-            <div>{this.state.race.track.trackResponse.country}</div>
+            <div>{this.props.race.raceResponse.displayName} - SMALL</div>
+            <div>{this.props.race.raceDate}</div>
+            <div>{this.props.race.track.trackResponse.country}</div>
         </div>;
     }
 
@@ -51,27 +50,31 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
         this.setState({ activeKey: eventKey });
     }
 
+    saveUserPicks(model: PredictionModel): Promise<boolean> {
+        return model.saveUserPicks();
+    }
+
     getFull() {
-        if (!this.state.race) {
+        if (!this.props.race) {
             return <div>Loading...</div>;
         }
 
-        const race = this.state.race;
+        const race = this.props.race;
         const predictionsTitle = (
-            <div><h5 className="pull-left">{"Predictions"}</h5>< Button className="pull-right"></Button><div className="clearfix"></div></div>
+            <div><h4 className="pull-left">{"Predictions"}</h4><div className="clearfix"></div></div>
         );
-        const title = (
-            <div><h5 className="pull-left">{race.raceResponse.displayName + "  " + race.raceDate}</h5></div>
+        const infoTitle = (
+            <div><h4 className="pull-left">{"Race Info"}</h4><div className="clearfix"></div></div>
         );
         const dFromNow = getDurationFromNow(race.cutoff);
         const timeRemaining = dFromNow.timeRemaining;
         const predictionsStyle = timeRemaining > 0 ? "primary" : "danger";
-        const predictions = race.predictions.map((p) => { return <PredictionComponent save={race.saveUserPicks} key={p.json.key} prediction={p} /> });
+        const predictions = race.predictions.map((p) => { return <PredictionComponent save={this.saveUserPicks} key={p.json.key} prediction={p} /> });
         const predictionsPanel = <Panel eventKey={ActiveKeys.PREDICTIONS} bsStyle={predictionsStyle} header={predictionsTitle} expanded={true} defaultExpanded={true} collapsible={true}>
             {predictions}
         </Panel>;
         const infoPanel =
-            <Panel eventKey={ActiveKeys.INFO} bsStyle={"primary"} header={"Race Info"}>
+            <Panel eventKey={ActiveKeys.INFO} bsStyle={"primary"} header={infoTitle}>
                 { race.track.trackResponse && <p>Track: {race.track.trackResponse.name}, {race.track.trackResponse.country}</p> }
                 { race.winner && <p>Winner: {race.winner.name}</p> }
             </Panel>;
@@ -84,7 +87,7 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
     }
 
     render() {
-        if (!this.state.race) {
+        if (!this.props.race) {
             return <div>Loading... </div>
         } else {
             if (this.state.small) {
@@ -92,7 +95,7 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
             } else {
                 const content = this.getFull();
                 const title = (
-                    <div><h3>{this.state.race.raceResponse.displayName + "  " + this.state.race.raceDate}</h3></div>
+                    <div><h3>{this.props.race.raceResponse.displayName + "  " + this.props.race.raceDate}</h3></div>
                 );
                 return (
                     <div>

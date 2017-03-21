@@ -6,11 +6,12 @@ import { UserComponent } from "./User";
 import { StateManager } from "../StateManager";
 import { BlogsComponent } from "./BlogsComponent";
 import { RaceCountdown } from "./widgets/RaceCountdown";
-import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, Signup } from "./Pages";
+import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, Signup, AllSeasonPicks } from "./Pages";
 import { RaceModel } from "../../common/models/Race";
 import { TeamModel } from "../../common/models/Team";
 import { DriverModel } from "../../common/models/Driver";
 import { BlogResponse } from "../../common/models/Blog";
+import { PredictionModel } from "../../common/models/Prediction";
 import { getUrlParameters } from "../utilities/PageUtilities";
 import { User } from "../../common/models/User";
 
@@ -34,6 +35,7 @@ export interface DentedLotusState {
     race: RaceModel;
     drivers: DriverModel[];
     blogs: BlogResponse[];
+    allSeasonPredictions: PredictionModel[];
 }
 
 export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusState>{
@@ -53,12 +55,14 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             drivers: [],
             races: [],
             teams: [],
-            blogs: []
+            blogs: [],
+            allSeasonPredictions: []
         };
         this.launchRacePicks = this.launchRacePicks.bind(this);
         this.signUp = this.signUp.bind(this);
         this.onPageChange = this.onPageChange.bind(this);
         this.changeRace = this.changeRace.bind(this);
+        this.launchAllSeasonPicks = this.launchAllSeasonPicks.bind(this);
         this.stateManager.watch("user", () => {
             this.onUserChange();
         });
@@ -107,6 +111,15 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         });
     }
 
+    launchAllSeasonPicks() {
+        const parameters = this.state.parameters;
+        parameters.page = Pages.ALL_SEASON_PICKS;
+        this.setState({ parameters: parameters });
+        this.stateManager.allSeasonPredictions.then(allSeasonPredictions => {
+            this.setState({ allSeasonPredictions: allSeasonPredictions });
+        });
+    }
+
     onPageChange(page: string) {
         const parameters = this.state.parameters;
         parameters.page = page;
@@ -134,6 +147,8 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
                 return <Drivers drivers={this.state.drivers} teams={this.state.teams} userIsAdmin={true} createDriver={this.stateManager.createDriver} createTeam={this.stateManager.createTeam} />
             case Pages.SIGN_UP:
                 return <Signup onSubmit={this.stateManager.signup} type={this.state.signUpMethod} />
+            case Pages.ALL_SEASON_PICKS:
+                return <AllSeasonPicks predictions={this.state.allSeasonPredictions} />
             default:
                 return this.getHomePage();
         }
@@ -143,7 +158,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         const components: JSX.Element[] = [];
 
         if (this.stateManager.isLoggedIn) {
-            components.push(<RaceCountdown key={1} onclick={this.launchRacePicks} race={this.stateManager.nextRace} />);
+            components.push(<RaceCountdown key={1} clickMakeAllSeasonPicks={this.launchAllSeasonPicks} clickMakeNextRacePicks={this.launchRacePicks} race={this.stateManager.nextRace} />);
         }
         components.push(<BlogsComponent key={2} blogs={this.state.blogs} numberBlogs={3} />);
         return <div>{components}</div>

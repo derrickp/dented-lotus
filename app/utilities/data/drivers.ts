@@ -45,7 +45,6 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
 }
 
 export async function getDriverResponses(active?: boolean, keys?: string[]): Promise<DriverResponse[]> {
-    console.log(keys);
     const driverRows = await getDrivers(false, keys);
     const drivers: DriverResponse[] = [];
     for (const driverRow of driverRows) {
@@ -83,7 +82,6 @@ export function getDrivers(active, keys?: string[]): Promise<DbDriver[]> {
             const innerKeys = keys.join("','");
             whereStatement = whereStatement + " and key IN ('" + innerKeys + "')";
         }
-        console.log(driverSelect + " " + whereStatement);
         db.all(driverSelect + " " + whereStatement, (err: Error, rows: DbDriver[]) => {
             if (err) {
                 reject(err);

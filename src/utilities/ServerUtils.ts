@@ -7,6 +7,7 @@ import { TeamResponse } from "../../common/models/Team";
 import { UserResponse } from "../../common/models/User";
 import { SignupInfo } from "../../common/models/Signup";
 import { BlogResponse } from "../../common/models/Blog";
+import { PredictionResponse } from "../../common/models/Prediction";
 import { AuthenticationPayload, AuthenticationResponse } from "../../common/models/Authentication";
 
 const baseUrl = window.location.origin;
@@ -182,6 +183,21 @@ export function getTeamByAbbreviation(abbreviation: string): Promise<TeamRespons
         return fetch(baseUrl + "/teams/" + abbreviation).then(response => {
             return response.json().then((team: TeamResponse) => {
                 resolve(team);
+            });
+        });
+    });
+}
+
+export function getAllSeasonPredictions(id_token: string): Promise<PredictionResponse[]> {
+    return new Promise<PredictionResponse[]>((resolve, reject) => {
+        return fetch("/allseason/predictions", {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + id_token
+            }
+        }).then(response => {
+            return response.json().then((predictions: PredictionResponse[]) => {
+                resolve(predictions);
             });
         });
     });

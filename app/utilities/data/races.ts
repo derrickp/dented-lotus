@@ -26,7 +26,6 @@ export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
             const innerKeys = keys.join("','");
             whereStatement = " and key IN ('" + innerKeys + "')";
         }
-        console.log(`${selectStatement} ${whereStatement}`);
         db.all(`${selectStatement} ${whereStatement}`, (err, rows) => {
             if (err) {
                 reject(err);

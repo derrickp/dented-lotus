@@ -23,7 +23,8 @@ import {
     getDriver,
     getRace,
     saveTeams,
-    signup
+    signup,
+    getAllSeasonPredictions
 } from "./utilities/ServerUtils"
 
 
@@ -87,22 +88,8 @@ export class StateManager {
                             return this.getDriver(response);
                         },
                         getPrediction: (response: PredictionResponse): PredictionModel => {
+                            response.raceKey = rr.key;
                             return new PredictionModel(response, this.predictionContext);
-                        },
-                        saveUserPicks: (raceKey: string, prediction: PredictionModel) => {
-                            if (!this.isLoggedIn) {
-                                return Promise.reject("Need to be logged in");
-                            }
-                            const payloads: UserPickPayload[] = [];
-                            for (const pick of prediction.userPicks) {
-                                const pickPayload: UserPickPayload = {
-                                    race: raceKey,
-                                    prediction: prediction.json.key,
-                                    choice: pick
-                                };
-                                payloads.push(pickPayload);
-                            }
-                            return saveUserPicks(payloads, this.user.id_token);
                         }
                     };
                     return new RaceModel(rr, context);
@@ -119,7 +106,18 @@ export class StateManager {
     get predictionContext(): PredictionContext {
         return {
             saveUserPicks: (model: PredictionModel) => {
-                return Promise.resolve(true);
+                if (!this.user.isLoggedIn){
+                    return Promise.reject(new Error("Need to be logged in to save"));
+                }
+                const payload: UserPickPayload[] = [];
+                for (const pick of model.userPicks) {
+                    payload.push({
+                        race: model.predictionResponse.raceKey,
+                        prediction: model.predictionResponse.key,
+                        choice: pick
+                    });
+                }
+                return saveUserPicks(payload, this.user.id_token);
             },
             getDriver: (response: DriverResponse) => {
                 return this.getDriver(response);
@@ -182,6 +180,21 @@ export class StateManager {
         return this._blogs;
     }
 
+    private _allSeasonPredictions: Promise<PredictionModel[]>;
+    get allSeasonPredictions(): Promise<PredictionModel[]> {
+        this._allSeasonPredictions = this._allSeasonPredictions ? this._allSeasonPredictions : new Promise<PredictionModel[]>((resolve, reject) => {
+            return getAllSeasonPredictions(this.user.id_token).then(predictionResponses => {
+                const allSeasonPredictions: PredictionModel[] = [];
+                for (const predictionResponse of predictionResponses) {
+                    const pm = new PredictionModel(predictionResponse, this.predictionContext);
+                    allSeasonPredictions.push(pm);
+                }
+                resolve(allSeasonPredictions);
+            });
+        });
+        return this._allSeasonPredictions;
+    }
+
     constructor() {
         this.signup = this.signup.bind(this);
         this.signOut = this.signOut.bind(this);
@@ -198,7 +211,6 @@ export class StateManager {
             console.log("got drivers");
         });
     }
-
 
     private _initFacebook() {
         (<any>window).fbAsyncInit = function () {

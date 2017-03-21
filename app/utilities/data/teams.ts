@@ -13,7 +13,6 @@ export function getTeams(keys?: string[]): Promise<DbTeam[]> {
             const innerKeys = keys.join("','");
             statement = statement + " where key IN ('" + innerKeys + "')";
         }
-        console.log(statement);
         db.all(statement, (err: Error, rows: DbTeam[]) => {
             if (err) {
                 reject(err);

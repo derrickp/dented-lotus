@@ -21,7 +21,6 @@ export async function getBlogResponses(): Promise<BlogResponse[]> {
                 const blogs: BlogResponse[] = [];
                 for (const blogRow of blogRows) {
                     const user = basicUsers.filter(basicUser => { return basicUser.key === blogRow.author })[0];
-                    console.log(user);
                     if (!user) {
                         continue;
                     }
@@ -59,7 +58,6 @@ export function saveNewBlog(blog: BlogResponse): Promise<boolean> {
             db.run(insert, valuesObject);
             resolve(true);
         } catch (exception) {
-            console.log(exception);
             reject(exception);
         }
     });

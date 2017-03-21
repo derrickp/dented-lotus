@@ -9,11 +9,12 @@ export interface PredictionResponse {
     type: string;
     allSeason: boolean;
     numChoices: number;
-    choices: DriverResponse[] | TeamResponse[];
-    value: number;
-    modifier: number;
+    choices?: DriverResponse[] | TeamResponse[];
+    value?: number;
+    modifier?: number;
     outcome?: DriverResponse[] | TeamResponse[];
     userPicks?: string[];
+    raceKey?: string;
 }
 
 export interface PredictionContext {
@@ -42,6 +43,10 @@ export class PredictionModel {
             this.userPicks.push(userPick);
         }
         this._context = context;
+    }
+
+    saveUserPicks(): Promise<boolean> {
+        return this._context.saveUserPicks(this);
     }
 
     get json(): PredictionResponse {

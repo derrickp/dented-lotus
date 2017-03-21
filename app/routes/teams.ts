@@ -15,7 +15,6 @@ export const teamRoutes: IRouteConfiguration[] = [
                 try {
                     const keys = request.params["key"] ? [request.params["key"]] : [];
                     const teams = await getTeamResponses(keys);
-                    console.log(teams);
                     reply(teams);
                 } catch (exception) {
                     reply(Boom.badRequest(exception));

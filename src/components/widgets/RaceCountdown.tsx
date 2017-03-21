@@ -3,21 +3,21 @@ import { RaceModel } from "../../../common/models/Race";
 import { DATE_FORMAT, getDurationFromNow } from "../../../common/utils/date";
 import * as moment from "moment";
 
-import { Jumbotron, Button } from "react-bootstrap";
+import { Jumbotron, Button, ButtonToolbar } from "react-bootstrap";
 
 export interface RaceCountdownProps {
     race: Promise<RaceModel>;
-    onclick: () => void;
+    clickMakeNextRacePicks: () => void;
+    clickMakeAllSeasonPicks: () => void;
 }
 
 export interface RaceCountdownState {
-    timeRemaining: string;
+    fullDuration: string;
 }
 
 export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
     interval;
     nextRace: RaceModel;
-    onclick: () => void;
     /**
      *
      */
@@ -28,7 +28,6 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
         props.race.then(race => {
             this.nextRace = race;
         });
-        this.onclick = props.onclick;
     }
 
     componentDidMount() {
@@ -50,11 +49,16 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
         if (!this.nextRace) {
             return <span className="race-countdown">Loading race countdown...</span>;
         }
+        const allSeasonDFromNow = getDurationFromNow("04/20/2017");
+        
         const jumbo =
             <Jumbotron id="race-countdown-jumbo">
                 <h1>Next Race!</h1>
                 <p>{this.nextRace.raceResponse.displayName + " " + this.state.timeRemaining}</p>
-                <Button onClick={this.onclick} bsSize="large" bsStyle="primary" >Make Your Picks</Button>
+                <ButtonToolbar >
+                    <Button onClick={this.props.clickMakeNextRacePicks} bsSize="large" bsStyle="primary" >Make Your Picks</Button>
+                    { allSeasonDFromNow.timeRemaining > 0 && <Button bsSize="large" bsStyle="primary" onClick={this.props.clickMakeAllSeasonPicks}>Make All Season Picks</Button> }
+                </ButtonToolbar>
             </Jumbotron>;
         return jumbo;
     }

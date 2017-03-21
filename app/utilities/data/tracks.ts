@@ -73,7 +73,6 @@ export function getTracks(keys?: string[]): Promise<DbTrack[]> {
             const innerKeys = keys.join("','");
             statement = statement + ` where key IN ('${innerKeys}')`
         }
-        console.log(statement);
         db.all(statement, (err, rows: DbTrack[]) => {
             if (err) {
                 reject(err);
