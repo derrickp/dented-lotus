@@ -10,11 +10,11 @@ import { BlogResponse } from "../../common/models/Blog";
 import { PredictionResponse } from "../../common/models/Prediction";
 import { AuthenticationPayload, AuthenticationResponse } from "../../common/models/Authentication";
 
-const baseUrl = window.location.origin;
+const baseUrl = `${window.location.origin}:8080`;
 
 export function getBlogs(): Promise<BlogResponse[]> {
     return new Promise<BlogResponse[]>((resolve, reject) => {
-        return fetch("/blogs").then(response => {
+        return fetch(`${baseUrl}/blogs`).then(response => {
             return response.json().then((blogResponse: BlogResponse[]) => {
                 if (response.ok) {
                     resolve(blogResponse);
@@ -31,7 +31,7 @@ export function getBlogs(): Promise<BlogResponse[]> {
 
 export function getAllTracks(): Promise<TrackResponse[]> {
     return new Promise<TrackResponse[]>((resolve, reject) => {
-        return fetch(baseUrl + "/tracks").then(response => {
+        return fetch(`${baseUrl}/tracks`).then(response => {
             return response.json().then((tracks: TrackResponse[]) => {
                 resolve(tracks);
             });
@@ -41,7 +41,7 @@ export function getAllTracks(): Promise<TrackResponse[]> {
 
 export function getTrack(key: string): Promise<TrackResponse> {
     return new Promise<TrackResponse>((resolve, reject) => {
-        return fetch(`/tracks/${key}`).then(response => {
+        return fetch(`${baseUrl}/tracks/${key}`).then(response => {
             return response.json().then((tracks: TrackResponse[]) => {
                 if (tracks.length) {
                     resolve(tracks[0]);
@@ -55,7 +55,7 @@ export function getTrack(key: string): Promise<TrackResponse> {
 
 export function getAllRaces(season: number, id_token: string): Promise<RaceResponse[]> {
     return new Promise<RaceResponse[]>((resolve, reject) => {
-        return fetch(`/races/${season}`, {
+        return fetch(`${baseUrl}/races/${season}`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + id_token
@@ -71,7 +71,7 @@ export function getAllRaces(season: number, id_token: string): Promise<RaceRespo
 export function saveRaces(season: number, races: RaceResponse[], id_token: string): Promise<RaceResponse[]> {
     if (!id_token) return Promise.reject(new Error("Unauthorized"));
     return new Promise<RaceResponse[]>((resolve, reject) => {
-        return fetch(`/races/${season}`, {
+        return fetch(`${baseUrl}/races/${season}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ export function saveRaces(season: number, races: RaceResponse[], id_token: strin
 
 export function getRace(season: number, key: string, id_token: string): Promise<RaceResponse> {
     return new Promise<RaceResponse>((resolve, reject) => {
-        return fetch(`/races/${season}/${key}`, {
+        return fetch(`${baseUrl}/races/${season}/${key}`, {
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + id_token
@@ -107,7 +107,7 @@ export function getAllDrivers(activeOnly: boolean = true): Promise<DriverRespons
         if (activeOnly) {
             suffix += "/active";
         }
-        return fetch(baseUrl + "/drivers").then(response => {
+        return fetch(`${baseUrl}/drivers`).then(response => {
             return response.json().then((drivers: DriverResponse[]) => {
                 resolve(drivers);
             });
@@ -117,7 +117,7 @@ export function getAllDrivers(activeOnly: boolean = true): Promise<DriverRespons
 
 export function getDriver(key: string): Promise<DriverResponse> {
     return new Promise<DriverResponse>((resolve, reject) => {
-        return fetch(baseUrl + `/drivers/${key}`).then(response => {
+        return fetch(`${baseUrl}/drivers/${key}`).then(response => {
             return response.json().then((drivers: DriverResponse[]) => {
                 if (drivers.length) {
                     resolve(drivers[0]);
@@ -132,7 +132,7 @@ export function getDriver(key: string): Promise<DriverResponse> {
 export function saveDrivers(driversPayload: DriverResponse[], id_token: string): Promise<DriverResponse[]> {
     if (!id_token) return Promise.reject(new Error("Unauthorized"));
     return new Promise<DriverResponse[]>((resolve, reject) => {
-        return fetch('/admin/drivers', {
+        return fetch(`${baseUrl}/admin/drivers`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ export function saveDrivers(driversPayload: DriverResponse[], id_token: string):
 export function createDriver(driverPayload: DriverResponse, id_token: string): Promise<DriverResponse> {
     if (!id_token) return Promise.reject(new Error("Unauthorized"));
     return new Promise<DriverResponse>((resolve, reject) => {
-        return fetch('/admin/drivers', {
+        return fetch(`${baseUrl}/admin/drivers`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -168,7 +168,7 @@ export function createDriver(driverPayload: DriverResponse, id_token: string): P
 export function saveTeams(teamPayload: TeamResponse[], id_token: string): Promise<TeamResponse[]> {
     if (!id_token) return Promise.reject(new Error("Unauthorized"));
     return new Promise<TeamResponse[]>((resolve, reject) => {
-        return fetch('/admin/teams', {
+        return fetch(`${baseUrl}/admin/teams`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -185,7 +185,7 @@ export function saveTeams(teamPayload: TeamResponse[], id_token: string): Promis
 
 export function getTeamByAbbreviation(abbreviation: string): Promise<TeamResponse> {
     return new Promise<TeamResponse>((resolve, reject) => {
-        return fetch(baseUrl + "/teams/" + abbreviation).then(response => {
+        return fetch(`${baseUrl}/teams/${abbreviation}`).then(response => {
             return response.json().then((team: TeamResponse) => {
                 resolve(team);
             });
@@ -195,7 +195,7 @@ export function getTeamByAbbreviation(abbreviation: string): Promise<TeamRespons
 
 export function getAllSeasonPredictions(id_token: string): Promise<PredictionResponse[]> {
     return new Promise<PredictionResponse[]>((resolve, reject) => {
-        return fetch("/allseason/predictions", {
+        return fetch(`${baseUrl}/allseason/predictions`, {
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + id_token
@@ -210,7 +210,7 @@ export function getAllSeasonPredictions(id_token: string): Promise<PredictionRes
 
 export function getAllTeams( ): Promise<TeamResponse[]> {
     return new Promise<TeamResponse[]>((resolve, reject) => {
-        return fetch(baseUrl + "/teams/").then(response => {
+        return fetch(`${baseUrl}/teams/`).then(response => {
             return response.json().then((teams: TeamResponse[]) => {
                 teams.sort((a,b)=>{ return a.name.localeCompare(b.name);});
                 resolve(teams);
@@ -221,7 +221,7 @@ export function getAllTeams( ): Promise<TeamResponse[]> {
 
 export function authenticate(authPayload: AuthenticationPayload): Promise<AuthenticationResponse> {
     return new Promise<UserResponse>((resolve, reject) => {
-        return fetch('/users/authenticate', {
+        return fetch(`${baseUrl}/users/authenticate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -237,7 +237,7 @@ export function authenticate(authPayload: AuthenticationPayload): Promise<Authen
 
 export function saveUserPicks(picks: UserPickPayload[], id_token: string): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-        return fetch("/picks", {
+        return fetch(`${baseUrl}/picks`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -261,7 +261,7 @@ export function saveUserPicks(picks: UserPickPayload[], id_token: string): Promi
 
 export function signup(info: SignupInfo): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-        return fetch("/signup", {
+        return fetch(`${baseUrl}/signup`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
