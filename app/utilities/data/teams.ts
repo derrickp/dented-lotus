@@ -2,7 +2,7 @@ import * as sqlite3 from "sqlite3";
 
 import { TeamResponse } from "../../../common/models/Team";
 
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const teamSelect = "select * from teams_vw";
 

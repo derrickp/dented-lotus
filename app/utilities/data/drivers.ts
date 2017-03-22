@@ -3,7 +3,7 @@ import * as sqlite3 from "sqlite3";
 import { DriverResponse } from "../../../common/models/Driver";
 import { getTeamResponses } from "./teams";
 
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const driverSelect = "SELECT * from drivers_vw";
 

@@ -2,7 +2,7 @@ import * as sqlite3 from "sqlite3";
 
 import { UserResponse } from "../../../common/models/User";
 import { SignupInfo } from "../../../common/models/Signup";
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const userSelect = "select * from full_user_vw";
 

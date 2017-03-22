@@ -1,7 +1,7 @@
 import * as sqlite3 from "sqlite3";
 import { TrackResponse } from "../../../common/models/Track";
 
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const trackSelect = "SELECT * from tracks_vw";
 

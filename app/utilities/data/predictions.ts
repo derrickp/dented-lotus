@@ -6,7 +6,7 @@ import { PredictionResponse } from "../../../common/models/Prediction";
 import { getDriverResponses } from "./drivers";
 import { getTeamResponses } from "./teams";
 
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const predictionsSelect = "select * from predictions_vw";
 const racePredictionSelect = "select * from racepredictions_vw";
