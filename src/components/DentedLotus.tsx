@@ -131,7 +131,9 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     changeRace(race: RaceModel) {
         const parameters = this.state.parameters;
         parameters.page = Pages.RACE;
-        this.setState({ parameters: parameters, race: race })
+        this.stateManager.getRace(race.key).then(refreshedRace => {
+            this.setState({ parameters: parameters, race: refreshedRace });
+        });
     }
 
     getCurrentView() {
