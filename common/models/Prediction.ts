@@ -27,7 +27,6 @@ export class PredictionModel {
     private _context: PredictionContext;
     predictionResponse: PredictionResponse;
     choices: Selectable[] = [];
-    userPicks: string[] = [];
 
     constructor(response: PredictionResponse, context: PredictionContext) {
         this.predictionResponse = response;
@@ -38,9 +37,6 @@ export class PredictionModel {
             else {
                 this.choices.push(context.getTeam(choice as TeamResponse));
             }
-        }
-        for (const userPick of response.userPicks) {
-            this.userPicks.push(userPick);
         }
         this._context = context;
     }

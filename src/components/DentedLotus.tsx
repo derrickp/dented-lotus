@@ -58,7 +58,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             blogs: [],
             allSeasonPredictions: []
         };
-        this.launchRacePicks = this.launchRacePicks.bind(this);
+        this.launchNextRacePicks = this.launchNextRacePicks.bind(this);
         this.signUp = this.signUp.bind(this);
         this.onPageChange = this.onPageChange.bind(this);
         this.changeRace = this.changeRace.bind(this);
@@ -103,10 +103,12 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         }
     }
 
-    launchRacePicks() {
+    launchNextRacePicks() {
         let parameters = this.state.parameters;
         parameters.page = Pages.RACE;
         this.stateManager.nextRace.then(race => {
+            return this.stateManager.getRace(race.key);
+        }).then(race => {
             this.setState({ parameters: parameters, race: race });
         });
     }
@@ -158,7 +160,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         const components: JSX.Element[] = [];
 
         if (this.stateManager.isLoggedIn) {
-            components.push(<RaceCountdown key={1} clickMakeAllSeasonPicks={this.launchAllSeasonPicks} clickMakeNextRacePicks={this.launchRacePicks} race={this.stateManager.nextRace} />);
+            components.push(<RaceCountdown key={1} clickMakeAllSeasonPicks={this.launchAllSeasonPicks} clickMakeNextRacePicks={this.launchNextRacePicks} race={this.stateManager.nextRace} />);
         }
         components.push(<BlogsComponent key={2} blogs={this.state.blogs} numberBlogs={3} />);
         return <div>{components}</div>

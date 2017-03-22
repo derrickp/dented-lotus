@@ -86,11 +86,16 @@ export function saveRaces(season: number, races: RaceResponse[], id_token: strin
     });
 }
 
-export function getRace(key: string): Promise<RaceResponse> {
+export function getRace(season: number, key: string, id_token: string): Promise<RaceResponse> {
     return new Promise<RaceResponse>((resolve, reject) => {
-        return fetch(`/races/${key}`).then(response => {
-            return response.json().then((race: RaceResponse) => {
-                resolve(race);
+        return fetch(`/races/${season}/${key}`, {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + id_token
+            }
+        }).then(response => {
+            return response.json().then((races: RaceResponse[]) => {
+                resolve(races[0]);
             });
         });
     });

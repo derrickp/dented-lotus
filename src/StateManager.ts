@@ -73,26 +73,43 @@ export class StateManager {
         return this._races;
     }
 
+    getRace(key: string): Promise<RaceModel> {
+        return new Promise<RaceModel>((resolve, reject) => {
+            return getRace(2017, key, this.user.id_token).then(raceResponse => {
+                const model = new RaceModel(raceResponse, this.raceModelContext);
+                if (this._raceMap.has(model.key)) {
+                    this._raceMap.delete(model.key);
+                }
+                this._raceMap.set(model.key, model);
+                this._publishWatches("races");
+                resolve(model);
+            });
+        });
+    }
+
+    get raceModelContext(): RaceModelContext {
+        const context: RaceModelContext = {
+            saveRace: (raceModel: RaceModel) => {
+                return this.saveRace(raceModel);
+            },
+            getTrack: (response: TrackResponse): TrackModel => {
+                return new TrackModel(response);
+            },
+            getDriver: (response: DriverResponse): DriverModel => {
+                return this.getDriver(response);
+            },
+            getPrediction: (response: PredictionResponse): PredictionModel => {
+                return new PredictionModel(response, this.predictionContext);
+            }
+        };
+        return context;
+    }
+
     private _getRaces(): Promise<RaceModel[]> {
         return new Promise<RaceModel[]>((resolve, reject) => {
             return getAllRaces(2017, this.user.id_token).then((raceResponses: RaceResponse[]) => {
                 const raceModels: RaceModel[] = raceResponses.map(rr => {
-                    const context: RaceModelContext = {
-                        saveRace: (raceModel: RaceModel) => {
-                            return this.saveRace(raceModel);
-                        },
-                        getTrack: (response: TrackResponse): TrackModel => {
-                            return new TrackModel(response);
-                        },
-                        getDriver: (response: DriverResponse): DriverModel => {
-                            return this.getDriver(response);
-                        },
-                        getPrediction: (response: PredictionResponse): PredictionModel => {
-                            response.raceKey = rr.key;
-                            return new PredictionModel(response, this.predictionContext);
-                        }
-                    };
-                    return new RaceModel(rr, context);
+                    return new RaceModel(rr, this.raceModelContext);
                 });
                 for (const raceModel of raceModels) {
                     if (!this._raceMap.has(raceModel.key)) this._raceMap.set(raceModel.key, raceModel);
@@ -106,11 +123,11 @@ export class StateManager {
     get predictionContext(): PredictionContext {
         return {
             saveUserPicks: (model: PredictionModel) => {
-                if (!this.user.isLoggedIn){
+                if (!this.user.isLoggedIn) {
                     return Promise.reject(new Error("Need to be logged in to save"));
                 }
                 const payload: UserPickPayload[] = [];
-                for (const pick of model.userPicks) {
+                for (const pick of model.predictionResponse.userPicks) {
                     payload.push({
                         race: model.predictionResponse.raceKey,
                         prediction: model.predictionResponse.key,
@@ -182,7 +199,7 @@ export class StateManager {
 
     private _allSeasonPredictions: Promise<PredictionModel[]>;
     get allSeasonPredictions(): Promise<PredictionModel[]> {
-        this._allSeasonPredictions = this._allSeasonPredictions ? this._allSeasonPredictions : new Promise<PredictionModel[]>((resolve, reject) => {
+        return new Promise<PredictionModel[]>((resolve, reject) => {
             return getAllSeasonPredictions(this.user.id_token).then(predictionResponses => {
                 const allSeasonPredictions: PredictionModel[] = [];
                 for (const predictionResponse of predictionResponses) {
@@ -192,7 +209,6 @@ export class StateManager {
                 resolve(allSeasonPredictions);
             });
         });
-        return this._allSeasonPredictions;
     }
 
     constructor() {

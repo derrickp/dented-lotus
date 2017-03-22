@@ -28,6 +28,7 @@ export const raceRoutes: IRouteConfiguration[] = [
                 const season = Number.parseInt(request.params["season"]);
                 if (isNaN(season)) {
                     reply(Boom.badRequest("Invalid season"));
+                    return;
                 }
                 try {
                     const credentials: Credentials = request.auth.credentials;

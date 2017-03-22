@@ -30,7 +30,7 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
 
     onChange(event: React.ChangeEvent<any>) {
         const value = event.target.value !== "not-app" ? event.target.value : null;
-        this.props.prediction.userPicks.splice(0, 1, value);
+        this.props.prediction.predictionResponse.userPicks.splice(0, 1, value);
         this.setState({ validationState: "warning" });
         this.props.save(this.props.prediction).then(success => {
             this.setState({ validationState: success ? "success" : "error" });
@@ -52,7 +52,7 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
         const options: JSX.Element[] = [];
         const placeholder = <option key={"not-app"} value={"not-app"} >Make your pick</option>;
         options.push(placeholder);
-        const userChoice = prediction.json.userPicks[0];
+        const userChoice = prediction.predictionResponse.userPicks[0];
         for (const c of prediction.choices) {
             options.push(this.getOption(c, userChoice));
         }
