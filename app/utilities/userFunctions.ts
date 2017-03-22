@@ -1,5 +1,6 @@
 'use strict';
 import * as Boom from "boom";
+import fetch from "node-fetch";
 import { getUsersByEmail } from "./data/users";
 import { AuthenticationPayload } from "../../common/models/Authentication";
 import { GOOGLE_CLIENT_ID } from "../config";
@@ -23,6 +24,24 @@ export function verifyUniqueUser(req, res) {
         // If everything checks out, send the payload through
         // to the route handler
         res(req.payload);
+    });
+}
+
+function verifyFacebook(token: string): Promise<string> {
+    console.log("checking facebook info");
+    return new Promise<string>((resolve, reject) => {
+        return fetch(`https://graph.facebook.com/v2.8/me?access_token=${token}&debug=all&fields=id%2Cname%2Cemail&format=json&method=get&pretty=0`)
+            .then((response) => {
+                if (response.ok) {
+                    return response.json().then((json: { id: string, name: string, email: string }) => {
+                        resolve(json.email);
+                        console.log(json);
+                    });
+                }
+                else {
+                    reject(new Error(response.statusText));
+                }
+            }).catch(reject);
     });
 }
 
@@ -58,6 +77,9 @@ export function verifyCredentials(req, res) {
         case "google":
             authPromise = verifyGoogleId(authPayload.auth_token);
             break;
+        case "facebook":
+            authPromise = verifyFacebook(authPayload.auth_token);
+            break;
         default:
             res(Boom.badRequest("Invalid authentication type"));
             return;
@@ -85,6 +107,6 @@ export function verifyCredentials(req, res) {
             }
         });
     }).catch((error: Error) => {
-        res(Boom.badRequest(error.message));    
+        res(Boom.badRequest(error.message));
     });
 }

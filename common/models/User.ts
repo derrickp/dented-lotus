@@ -79,13 +79,12 @@ export class GoogleUser extends User {
 
 }
 export class FacebookUser extends User {
-    authToken;
-    constructor(fbResponse) {
-        super({}, ""); // 
+    authToken: string;
+    constructor(fbResponse: FB.LoginStatusResponse, dentedLotusUser: UserResponse, id_token: string) {
+        super(dentedLotusUser, id_token);
         this.authToken = fbResponse.authResponse.accessToken;
-        FB.api('/me', function (response) {
-            console.log('Successful login for: ' + response.first_name);
-        });
+        // We could maybe get some facebook info here if we wanted it.
+        this._loggedIn = true;
     }
 
     logOut(): Promise<boolean> {

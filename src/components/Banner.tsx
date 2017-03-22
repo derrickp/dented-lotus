@@ -8,6 +8,7 @@ export interface BannerProps {
     title: string; 
     onPageChange: (page: string) => void;
     completeGoogleLogin: (args) => void;
+    completeFacebookLogin: (args) => void;
     logout: () => void;
     signUp: (type: string) => void;
     loggedIn: boolean;
@@ -29,7 +30,7 @@ export class Banner extends React.Component<BannerProps, any>{
     render() {
         return <div className="banner">
             <h1>{this.props.title}</h1>
-            <LoginLogout user={this.props.user} signUp={this.props.signUp} logout={this.props.logout} loggedIn={this.props.loggedIn} completeGoogleLogin={this.completeGoogleLogin} onPageChange={this.onPageChange} /> 
+            <LoginLogout user={this.props.user} completeFacebookLogin={this.props.completeFacebookLogin} signUp={this.props.signUp} logout={this.props.logout} loggedIn={this.props.loggedIn} completeGoogleLogin={this.completeGoogleLogin} onPageChange={this.onPageChange} /> 
         </div>;
     }
 }

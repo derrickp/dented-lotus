@@ -9,48 +9,35 @@ export interface GoogleLoginProps {
 }
 
 export interface GoogleLoginState {
-    loggedIn: boolean;
+    haveGapi: boolean;
 }
 
 export class GoogleLogin extends React.Component<GoogleLoginProps, GoogleLoginState> {
-    completeGoogleLogin: (args) => void;
-
+    private _mounted: boolean = false;
     private _googleAuth: gapi.auth2.GoogleAuth;
 
     constructor(props: GoogleLoginProps) {
         super(props);
-        this.completeGoogleLogin = props.completeGoogleLogin;
         this.state = {
-            loggedIn: false
+            haveGapi: false
         };
     }
 
     componentDidMount() {
+        this._mounted = true;
         this._initGoogle();
+    }
+
+    componentWillUnmount() {
+        this._mounted = false;
     }
 
     private _initGoogle() {
         if (window["gapi"]) {
-            gapi.load("auth2", () => {
-                gapi.auth2.init({
-                    client_id: "1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com"
-                }).then(() => {
-                    this._googleAuth = gapi.auth2.getAuthInstance();
-                    this._googleAuth.isSignedIn.listen(signedIn => {
-                        if (signedIn) {
-                            const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
-                            this.completeGoogleLogin(user);
-                        }
-                    });
-                    const loggedIn = this._googleAuth.isSignedIn.get();
-                    if (loggedIn) {
-                        const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
-                        this.completeGoogleLogin(user);
-                    }
-                }, (reason: string) => {
-                    console.error("component:GoogleLogin:" + reason);
-                });
-            });
+            this._googleAuth = gapi.auth2.getAuthInstance();
+            if (this._mounted) {
+                this.setState({ haveGapi: true });
+            }
         } else {
             const interval = setInterval(() => {
                 if (window["gapi"]) {

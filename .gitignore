@@ -6,6 +6,7 @@ bin
 **/*.js 
 **/*.jsx 
 **/*.js.map 
+APP_SECRETS.txt
 /dist/bundle.js
 /dist/bundle.js.map
 !webpack.config.js

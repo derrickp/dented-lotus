@@ -218,7 +218,9 @@ export class StateManager {
         this.saveDriver = this.saveDriver.bind(this);
         this.saveRace = this.saveRace.bind(this);
         this.saveTeam = this.saveTeam.bind(this);
-        // this._initFacebook();
+        this.completeFacebookLogin = this.completeFacebookLogin.bind(this);
+        this._initFacebook();
+        this._initGoogle();
 
         this.teams.then(() => {
             console.log("got teams");
@@ -229,30 +231,57 @@ export class StateManager {
     }
 
     private _initFacebook() {
-        (<any>window).fbAsyncInit = function () {
-            FB.init({
-                appId: '1630122457296096',
-                cookie: true,
-                xfbml: true,
-                version: 'v2.8'
-            });
-
-            (<any>FB).AppEvents.logPageView();
-            FB.getLoginStatus(function (response) {
-                if (response.status === 'connected') {
-                    // Logged into your app and Facebook.
-                    this.currentUser = new FacebookUser(response);
+        if (window["FB"]) {
+            FB.getLoginStatus((response: FB.LoginStatusResponse) => {
+                // If we haven't been authorized yet, then we aren't going to use Facebook to login
+                if (response.status !== "connected") {
                     return;
                 }
+                else {
+                    this.completeFacebookLogin(response);
+                }
+            }, true);
+        }
+        else {
+            const interval = setInterval(() => {
+                if (window["FB"]) {
+                    clearInterval(interval);
+                    this._initFacebook();
+                }
+            }, 100);
+        }
+    }
+
+    private _initGoogle() {
+        if (window["gapi"]) {
+            gapi.load("auth2", () => {
+                gapi.auth2.init({
+                    client_id: "1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com"
+                }).then(() => {
+                    const googleAuth = gapi.auth2.getAuthInstance();
+                    googleAuth.isSignedIn.listen(signedIn => {
+                        if (signedIn) {
+                            const user: gapi.auth2.GoogleUser = googleAuth.currentUser.get();
+                            this.completeGoogleLogin(user);
+                        }
+                    });
+                    const loggedIn = googleAuth.isSignedIn.get();
+                    if (loggedIn) {
+                        const user: gapi.auth2.GoogleUser = googleAuth.currentUser.get();
+                        this.completeGoogleLogin(user);
+                    }
+                }, (reason: string) => {
+                    console.error("component:GoogleLogin:" + reason);
+                });
             });
-        };
-        (function (d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) return;
-            js = d.createElement(s); js.id = id;
-            js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.8";
-            fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
+        } else {
+            const interval = setInterval(() => {
+                if (window["gapi"]) {
+                    clearInterval(interval);
+                    this._initGoogle();
+                }
+            }, 10);
+        }
     }
 
     watch(path: string, callback: Function) {
@@ -403,6 +432,18 @@ export class StateManager {
         this._teamMap.set(teamResponse.key, model);
         this._publishWatches("teams");
         return model;
+    }
+
+    completeFacebookLogin(args: FB.LoginStatusResponse) {
+        const authPayload: AuthenticationPayload = {
+            auth_token: args.authResponse.accessToken,
+            authType: AuthenticationTypes.FACEBOOK
+        };
+
+        authenticate(authPayload).then(authResponse => {
+            const user = new FacebookUser(args, authResponse.user, authResponse.id_token);
+            this.user = user;
+        });
     }
 
     completeGoogleLogin(response: gapi.auth2.GoogleUser) {

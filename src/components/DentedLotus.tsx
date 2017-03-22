@@ -182,7 +182,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         mainContent.push(<div key={"wrapper"} className="wrapper">{this.getCurrentView()}</div>);
 
         return <div>
-            <Banner key={"banner"} signUp={this.signUp} user={this.stateManager.user} logout={this.stateManager.signOut} loggedIn={this.state.loggedIn} completeGoogleLogin={this.stateManager.completeGoogleLogin} onPageChange={this.onPageChange} title="Project Dented Lotus" />
+            <Banner key={"banner"} completeFacebookLogin={this.stateManager.completeFacebookLogin} signUp={this.signUp} user={this.stateManager.user} logout={this.stateManager.signOut} loggedIn={this.state.loggedIn} completeGoogleLogin={this.stateManager.completeGoogleLogin} onPageChange={this.onPageChange} title="Project Dented Lotus" />
             {mainContent}
         </div>;
 
