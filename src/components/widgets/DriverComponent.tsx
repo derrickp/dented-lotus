@@ -103,7 +103,7 @@ function DisplayDriver(props: EditDriverProps) {
                 </div>
             </div>
         </div>
-        <div className="panel-body">
+        <div className="panel-body container">
             <div className="row">
                 <div className="small-driver-info col-md-3">
                     <div id="form-field-4">{points}</div>
