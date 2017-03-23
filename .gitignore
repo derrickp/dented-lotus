@@ -7,7 +7,7 @@ bin
 **/*.jsx 
 **/*.js.map 
 APP_SECRETS.txt
-/dist/**
+dist/**
 !webpack.config.js
 !gulpfile.js
 !.eslintrc.js
