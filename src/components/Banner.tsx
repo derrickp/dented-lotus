@@ -93,7 +93,7 @@ export class Banner extends React.Component<BannerProps, BannerState>{
         if (this.props.loggedIn) {
             navItems.push(<NavItem key={"races"} eventKey={"races"} onClick={this.clickRaces} href="#races">Races</NavItem>);
             navItems.push(<NavItem key={"drivers"} eventKey={"drivers"} onClick={this.clickDrivers} >Drivers</NavItem>);
-            navItems.push(<NavItem  key={"tracks"} eventKey={"tracks"}>Tracks</NavItem>);
+            navItems.push(<NavItem key={"tracks"} eventKey={"tracks"}>Tracks</NavItem>);
             /*navItems.push(<NavDropdown key={"dropdown"} eventKey={"dropdown"} title="More" id="basic-nav-dropdown">
                 <MenuItem key={"drivers"} eventKey={"drivers"} onClick={this.clickDrivers} >Drivers</MenuItem>
                 <MenuItem key={"tracks"} eventKey={"tracks"}>Tracks</MenuItem>
@@ -110,10 +110,12 @@ export class Banner extends React.Component<BannerProps, BannerState>{
         return (
             <div>
                 <Navbar inverse={true} collapseOnSelect={true}>
-                    <Navbar.Brand>
-                        <a onClick={this.clickHome}>{this.props.title}</a>
-                    </Navbar.Brand>
-                    <Navbar.Toggle />
+                    <Navbar.Header>
+                        <Navbar.Brand>
+                            <a onClick={this.clickHome}>{this.props.title}</a>
+                        </Navbar.Brand>
+                        <Navbar.Toggle />
+                    </Navbar.Header>
                     <Navbar.Collapse>
                         <Nav>
                             {navItems}
@@ -123,7 +125,7 @@ export class Banner extends React.Component<BannerProps, BannerState>{
                         </Nav>
                     </Navbar.Collapse>
                 </Navbar>
-                <LoginLogout key={"loginlogout"} show={this.state.showLogin} onLogin={this.onLogin} doGoogleLogin={this.props.doGoogleLogin} doFacebookLogin={this.props.doFacebookLogin} loggedIn={this.props.loggedIn} /> 
+                <LoginLogout key={"loginlogout"} show={this.state.showLogin} onLogin={this.onLogin} doGoogleLogin={this.props.doGoogleLogin} doFacebookLogin={this.props.doFacebookLogin} loggedIn={this.props.loggedIn} />
             </div>
         );
     }
