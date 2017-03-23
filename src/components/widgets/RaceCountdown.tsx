@@ -53,8 +53,8 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
 
         const jumbo =
             <Jumbotron className="jumbotron">
-                <h1>Next Race!</h1>
                 <div className="container">
+                <h1>Next Race!</h1>
                     <div className="row">
                         <div className="col-md-4 col-sm-8">
                             <p>{this.nextRace.raceResponse.displayName + " " + this.state.timeRemaining}</p>
