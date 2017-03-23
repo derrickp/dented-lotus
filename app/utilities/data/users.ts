@@ -95,7 +95,7 @@ export function saveRequestedUser(info: SignupInfo): Promise<boolean> {
     });
 }
 
-export function saveUser(user): Promise<boolean> {
+export function saveUser(user: UserResponse): Promise<boolean> {
     return new Promise((resolve, reject) => {
         if (!user) {
             reject(new Error("must have a user to save"));

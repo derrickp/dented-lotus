@@ -36,6 +36,8 @@ export interface DentedLotusState {
     drivers: DriverModel[];
     blogs: BlogResponse[];
     allSeasonPredictions: PredictionModel[];
+    haveGoogleApi: boolean;
+    haveFacebookApi: boolean;
 }
 
 export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusState>{
@@ -56,7 +58,9 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             races: [],
             teams: [],
             blogs: [],
-            allSeasonPredictions: []
+            allSeasonPredictions: [],
+            haveGoogleApi: false,
+            haveFacebookApi: false
         };
         this.launchNextRacePicks = this.launchNextRacePicks.bind(this);
         this.signUp = this.signUp.bind(this);
@@ -85,6 +89,14 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             this.stateManager.blogs.then(blogs => {
                 this.setState({ blogs: blogs });
             });
+        });
+
+        this.stateManager.watch("googleLogin", () => {
+            this.setState({ haveGoogleApi: true });
+        });
+
+        this.stateManager.watch("facebookLogin", () => {
+            this.setState({ haveFacebookApi: true });
         });
     }
 
@@ -180,9 +192,10 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             mainContent.push(<div key={"header"} className="header-section"></div>);
         }
         mainContent.push(<div key={"wrapper"} className="wrapper">{this.getCurrentView()}</div>);
-
+        const googleLogin = this.state.haveGoogleApi ? this.stateManager.doGoogleLogin : null;
+        const fbLogin = this.state.haveFacebookApi ? this.stateManager.doFacebookLogin : null;
         return <div>
-            <Banner key={"banner"} completeFacebookLogin={this.stateManager.completeFacebookLogin} signUp={this.signUp} user={this.stateManager.user} logout={this.stateManager.signOut} loggedIn={this.state.loggedIn} completeGoogleLogin={this.stateManager.completeGoogleLogin} onPageChange={this.onPageChange} title="Project Dented Lotus" />
+            <Banner key={"banner"} doFacebookLogin={fbLogin} signUp={this.signUp} user={this.stateManager.user} logout={this.stateManager.signOut} loggedIn={this.state.loggedIn} doGoogleLogin={googleLogin} onPageChange={this.onPageChange} title="Project Dented Lotus" />
             {mainContent}
         </div>;
 
