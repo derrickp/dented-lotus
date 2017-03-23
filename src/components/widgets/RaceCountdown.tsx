@@ -60,9 +60,9 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
                         </div>
                 </div>
                 <div className="row">
-                    <div className="col-md-2">
+                    <div className="col-md-2 pad-1">
                         <Button block={true} onClick={this.props.clickMakeNextRacePicks} bsSize="large" bsStyle="primary" >Make Your Picks</Button></div>
-                    <div className="col-md-2">
+                    <div className="col-md-2  pad-1">
                         {allSeasonDFromNow.timeRemaining > 0 && <Button block={true} bsSize="large" bsStyle="primary" onClick={this.props.clickMakeAllSeasonPicks}>Make All Season Picks</Button>}
                     </div>
                 </div>

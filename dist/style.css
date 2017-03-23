@@ -93,10 +93,6 @@ body .race-countdown .timer,
 html .race-countdown .timer {
   margin-right: 1rem;
 }
-body #race-countdown-jumbo,
-html #race-countdown-jumbo {
-  padding-left: 5em;
-}
 body .button,
 html .button {
   background-color: #4CAF50;
