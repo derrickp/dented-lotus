@@ -52,17 +52,21 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
         const allSeasonDFromNow = getDurationFromNow("04/20/2017");
 
         const jumbo =
-            <Jumbotron id="race-countdown-jumbo">
-                <h1>Next Race!</h1>
+            <Jumbotron className="jumbotron container">
+                <div className="row">
+                    <div className="col-md-4 col-sm-8">
+                        <h1>Next Race!</h1>
+                    </div>
+                </div>
                 <div className="row">
                     <div className="col-md-4">
                         <p>{this.nextRace.raceResponse.displayName + " " + this.state.timeRemaining}</p>
-                        </div>
+                    </div>
                 </div>
                 <div className="row">
-                    <div className="col-md-2 pad-1">
+                    <div className="col-md-2 col-sm-8">
                         <Button block={true} onClick={this.props.clickMakeNextRacePicks} bsSize="large" bsStyle="primary" >Make Your Picks</Button></div>
-                    <div className="col-md-2  pad-1">
+                    <div className="col-md-2 col-sm-8">
                         {allSeasonDFromNow.timeRemaining > 0 && <Button block={true} bsSize="large" bsStyle="primary" onClick={this.props.clickMakeAllSeasonPicks}>Make All Season Picks</Button>}
                     </div>
                 </div>

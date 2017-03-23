@@ -93,6 +93,10 @@ body .race-countdown .timer,
 html .race-countdown .timer {
   margin-right: 1rem;
 }
+body .pad-1,
+html .pad-1 {
+  padding: 1rem;
+}
 body .button,
 html .button {
   background-color: #4CAF50;
