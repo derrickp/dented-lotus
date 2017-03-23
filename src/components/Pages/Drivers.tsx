@@ -35,7 +35,7 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
         }
         let output = null;
         let drivers = this.props.drivers.map(driver => {
-            return <li key={driver.key} className="dl-panel">
+            return <li key={driver.key} >
                 <DriverComponent userIsAdmin={this.state.userIsAdmin} allTeams={this.props.teams} key={driver.abbreviation} driver={driver} small={true} />
             </li>
         });
