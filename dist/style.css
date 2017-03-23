@@ -44,6 +44,10 @@ body li,
 html li {
   list-style: none;
 }
+body .jumbotron .row,
+html .jumbotron .row {
+  margin-top: 3rem;
+}
 body .dl-panel,
 html .dl-panel {
   border: 1px solid #b5b3b4;

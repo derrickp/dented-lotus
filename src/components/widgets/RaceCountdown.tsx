@@ -58,10 +58,10 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
                     <div className="col-md-4">
                         <p>{this.nextRace.raceResponse.displayName + " " + this.state.timeRemaining}</p></div>
                     <div className="col-md-2">
-                        <Button onClick={this.props.clickMakeNextRacePicks} bsSize="large" bsStyle="primary" >Make Your Picks</Button></div>
+                        <Button block={true} onClick={this.props.clickMakeNextRacePicks} bsSize="large" bsStyle="primary" >Make Your Picks</Button></div>
                     <div className="col-md-2">
-                        {allSeasonDFromNow.timeRemaining > 0 && <Button bsSize="large" bsStyle="primary" onClick={this.props.clickMakeAllSeasonPicks}>Make All Season Picks</Button>}
-                    </div>
+                        {allSeasonDFromNow.timeRemaining > 0 && <Button  block={true} bsSize="large" bsStyle="primary" onClick={this.props.clickMakeAllSeasonPicks}>Make All Season Picks</Button>}
+                    </div> 
                 </div> 
             </Jumbotron>;
         return jumbo;
