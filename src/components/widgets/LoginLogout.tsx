@@ -1,6 +1,5 @@
 
-import * as React from "react";
-import Rodal from "rodal";
+import * as React from "react"; 
 import { Pages } from "../Pages";
 import { MenuComponent } from "../Menu";
 import { GoogleLogin } from "../Auth/GoogleLogin";
