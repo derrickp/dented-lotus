@@ -10,7 +10,14 @@ import { BlogResponse } from "../../common/models/Blog";
 import { PredictionResponse } from "../../common/models/Prediction";
 import { AuthenticationPayload, AuthenticationResponse } from "../../common/models/Authentication";
 
+<<<<<<< Updated upstream
 const baseUrl = `//${window.location.hostname}:8080`;
+=======
+let baseUrl = `${window.location.origin}`;
+if (baseUrl.indexOf(":8080") == -1){
+ baseUrl += ":8080";   
+}
+>>>>>>> Stashed changes
 
 export function getBlogs(): Promise<BlogResponse[]> {
     return new Promise<BlogResponse[]>((resolve, reject) => {
