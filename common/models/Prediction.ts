@@ -8,12 +8,11 @@ export interface PredictionResponse {
     title: string;
     type: string;
     allSeason: boolean;
-    numChoices: number;
     choices?: DriverResponse[] | TeamResponse[];
     value?: number;
     modifier?: number;
     outcome?: DriverResponse[] | TeamResponse[];
-    userPicks?: string[];
+    userPick?: string;
     raceKey?: string;
 }
 

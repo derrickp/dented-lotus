@@ -130,13 +130,11 @@ export class StateManager {
                     return Promise.reject(new Error("Need to be logged in to save"));
                 }
                 const payload: UserPickPayload[] = [];
-                for (const pick of model.predictionResponse.userPicks) {
-                    payload.push({
-                        race: model.predictionResponse.raceKey,
-                        prediction: model.predictionResponse.key,
-                        choice: pick
-                    });
-                }
+                payload.push({
+                    race: model.predictionResponse.raceKey,
+                    prediction: model.predictionResponse.key,
+                    choice: model.predictionResponse.userPick
+                });
                 return saveUserPicks(payload, this.user.id_token);
             },
             getDriver: (response: DriverResponse) => {

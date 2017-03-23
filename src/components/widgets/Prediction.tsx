@@ -30,7 +30,7 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
 
     onChange(event: React.ChangeEvent<any>) {
         const value = event.target.value !== "not-app" ? event.target.value : null;
-        this.props.prediction.predictionResponse.userPicks.splice(0, 1, value);
+        this.props.prediction.predictionResponse.userPick = event.target.value;
         this.setState({ validationState: "warning" });
         this.props.save(this.props.prediction).then(success => {
             this.setState({ validationState: success ? "success" : "error" });
@@ -43,7 +43,7 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
         });
     }
 
-    getOption(selectable: Selectable, choice: string): JSX.Element {
+    getOption(selectable: Selectable): JSX.Element {
         return <option key={selectable.key} value={selectable.key}>{selectable.display}</option>;
     }
 
@@ -52,13 +52,13 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
         const options: JSX.Element[] = [];
         const placeholder = <option key={"not-app"} value={"not-app"} >Make your pick</option>;
         options.push(placeholder);
-        const userChoice = prediction.predictionResponse.userPicks[0];
+        const userChoices = prediction.predictionResponse.userPick;
         for (const c of prediction.choices) {
-            options.push(this.getOption(c, userChoice));
+            options.push(this.getOption(c));
         }
         const formControl =
             <FormGroup key={prediction.json.key} validationState={this.state.validationState} bsSize="large">
-                <FormControl defaultValue={userChoice} onChange={this.onChange} id={prediction.json.key} componentClass="select" placeholder="Make your pick">
+                <FormControl defaultValue={userChoices} onChange={this.onChange} id={prediction.json.key} componentClass="select" placeholder="Make your pick">
                     {options}
                 </FormControl>
             </FormGroup>;
