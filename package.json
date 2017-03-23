@@ -88,6 +88,7 @@
     "build": "npm run compile && npm run webpack && npm run copy-static-files && npm run compile-less",
     "compile": "tsc -v && tsc && echo Typescript compile complete",
     "compile-watch": "tsc -v && tsc -w",
-    "test": "npm run build"
+    "test": "npm run build",
+    "prod-update": "git pull && npm run build && npm run start"
   }
 }
