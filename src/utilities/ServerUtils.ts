@@ -10,7 +10,7 @@ import { BlogResponse } from "../../common/models/Blog";
 import { PredictionResponse } from "../../common/models/Prediction";
 import { AuthenticationPayload, AuthenticationResponse } from "../../common/models/Authentication";
 
-const baseUrl = `${window.location.origin}:8080`;
+const baseUrl = `//${window.location.hostname}:8080`;
 
 export function getBlogs(): Promise<BlogResponse[]> {
     return new Promise<BlogResponse[]>((resolve, reject) => {

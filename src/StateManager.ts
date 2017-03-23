@@ -30,6 +30,9 @@ import {
 
 export class StateManager {
 
+    private _googleAuth: gapi.auth2.GoogleAuth;
+    private _fbLoaded: boolean;
+
     private _watches: Map<string, Function[]> = new Map<string, Function[]>();
 
     private _tracks: Promise<TrackResponse[]>;
@@ -127,13 +130,11 @@ export class StateManager {
                     return Promise.reject(new Error("Need to be logged in to save"));
                 }
                 const payload: UserPickPayload[] = [];
-                for (const pick of model.predictionResponse.userPicks) {
-                    payload.push({
-                        race: model.predictionResponse.raceKey,
-                        prediction: model.predictionResponse.key,
-                        choice: pick
-                    });
-                }
+                payload.push({
+                    race: model.predictionResponse.raceKey,
+                    prediction: model.predictionResponse.key,
+                    choice: model.predictionResponse.userPick
+                });
                 return saveUserPicks(payload, this.user.id_token);
             },
             getDriver: (response: DriverResponse) => {
@@ -219,6 +220,9 @@ export class StateManager {
         this.saveRace = this.saveRace.bind(this);
         this.saveTeam = this.saveTeam.bind(this);
         this.completeFacebookLogin = this.completeFacebookLogin.bind(this);
+
+        this.doFacebookLogin = this.doFacebookLogin.bind(this);
+        this.doGoogleLogin = this.doGoogleLogin.bind(this);
         this._initFacebook();
         this._initGoogle();
 
@@ -230,8 +234,21 @@ export class StateManager {
         });
     }
 
+    doFacebookLogin(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            FB.login((response) => {
+                // handle the response
+                return this.completeFacebookLogin(response).then(() => {
+                    resolve();
+                });
+            }, { scope: 'public_profile,email' });
+        });
+    }
+
     private _initFacebook() {
         if (window["FB"]) {
+            this._fbLoaded = true;
+            this._publishWatches("facebookLogin");
             FB.getLoginStatus((response: FB.LoginStatusResponse) => {
                 // If we haven't been authorized yet, then we aren't going to use Facebook to login
                 if (response.status !== "connected") {
@@ -252,22 +269,31 @@ export class StateManager {
         }
     }
 
+    doGoogleLogin(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this._googleAuth.signIn().then(() => {
+                resolve();
+            });
+        });
+    }
+
     private _initGoogle() {
         if (window["gapi"]) {
             gapi.load("auth2", () => {
                 gapi.auth2.init({
                     client_id: "1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com"
                 }).then(() => {
-                    const googleAuth = gapi.auth2.getAuthInstance();
-                    googleAuth.isSignedIn.listen(signedIn => {
+                    this._publishWatches("googleLogin");
+                    this._googleAuth = gapi.auth2.getAuthInstance();
+                    this._googleAuth.isSignedIn.listen(signedIn => {
                         if (signedIn) {
-                            const user: gapi.auth2.GoogleUser = googleAuth.currentUser.get();
+                            const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
                             this.completeGoogleLogin(user);
                         }
                     });
-                    const loggedIn = googleAuth.isSignedIn.get();
+                    const loggedIn = this._googleAuth.isSignedIn.get();
                     if (loggedIn) {
-                        const user: gapi.auth2.GoogleUser = googleAuth.currentUser.get();
+                        const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
                         this.completeGoogleLogin(user);
                     }
                 }, (reason: string) => {
@@ -295,12 +321,9 @@ export class StateManager {
     private _publishWatches(path: string) {
         if (this._watches.has(path)) {
             const callbacks = this._watches.get(path);
-            if (this[path]) {
-                const watchedValue = this[path];
-                callbacks.forEach(callback => {
-                    callback();
-                });
-            }
+            callbacks.forEach(callback => {
+                callback();
+            });
 
         }
     }
@@ -434,25 +457,25 @@ export class StateManager {
         return model;
     }
 
-    completeFacebookLogin(args: FB.LoginStatusResponse) {
+    completeFacebookLogin(args: FB.LoginStatusResponse): Promise<void> {
         const authPayload: AuthenticationPayload = {
             auth_token: args.authResponse.accessToken,
             authType: AuthenticationTypes.FACEBOOK
         };
 
-        authenticate(authPayload).then(authResponse => {
+        return authenticate(authPayload).then(authResponse => {
             const user = new FacebookUser(args, authResponse.user, authResponse.id_token);
             this.user = user;
         });
     }
 
-    completeGoogleLogin(response: gapi.auth2.GoogleUser) {
+    completeGoogleLogin(response: gapi.auth2.GoogleUser): Promise<void> {
         const authPayload: AuthenticationPayload = {
             auth_token: response.getAuthResponse().id_token,
             authType: AuthenticationTypes.GOOGLE
         };
 
-        authenticate(authPayload).then(authResponse => {
+        return authenticate(authPayload).then(authResponse => {
             const googleUser = new GoogleUser(response, authResponse.user, authResponse.id_token);
             this.user = googleUser;
         });

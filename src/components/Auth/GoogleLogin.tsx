@@ -3,18 +3,14 @@ import * as React from "react";
 import { GoogleLoginResponse } from "../../../common/models/GoogleLoginResponse";
 
 export interface GoogleLoginProps {
-    completeGoogleLogin: (args) => void;
-    onLogin: () => void;
+    login: () => void;
     loggedIn: boolean;
 }
 
 export interface GoogleLoginState {
-    haveGapi: boolean;
 }
 
 export class GoogleLogin extends React.Component<GoogleLoginProps, GoogleLoginState> {
-    private _mounted: boolean = false;
-    private _googleAuth: gapi.auth2.GoogleAuth;
 
     constructor(props: GoogleLoginProps) {
         super(props);
@@ -23,38 +19,8 @@ export class GoogleLogin extends React.Component<GoogleLoginProps, GoogleLoginSt
         };
     }
 
-    componentDidMount() {
-        this._mounted = true;
-        this._initGoogle();
-    }
-
-    componentWillUnmount() {
-        this._mounted = false;
-    }
-
-    private _initGoogle() {
-        if (window["gapi"]) {
-            this._googleAuth = gapi.auth2.getAuthInstance();
-            if (this._mounted) {
-                this.setState({ haveGapi: true });
-            }
-        } else {
-            const interval = setInterval(() => {
-                if (window["gapi"]) {
-                    clearInterval(interval);
-                    this._initGoogle();
-                }
-            }, 10);
-        }
-    }
-
     onClickLogin() {
-        this._googleAuth.signIn().then(() => {
-            // Don't need to do anything here, the listener above will handle it
-            this.props.onLogin();
-        }, (reason: string) => {
-            console.error("component:GoogleLogin:" + reason);
-        });
+        this.props.login();
     }
 
     onClickLogout() {
@@ -64,7 +30,7 @@ export class GoogleLogin extends React.Component<GoogleLoginProps, GoogleLoginSt
     render() {
         let displayText = "Sign in with Google";
         // If for some reason we don't have the google API, then we won't be able to sign in anyways
-        if (!this._googleAuth) {
+        if (!this.props.login) {
             return (
                 <div className="placeHolder"></div>
             );

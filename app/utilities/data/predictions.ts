@@ -36,20 +36,19 @@ export async function getPredictionResponses(raceKeys: string[], credentials: Cr
             modifier: racePredictionRow.modifier,
             description: thisPrediction.description,
             title: thisPrediction.title,
-            numChoices: thisPrediction.numChoices,
             type: thisPrediction.type,
             outcome: [],
-            userPicks: [],
+            userPick: "",
             choices: [],
             raceKey: racePredictionRow.race
         };
 
         // Get all of the user picks for this prediction
-        prediction.userPicks = userPicks.filter(up => {
+        prediction.userPick = userPicks.filter(up => {
             return up.prediction === prediction.key;
         }).map(up => {
             return up.choice;
-        });
+        })[0];
 
         // Get the choices for this prediction.
         const possibleChoices = await getPredictionChoices(prediction.key, racePredictionRow.race);
@@ -194,7 +193,6 @@ export function getAllSeasonPredictions(): Promise<PredictionResponse[]> {
                 const prediction: PredictionResponse = {
                     key: row.key,
                     allSeason: row.allSeason != 0 ? true : false,
-                    numChoices: row.numChoices,
                     title: row.title,
                     description: row.description,
                     type: row.type
@@ -224,7 +222,6 @@ export function getPredictions(keys?: string[]): Promise<PredictionResponse[]> {
                 const prediction: PredictionResponse = {
                     key: row.key,
                     allSeason: row.allSeason != 0 ? true : false,
-                    numChoices: row.numChoices,
                     title: row.title,
                     description: row.description,
                     type: row.type
@@ -361,8 +358,8 @@ export function updatePredictions(predictions: PredictionResponse[]): Promise<bo
     return new Promise<boolean>((resolve, reject) => {
         try {
             const insert = `INSERT OR REPLACE INTO predictions
-            (key, description, title, type, allseason, numchoices) 
-            VALUES (?1, ?2, ?3, ?4, ?5, ?6)`;
+            (key, description, title, type, allseason) 
+            VALUES (?1, ?2, ?3, ?4, ?5)`;
             db.serialize(() => {
                 db.exec("BEGIN;", (beginError) => {
                     if (beginError) {
@@ -376,8 +373,7 @@ export function updatePredictions(predictions: PredictionResponse[]): Promise<bo
                             2: prediction.description,
                             3: prediction.title,
                             4: prediction.type,
-                            5: prediction.allSeason ? 1 : 0,
-                            6: prediction.numChoices
+                            5: prediction.allSeason ? 1 : 0
                         };
                         db.run(insert, valuesObject);
                     }
@@ -413,7 +409,6 @@ export interface DbBasePrediction {
     title: string;
     type: string;
     allSeason: number;
-    numChoices: number;
 }
 
 export interface DbUserPick {

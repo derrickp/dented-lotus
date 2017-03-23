@@ -45,8 +45,8 @@ function FullUser(props:UserProps){
         </div>;
 }
 function SmallUser(props:SmallNameProps){
-    return <div className="small-user">
+    return <li className="small-user">
             <img className="round" src={props.imgUrl}/>
             <span>{props.name}</span>
-        </div>
+        </li>;
 }

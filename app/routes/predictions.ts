@@ -101,9 +101,9 @@ export const predictionsRoutes: IRouteConfiguration[] = [
                         else {
                             prediction.choices = teams;
                         }
-                        prediction.userPicks = userPicks.filter(p => {
+                        prediction.userPick = userPicks.filter(p => {
                             return p.prediction === prediction.key;
-                        }).map(p => p.choice);
+                        }).map(p => p.choice)[0];
                     }
                     reply(predictions);
                 } 
