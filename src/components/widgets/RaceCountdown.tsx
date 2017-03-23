@@ -56,13 +56,16 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
                 <h1>Next Race!</h1>
                 <div className="row">
                     <div className="col-md-4">
-                        <p>{this.nextRace.raceResponse.displayName + " " + this.state.timeRemaining}</p></div>
+                        <p>{this.nextRace.raceResponse.displayName + " " + this.state.timeRemaining}</p>
+                        </div>
+                </div>
+                <div className="row">
                     <div className="col-md-2">
                         <Button block={true} onClick={this.props.clickMakeNextRacePicks} bsSize="large" bsStyle="primary" >Make Your Picks</Button></div>
                     <div className="col-md-2">
-                        {allSeasonDFromNow.timeRemaining > 0 && <Button  block={true} bsSize="large" bsStyle="primary" onClick={this.props.clickMakeAllSeasonPicks}>Make All Season Picks</Button>}
-                    </div> 
-                </div> 
+                        {allSeasonDFromNow.timeRemaining > 0 && <Button block={true} bsSize="large" bsStyle="primary" onClick={this.props.clickMakeAllSeasonPicks}>Make All Season Picks</Button>}
+                    </div>
+                </div>
             </Jumbotron>;
         return jumbo;
     }
