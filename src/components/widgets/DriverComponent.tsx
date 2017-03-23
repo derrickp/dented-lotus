@@ -118,7 +118,7 @@ function DisplayDriver(props: EditDriverProps) {
                     <label htmlFor="form-field-6">Team</label>
                 </div>
                 <div className="small-driver-info col-md-3">
-                    <img className="driver-image" src={imageUrl} />
+                    <img className="img-responsive center-block" src={imageUrl} />
                 </div>
             </div>
                 
