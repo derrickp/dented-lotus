@@ -13,9 +13,10 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
             const insert = `INSERT OR REPLACE INTO drivers 
             (key, active, firstname, lastname, team, trivia, nationality, flag, birthdate, abbreviation, wins, number) 
             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)`;
-            return  new Promise<boolean>((res, rej) => {
+            let driverPromise = new Promise<boolean>((res, rej) => {
                 db.serialize(() => {
-                    db.exec("BEGIN;"); 
+                    db.exec("BEGIN;");
+
                     drivers.forEach(driver => {
                         let valuesObject = {
                             1: driver.key,
@@ -33,21 +34,34 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
                         };
                         db.run(insert, valuesObject);
                     });
-                    let year = new Date(Date.now()).getFullYear();
+                    db.exec("COMMIT;");
+                    return res(true);
+                });
+            });
+
+            let pointsPromise = new Promise<boolean>((res, rej) => {
+                let year = new Date(Date.now()).getFullYear();
+                db.serialize(() => {
+                    db.exec("BEGIN;");
                     drivers.forEach((d) => {
                         let values = {
                             1: d.key,
                             2: year,
                             3: d.points
-                        }
-                        let insert = `INSERT OR REPLACE INTO driver_season_points (driver, season, points) VALUES (?1, ?2, ?3)`;
-                        console.log(insert, values);
-                        db.run(insert, values);
+                        } 
+                        let insert =`INSERT OR REPLACE INTO driver_season_points (driver, season, points) VALUES (?1, ?2, ?3)`;
+                        console.log(insert,values);
+                        db.run(insert,values);
                     });
                     db.exec("COMMIT;");
-                    return res(true);
+                    res(true);
                 });
-            }); 
+            });
+            return Promise.all([driverPromise,pointsPromise]).then(()=>{
+                    return resolve(true);
+            });
+
+
         } catch (exception) {
             console.log(exception);
             db.exec("ROLLBACK;");
