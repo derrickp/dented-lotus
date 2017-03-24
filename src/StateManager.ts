@@ -31,8 +31,8 @@ import {
 export class StateManager {
 
     private _googleAuth: gapi.auth2.GoogleAuth;
-    private _fbLoaded: boolean;
-
+    fbLoaded: boolean;
+    googleLoaded: boolean;
     private _watches: Map<string, Function[]> = new Map<string, Function[]>();
 
     private _tracks: Promise<TrackResponse[]>;
@@ -247,7 +247,7 @@ export class StateManager {
 
     private _initFacebook() {
         if (window["FB"]) {
-            this._fbLoaded = true;
+            this.fbLoaded = true;
             this._publishWatches("facebookLogin");
             FB.getLoginStatus((response: FB.LoginStatusResponse) => {
                 // If we haven't been authorized yet, then we aren't going to use Facebook to login
