@@ -58,7 +58,9 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
                     res(true);
                 });
             });
-            return Promise.all([driverPromise,pointsPromise]);
+            return Promise.all([driverPromise,pointsPromise]).then(()=>{
+                    return resolve(true);
+            });
 
 
         } catch (exception) {
