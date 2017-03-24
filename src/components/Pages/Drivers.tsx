@@ -27,14 +27,19 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
         this.state = {
             userIsAdmin: props.userIsAdmin
         };   
-    }
-
+    } 
     render() {
         if (!this.props.drivers.length) {
             return <div>Loading...</div>;
         }
         let output = null;
-        let drivers = this.props.drivers.map(driver => {
+        let drivers = this.props.drivers.sort((a,b)=>{ 
+            let out = a.points - b.points;
+            if (!out){
+                out = a.lastName.localeCompare(b.lastName);
+            }
+            return out;
+    }).map(driver => {
             return <li key={driver.key} >
                 <DriverComponent userIsAdmin={this.state.userIsAdmin} allTeams={this.props.teams} key={driver.abbreviation} driver={driver} small={true} />
             </li>
