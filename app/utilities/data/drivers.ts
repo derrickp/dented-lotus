@@ -13,29 +13,54 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
             const insert = `INSERT OR REPLACE INTO drivers 
             (key, active, firstname, lastname, team, trivia, nationality, flag, birthdate, abbreviation, wins, number) 
             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)`;
-            db.serialize(() => {
-                db.exec("BEGIN;");
+            let driverPromise = new Promise<boolean>((res, rej) => {
+                db.serialize(() => {
+                    db.exec("BEGIN;");
 
-                drivers.forEach(driver => {
-                    let valuesObject = {
-                        1: driver.key,
-                        2: driver.active ? 1 : 0,
-                        3: driver.firstName ? driver.firstName : "",
-                        4: driver.lastName,
-                        5: driver.team ? driver.team.key : "",
-                        6: driver.trivia ? JSON.stringify(driver.trivia) : "",
-                        7: driver.nationality ? driver.nationality : "",
-                        8: driver.flag ? driver.flag : "",
-                        9: driver.birthdate ? driver.birthdate : "",
-                        10: driver.abbreviation ? driver.abbreviation : "",
-                        11: driver.wins ? driver.wins : 0,
-                        12: driver.number ? driver.number : 0
-                    };
-                    db.run(insert, valuesObject);
+                    drivers.forEach(driver => {
+                        let valuesObject = {
+                            1: driver.key,
+                            2: driver.active ? 1 : 0,
+                            3: driver.firstName ? driver.firstName : "",
+                            4: driver.lastName,
+                            5: driver.team ? driver.team.key : "",
+                            6: driver.trivia ? JSON.stringify(driver.trivia) : "",
+                            7: driver.nationality ? driver.nationality : "",
+                            8: driver.flag ? driver.flag : "",
+                            9: driver.birthdate ? driver.birthdate : "",
+                            10: driver.abbreviation ? driver.abbreviation : "",
+                            11: driver.wins ? driver.wins : 0,
+                            12: driver.number ? driver.number : 0
+                        };
+                        db.run(insert, valuesObject);
+                    });
+                    db.exec("COMMIT;");
+                    return res(true);
                 });
-                db.exec("COMMIT;");
-                resolve(true);
             });
+
+            let pointsPromise = new Promise<boolean>((res, rej) => {
+                let year = new Date(Date.now()).getFullYear();
+                db.serialize(() => {
+                    db.exec("BEGIN;");
+                    drivers.forEach((d) => {
+                        let values = {
+                            1: d.key,
+                            2: year,
+                            3: d.points
+                        }
+                        db.run(`INSERT OR REPLACE INTO driver_season_points 
+                            (driver, season, points) 
+                            VALUES (?1, ?2, ?3)`,
+                            values);
+                    });
+                    db.exec("COMMIT;");
+                    res(true);
+                });
+            });
+            return Promise.all([driverPromise,pointsPromise]);
+
+
         } catch (exception) {
             console.log(exception);
             db.exec("ROLLBACK;");
@@ -88,10 +113,10 @@ export function getDrivers(active, keys?: string[]): Promise<DbDriver[]> {
                 reject(err);
                 return;
             }
-            
+
             resolve(rows);
         });
-    }); 
+    });
 };
 
 export interface DbDriver {
