@@ -13,10 +13,9 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
             const insert = `INSERT OR REPLACE INTO drivers 
             (key, active, firstname, lastname, team, trivia, nationality, flag, birthdate, abbreviation, wins, number) 
             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)`;
-            let driverPromise = new Promise<boolean>((res, rej) => {
+            return  new Promise<boolean>((res, rej) => {
                 db.serialize(() => {
-                    db.exec("BEGIN;");
-
+                    db.exec("BEGIN;"); 
                     drivers.forEach(driver => {
                         let valuesObject = {
                             1: driver.key,
@@ -34,15 +33,7 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
                         };
                         db.run(insert, valuesObject);
                     });
-                    db.exec("COMMIT;");
-                    return res(true);
-                });
-            });
-
-            let pointsPromise = new Promise<boolean>((res, rej) => {
-                let year = new Date(Date.now()).getFullYear();
-                db.serialize(() => {
-                    db.exec("BEGIN;");
+                    let year = new Date(Date.now()).getFullYear();
                     drivers.forEach((d) => {
                         let values = {
                             1: d.key,
@@ -54,16 +45,9 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
                         db.run(insert, values);
                     });
                     db.exec("COMMIT;");
-                    res(true);
+                    return res(true);
                 });
-            });
-            return driverPromise.then(() => {
-                return pointsPromise;
-            }).then(() => {
-                return resolve(true);
-            });
-
-
+            }); 
         } catch (exception) {
             console.log(exception);
             db.exec("ROLLBACK;");
