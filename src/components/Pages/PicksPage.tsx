@@ -32,8 +32,9 @@ export class PicksPage extends React.Component<PicksPageProps, PicksPageState> {
 
     render() {
         const mainContent: JSX.Element[] = [];
-        if (!this.state.race) mainContent.push(<div>{"Loading ..."}</div>);
-        else {
+        if (!this.state.race) {
+            mainContent.push(<div>{"Loading ..."}</div>);
+        } else {
             mainContent.push(<div>{this.state.race.raceResponse.displayName}</div>)
         }
         return <div>{mainContent}</div>;

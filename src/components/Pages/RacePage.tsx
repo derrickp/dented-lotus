@@ -80,8 +80,8 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
             </Panel>;
         const panelGroup =
             <PanelGroup accordion={true} title={"Race Info"} key={race.key + "panelgroup"} defaultActiveKey={ActiveKeys.PREDICTIONS}>
-                {predictionsPanel}
                 {infoPanel}
+                {predictionsPanel}
             </PanelGroup>;
         return panelGroup;
     }
