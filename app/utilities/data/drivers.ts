@@ -55,6 +55,7 @@ export async function getDriverResponses(active?: boolean, keys?: string[]): Pro
             firstName: driverRow.firstName,
             lastName: driverRow.lastName,
             flag: driverRow.flag,
+            points: driverRow.points,
             nationality: driverRow.nationality,
             team: null,
             trivia: driverRow.trivia ? JSON.parse(driverRow.trivia) : [],
