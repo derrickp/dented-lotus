@@ -50,7 +50,7 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
                             2: year,
                             3: d.points
                         } 
-                        let pointsInsert =`INSERT OR REPLACE INTO driver_season_points (driver, season, points) VALUES (?1, ?2, ?3)`;
+                        let pointsInsert =`REPLACE INTO driver_season_points (driver, season, points) VALUES (?1, ?2, ?3)`;
                         console.log(pointsInsert,values);
                         db.run(pointsInsert,values);
                     });
