@@ -34,7 +34,7 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
         }
         let output = null;
         let drivers = this.props.drivers.sort((a,b)=>{ 
-            let out = a.points - b.points;
+            let out = b.points - a.points;
             if (!out){
                 out = a.lastName.localeCompare(b.lastName);
             }
