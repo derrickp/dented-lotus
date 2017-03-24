@@ -59,8 +59,8 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             teams: [],
             blogs: [],
             allSeasonPredictions: [],
-            haveGoogleApi: false,
-            haveFacebookApi: false
+            haveGoogleApi: this.stateManager.googleLoaded,
+            haveFacebookApi: this.stateManager.fbLoaded
         };
         this.launchNextRacePicks = this.launchNextRacePicks.bind(this);
         this.changePage = this.changePage.bind(this);
