@@ -31,8 +31,7 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
                             10: driver.abbreviation ? driver.abbreviation : "",
                             11: driver.wins ? driver.wins : 0,
                             12: driver.number ? driver.number : 0
-                        };
-                        console.log(insert,valuesObject );
+                        }; 
                         db.run(insert, valuesObject);
                     });
                     db.exec("COMMIT;");
@@ -50,8 +49,7 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
                             2: year,
                             3: d.points
                         } 
-                        let pointsInsert =`REPLACE INTO driver_season_points (driver, season, points) VALUES (?1, ?2, ?3)`;
-                        console.log(pointsInsert,values);
+                        let pointsInsert =`REPLACE INTO driver_season_points (driver, season, points) VALUES (?1, ?2, ?3)`; 
                         db.run(pointsInsert,values);
                     });
                     db.exec("COMMIT;");
