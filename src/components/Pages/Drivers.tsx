@@ -59,7 +59,7 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
         }
         return <div>
             <h1>Drivers</h1>
-            <ul>{drivers}</ul>
+            <ul className="no-padding">{drivers}</ul>
             <h1>Teams</h1>
             <ul>{teams}</ul>
         </div>
