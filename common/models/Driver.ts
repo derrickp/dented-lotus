@@ -72,6 +72,7 @@ export class DriverModel implements Selectable {
             abbreviation: this.abbreviation,
             active: this.active,
             birthdate: this.birthdate,
+            points: +this.points,
             nationality: this.nationality,
             team: this.team.json,
             trivia: this.trivia,
