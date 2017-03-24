@@ -40,6 +40,7 @@ export class DriverModel implements Selectable {
         this.active = driverResponse.active;
         this.trivia = driverResponse.trivia;
         this.wins = driverResponse.wins; 
+        this.points = driverResponse.points;
         this.team = driverResponse.team && context.getTeam(driverResponse.team);
         this._context = context;
     } 
