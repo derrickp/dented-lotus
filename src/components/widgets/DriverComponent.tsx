@@ -97,9 +97,9 @@ function DisplayDriver(props: EditDriverProps) {
     return <div className="panel panel-default" >
         <div className="panel-heading">
             <div className="row">
-                <h3 className="name col-md-10">{props.driver.firstName}&nbsp;{props.driver.lastName}</h3>
-                <div className="img-container col-md-2">
-                    <img className="flag" title={props.driver.nationality} src={flag} />
+                <h3 className="name col-md-10 col-xs-10">{props.driver.firstName}&nbsp;{props.driver.lastName}</h3>
+                <div className="img-container col-md-2 col-xs-2">
+                    <img className="flag img-responsive" title={props.driver.nationality} src={flag} />
                 </div>
             </div>
         </div>
