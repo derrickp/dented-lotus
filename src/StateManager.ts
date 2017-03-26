@@ -311,6 +311,7 @@ export class StateManager {
 
     private _initGoogle() {
         alert("GoogleInit");
+        gapi.auth2.init({});
         if (window["gapi"]) {
             gapi.load("auth2", () => {
                 gapi.auth2.init({
@@ -334,16 +335,13 @@ export class StateManager {
                     console.error("component:GoogleLogin:" + reason);
                 });
             });
-        } else {
-            while (!window["gapi"]) {
-            alert("NoWindowApi");
+        } else { 
                 const interval = setInterval(() => {
                     if (window["gapi"]) {
                         clearInterval(interval);
                         this._initGoogle();
                     }
-                }, 1000);
-            }
+                }, 1000); 
         }
     }
 
