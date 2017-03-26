@@ -311,7 +311,6 @@ export class StateManager {
 
     private _initGoogle() {
         alert("GoogleInit");
-        gapi.auth2.init({});
         if (window["gapi"]) {
             gapi.load("auth2", () => {
                 gapi.auth2.init({
