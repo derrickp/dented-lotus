@@ -10,7 +10,7 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "noImplicitAny": false,
-    "sourceMap": true, 
+    "sourceMap": false, 
     "jsx": "react",
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true

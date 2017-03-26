@@ -41,7 +41,7 @@ export class AllRaces extends React.Component<AllRacesProps, AllRacesState> {
 
     getRacePanel(race: RaceModel): JSX.Element {
         const expanded = race === this.state.expandedRace;
-        const dFromNow = getDurationFromNow(race.raceDate);
+        const dFromNow = getDurationFromNow(race.cutoff);
         const buttonText = dFromNow.duration.seconds() <= 0 ? "View Picks" : "Make Picks";
         const buttonStyle = dFromNow.duration.seconds() <= 0 ? "danger" : "primary";
 
