@@ -9,6 +9,7 @@ export interface TrackResponse {
     latitude?: number;
     longitude?: number;
     info?:string;
+    image?:string;
 }
 
 export class TrackModel {
