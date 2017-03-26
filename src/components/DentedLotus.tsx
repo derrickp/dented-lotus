@@ -14,6 +14,9 @@ import { PredictionModel } from "../../common/models/Prediction";
 import { getUrlParameters } from "../utilities/PageUtilities";
 import { User } from "../../common/models/User";
 import {Scoreboard} from "./widgets/Scoreboard";
+window.onerror = function(error) {
+    alert(error);
+};
 export interface DentedLotusProps {
     stateManager: StateManager;
 }
@@ -85,12 +88,12 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         });
 
         this.stateManager.watch("googleLogin", () => {
-            console.log("have google api");
+            alert("have google api");
             if (this._mounted) this.setState({ haveGoogleApi: true });
         });
 
         this.stateManager.watch("facebookLogin", () => {
-            console.log("have facebook api");
+            alert("have facebook api");
             if (this._mounted) this.setState({ haveFacebookApi: true });
         });
         this.stateManager.initialize();
