@@ -35,7 +35,7 @@ export class TriviaComponent extends React.Component<TriviaProps,any>{
         const ts = this.trivia.map((t)=>{ return <li key={t.key}>{t.trivia}</li>});
         return <div> 
             <h3>Trivia</h3>
-            +<ul>{ts}</ul> 
+             <ul>{ts}</ul> 
         </div>
     }
 }
