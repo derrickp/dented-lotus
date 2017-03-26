@@ -39,7 +39,7 @@ export class Banner extends React.Component<BannerProps, BannerState>{
         this.onLogin = this.onLogin.bind(this);
     }
 
-    clickHome(event: React.MouseEvent<HTMLAnchorElement>) {
+    clickHome() {
         this.props.changePage(Pages.HOME);
         event.preventDefault();
     }
@@ -87,17 +87,13 @@ export class Banner extends React.Component<BannerProps, BannerState>{
         const navItems: JSX.Element[] = [];
         const navRightItems: JSX.Element[] = [];
         // We'll always allow blogs to be visible
-        navItems.push(<NavItem key={"blogs"} eventKey={"blogs"} href="#blogs">Blogs</NavItem>);
-
+        navItems.push(<NavItem key={"home"} eventKey={"home"} onClick={this.clickHome} href="#home">Home</NavItem>);
+        navItems.push(<NavItem key={"blogs"} eventKey={"blogs"} onClick={this.clickBlogs} href="#blogs">Blogs</NavItem>);
+        navItems.push(<NavItem key={"drivers"} eventKey={"drivers"} onClick={this.clickDrivers} >Drivers</NavItem>);
+        navItems.push(<NavItem key={"tracks"} eventKey={"tracks"} onClick={this.clickTracks}>Tracks</NavItem>);
         // If the user is logged in, they get more options
         if (this.props.loggedIn) {
             navItems.push(<NavItem key={"races"} eventKey={"races"} onClick={this.clickRaces} href="#races">Races</NavItem>);
-            navItems.push(<NavItem key={"drivers"} eventKey={"drivers"} onClick={this.clickDrivers} >Drivers</NavItem>);
-            navItems.push(<NavItem key={"tracks"} eventKey={"tracks"}>Tracks</NavItem>);
-            /*navItems.push(<NavDropdown key={"dropdown"} eventKey={"dropdown"} title="More" id="basic-nav-dropdown">
-                <MenuItem key={"drivers"} eventKey={"drivers"} onClick={this.clickDrivers} >Drivers</MenuItem>
-                <MenuItem key={"tracks"} eventKey={"tracks"}>Tracks</MenuItem>
-            </NavDropdown>);*/
             navRightItems.push(<NavDropdown key={"user-dropdown"} eventKey={"user-dropdown"} title={this.props.user.displayName} id="basic-nav-dropdown">
                 <MenuItem key={"profile"} eventKey={"profile"} onClick={this.clickProfile} >Profile</MenuItem>
                 <MenuItem key={"logout"} eventKey={"logout"} onClick={this.clickLogout}>Logout</MenuItem>

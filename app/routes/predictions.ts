@@ -80,7 +80,6 @@ export const predictionsRoutes: IRouteConfiguration[] = [
                 const keys = request.params["key"] ? [request.params["key"]] : [];
                 try {
                     const predictions = await getAllSeasonPredictions();
-                    console.log(predictions);
                     const values = await getAllSeasonValues();
                     const drivers = await getDriverResponses();
                     const teams = await getTeamResponses();
