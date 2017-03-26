@@ -2,7 +2,7 @@ import * as moment from "moment";
 
 import { FULL_FORMAT } from "../common/utils/date";
 import { BlogResponse } from "../common/models/Blog";
-import { User,PublicUser, GoogleUser, FacebookUser } from "../common/models/User";
+import { User, PublicUser, GoogleUser, FacebookUser } from "../common/models/User";
 import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
 import { DriverModel, DriverModelContext, DriverResponse } from "../common/models/Driver";
@@ -78,7 +78,7 @@ export class StateManager {
         this.refreshBlogs();
     }
 
-    private _allUsers:Promise<PublicUser[]>;
+    private _allUsers: Promise<PublicUser[]>;
     get teams(): Promise<TeamModel[]> {
         this._teams = this._teams ? this._teams : new Promise<TeamModel[]>((resolve, reject) => {
             return getAllTeams().then(teamResponses => {
@@ -125,8 +125,8 @@ export class StateManager {
 
     get raceModelContext(): RaceModelContext {
         const context: RaceModelContext = {
-            refresh:(race:RaceModel)=>{
-                return this.getRace(race.key).then((newRace)=>{
+            refresh: (race: RaceModel) => {
+                return this.getRace(race.key).then((newRace) => {
                     race.track = newRace.track;
                 })
             },
@@ -228,10 +228,10 @@ export class StateManager {
 
         return this._drivers;
     }
-    
-    get allUsers():Promise<PublicUser[]>{
-        return this._allUsers ? this._allUsers:new Promise<PublicUser[]>((resolve,reject)=>{
-            return getAllPublicUsers().then((users:PublicUser[]) => { 
+
+    get allUsers(): Promise<PublicUser[]> {
+        return this._allUsers ? this._allUsers : new Promise<PublicUser[]>((resolve, reject) => {
+            return getAllPublicUsers().then((users: PublicUser[]) => {
                 resolve(users);
             });
         });
@@ -335,13 +335,15 @@ export class StateManager {
                 });
             });
         } else {
-        alert("NoWindowApi");
-            const interval = setInterval(() => {
-                if (window["gapi"]) {
-                    clearInterval(interval);
-                    this._initGoogle();
-                }
-            }, 1000);
+            while (!window["gapi"]) {
+            alert("NoWindowApi");
+                const interval = setInterval(() => {
+                    if (window["gapi"]) {
+                        clearInterval(interval);
+                        this._initGoogle();
+                    }
+                }, 1000);
+            }
         }
     }
 
