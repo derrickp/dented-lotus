@@ -303,6 +303,9 @@ export class StateManager {
         return new Promise<void>((resolve, reject) => {
             this._googleAuth.signIn().then(() => { 
                 resolve();
+            }).catch((error: Error) => {
+                console.error(error.message);
+                alert(error.message);  
             });
         });
     }
@@ -514,6 +517,9 @@ export class StateManager {
         return authenticate(authPayload).then(authResponse => {
             const user = new FacebookUser(args, authResponse.user, authResponse.id_token);
             this.user = user;
+        }).catch((error: Error) => {
+            console.log(error.message);
+            alert(error.message);
         });
     }
 
