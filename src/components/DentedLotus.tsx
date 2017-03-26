@@ -150,7 +150,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     getCurrentView() {
         switch (this.state.parameters.page) {
             case Pages.RACE:
-                return <RacePage race={this.state.race} small={false} ></RacePage>;
+                return <RacePage race={this.state.race} small={false} isAdmin={this.stateManager.user.isAdmin}></RacePage>;
             // return <div></div>;
             case Pages.USER:
                 return <div>User!!!!</div>;

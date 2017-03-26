@@ -8,6 +8,7 @@ export interface RaceModelContext {
     getDriver?: (response: DriverResponse) => DriverModel;
     saveRace?: (model: RaceModel) => Promise<boolean>;
     getPrediction?: (response: PredictionResponse) => PredictionModel;
+    refresh?:(race:RaceModel)=>Promise<void>;
 }
 
 export class RaceModel {
@@ -52,6 +53,10 @@ export class RaceModel {
 
     async initialize(): Promise<void> {
         
+    }
+
+    refresh():Promise<void>{
+        return this._context.refresh(this);
     }
 
     save(): Promise<boolean> {

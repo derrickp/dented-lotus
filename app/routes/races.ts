@@ -97,6 +97,10 @@ export const raceRoutes: IRouteConfiguration[] = [
             auth: {
                 strategies: ['jwt'],
                 scope: ['admin']
+            },
+            payload:{
+                parse:false,
+                maxBytes: 20000000
             }
         }
     },

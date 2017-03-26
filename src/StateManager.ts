@@ -92,6 +92,11 @@ export class StateManager {
 
     get raceModelContext(): RaceModelContext {
         const context: RaceModelContext = {
+            refresh:(race:RaceModel)=>{
+                return this.getRace(race.key).then((newRace)=>{
+                    race.track = newRace.track;
+                })
+            },
             saveRace: (raceModel: RaceModel) => {
                 return this.saveRace(raceModel);
             },

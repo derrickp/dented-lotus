@@ -10,6 +10,7 @@ import {RaceInfo} from "../RaceInfo";
 export interface RaceProps {
     race: RaceModel;
     small: boolean;
+    isAdmin:boolean;
 }
 
 export interface RaceState {
@@ -73,7 +74,7 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
         const predictionsPanel = <Panel eventKey={ActiveKeys.PREDICTIONS} bsStyle={predictionsStyle} header={predictionsTitle} expanded={true} defaultExpanded={true} collapsible={true}>
             {predictions}
         </Panel>;
-        const infoPanel = <RaceInfo race={race} eventKey={ActiveKeys.INFO}/>;
+        const infoPanel = <RaceInfo race={race} eventKey={ActiveKeys.INFO} canAddTrivia={this.props.isAdmin}/>;
         const panelGroup =
             <PanelGroup accordion={true} title={"Race Info"} key={race.key + "panelgroup"} defaultActiveKey={ActiveKeys.PREDICTIONS}>
                 {infoPanel}

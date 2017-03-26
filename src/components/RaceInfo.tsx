@@ -7,6 +7,7 @@ import {TriviaComponent} from "./widgets/TriviaComponent";
 export interface RaceInfoProps {
     race: RaceModel;
     eventKey: any;
+    canAddTrivia: boolean;
 }
 
 export interface RaceInfoState {
@@ -20,8 +21,15 @@ export class RaceInfo extends React.Component<RaceInfoProps, any>{
      */
     constructor(props: RaceInfoProps) {
         super(props);
+    }
 
-
+    onAddNewTrivia(trivia:string):Promise<void>{
+        this.props.race.track.trackResponse.trivia.push(trivia);
+        return this.props.race.save().then(()=>{
+          return this.props.race.refresh();  
+        }).catch((err)=>{
+            alert(err.message);
+        });
     }
 
     render() {
@@ -37,7 +45,7 @@ export class RaceInfo extends React.Component<RaceInfoProps, any>{
                         {race.track.trackResponse && <h3>Track: {race.track.trackResponse.name}, {race.track.trackResponse.country}</h3>}
                         {race.winner && <p>Winner: {race.winner.name}</p>}
                         {race.track.trackResponse && <p>{race.track.trackResponse.info}</p>} 
-                        <TriviaComponent trivia={race.track.trackResponse.trivia}/>
+                        <TriviaComponent trivia={race.track.trackResponse.trivia} canAddTrivia={this.props.canAddTrivia} onAddNewTrivia={this.onAddNewTrivia.bind(this)}/>
                     </div>
                 </div>
             </div>
