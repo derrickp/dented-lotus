@@ -300,14 +300,17 @@ export class StateManager {
     }
 
     doGoogleLogin(): Promise<void> {
+        alert("InDoGoogleLogin");
         return new Promise<void>((resolve, reject) => {
             this._googleAuth.signIn().then(() => {
+                alert("DoneGoogleLogIn");
                 resolve();
             });
         });
     }
 
     private _initGoogle() {
+        alert("GoogleInit");
         if (window["gapi"]) {
             gapi.load("auth2", () => {
                 gapi.auth2.init({
@@ -332,6 +335,7 @@ export class StateManager {
                 });
             });
         } else {
+        alert("NoWindowApi");
             const interval = setInterval(() => {
                 if (window["gapi"]) {
                     clearInterval(interval);
