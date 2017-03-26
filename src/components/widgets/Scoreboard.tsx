@@ -21,6 +21,7 @@ export interface CanShowOnScoreboard {
     points: number;
     display: string;
     key:string;
+    position:number;
 }
 
 export interface ScoreboardState {
@@ -48,15 +49,17 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
             entrants: []
         }
         prom.then((entrants: CanShowOnScoreboard[]) => {
-            
+            entrants.forEach((e,i)=>{
+                e.key = UUID();
+                e.position = i+1;
+            })
             entrants.sort((a, b) => {
                 if (this.state.sortDir && this.state.sortDir == "ASC") {
                     return a.points - b.points;
                 } else {
                     return b.points - a.points;
                 }
-            });
-
+            })
             this.setState({
                 entrants: entrants.slice(0,this.props.count)
             })
@@ -73,6 +76,7 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
                     </tr>
                 </thead>
                 <tbody>
+                    {this.state.entrants.map((e, i) => { return <tr  key={e.key}><td>{e.position}</td><td>{e.display}</td><td>{e.points}</td></tr> })}
                 </tbody>
             </Table>
         </div>
