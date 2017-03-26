@@ -300,21 +300,12 @@ export class StateManager {
     }
 
     doGoogleLogin(): Promise<void> {
-        try {
-            return new Promise<void>((resolve, reject) => {
-                this._googleAuth.signIn().then(() => {
-                    alert("signed into google");
-                    resolve();
-                }, (error: Error) => {
-                    console.error(error.message);
-                    alert(error.message);
-                });
+        return new Promise<void>((resolve, reject) => {
+            this._googleAuth.signIn().then(() => {
+                const user = this._googleAuth.currentUser.get();
+                return this.completeGoogleLogin(user).then(resolve);
             });
-        }
-        catch (exception) {
-            alert("Failed to sign in");
-            return Promise.reject(new Error("Failed to sign in"));
-        }
+        });
 
     }
 
@@ -327,13 +318,12 @@ export class StateManager {
                     this.googleLoaded = true;
                     this._googleAuth = gapi.auth2.getAuthInstance();
                     this._publishWatches("googleLogin");
-                    this._googleAuth.isSignedIn.listen(signedIn => {
-                        alert("signed")
-                        if (signedIn) {
-                            const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
-                            this.completeGoogleLogin(user);
-                        }
-                    });
+                    // this._googleAuth.isSignedIn.listen(signedIn => {
+                    //     if (signedIn) {
+                    //         const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
+                    //         this.completeGoogleLogin(user);
+                    //     }
+                    // });
                     const loggedIn = this._googleAuth.isSignedIn.get();
                     if (loggedIn) {
                         const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
