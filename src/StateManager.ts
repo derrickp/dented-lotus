@@ -305,7 +305,7 @@ export class StateManager {
                 this._googleAuth.signIn().then(() => {
                     alert("signed into google");
                     resolve();
-                }).catch((error: Error) => {
+                }, (error: Error) => {
                     console.error(error.message);
                     alert(error.message);
                 });
