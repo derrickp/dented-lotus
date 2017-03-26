@@ -20,8 +20,8 @@ export interface ScoreboardProps {
 export interface CanShowOnScoreboard {
     points: number;
     display: string;
-    key:string;
-    position:number;
+    key: string;
+    position: number;
 }
 
 export interface ScoreboardState {
@@ -49,9 +49,9 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
             entrants: []
         }
         prom.then((entrants: CanShowOnScoreboard[]) => {
-            entrants.forEach((e,i)=>{
+            entrants.forEach((e, i) => {
                 e.key = UUID();
-                e.position = i+1;
+                e.position = i + 1;
             })
             entrants.sort((a, b) => {
                 if (this.state.sortDir && this.state.sortDir == "ASC") {
@@ -61,13 +61,13 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
                 }
             })
             this.setState({
-                entrants: entrants.slice(0,this.props.count)
+                entrants: entrants.slice(0, this.props.count)
             })
         })
     }
 
     render() {
-        return <div className="panel">
+        return <Panel>
             <h3>{this.props.title}</h3>
             <Table striped bordered condensed responsive>
                 <thead>
@@ -76,9 +76,9 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
                     </tr>
                 </thead>
                 <tbody>
-                    {this.state.entrants.map((e, i) => { return <tr  key={e.key}><td>{e.position}</td><td>{e.display}</td><td>{e.points}</td></tr> })}
+                    {this.state.entrants.map((e, i) => { return <tr key={e.key}><td>{e.position}</td><td>{e.display}</td><td>{e.points}</td></tr> })}
                 </tbody>
             </Table>
-        </div>
+        </Panel>
     }
 }
