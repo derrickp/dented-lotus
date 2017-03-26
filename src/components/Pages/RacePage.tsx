@@ -5,6 +5,7 @@ import { PredictionModel } from "../../../common/models/Prediction";
 import { getDurationFromNow } from "../../../common/utils/date";
 import { PredictionComponent } from "../widgets/Prediction";
 import { Panel, Button, PanelGroup } from "react-bootstrap";
+import {RaceInfo} from "../RaceInfo";
 
 export interface RaceProps {
     race: RaceModel;
@@ -63,9 +64,7 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
         const predictionsTitle = (
             <div><h4 className="pull-left">{"Predictions"}</h4><div className="clearfix"></div></div>
         );
-        const infoTitle = (
-            <div><h4 className="pull-left">{"Race Info"}</h4><div className="clearfix"></div></div>
-        );
+        
         const dFromNow = getDurationFromNow(race.cutoff);
         const timeRemaining = dFromNow.timeRemaining;
         const allowedPrediction = timeRemaining > 0;
@@ -74,11 +73,7 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
         const predictionsPanel = <Panel eventKey={ActiveKeys.PREDICTIONS} bsStyle={predictionsStyle} header={predictionsTitle} expanded={true} defaultExpanded={true} collapsible={true}>
             {predictions}
         </Panel>;
-        const infoPanel =
-            <Panel eventKey={ActiveKeys.INFO} bsStyle={"primary"} header={infoTitle}>
-                { race.track.trackResponse && <p>Track: {race.track.trackResponse.name}, {race.track.trackResponse.country}</p> }
-                { race.winner && <p>Winner: {race.winner.name}</p> }
-            </Panel>;
+        const infoPanel = <RaceInfo race={race} eventKey={ActiveKeys.INFO}/>;
         const panelGroup =
             <PanelGroup accordion={true} title={"Race Info"} key={race.key + "panelgroup"} defaultActiveKey={ActiveKeys.PREDICTIONS}>
                 {infoPanel}

@@ -23,7 +23,7 @@ export class RaceModel {
     cutoff?: string;
     predictions: PredictionModel[];
     imageUrl:string;
-
+    info:string;
 
     constructor(race: RaceResponse, context?: RaceModelContext) {
         this.raceResponse = race;
@@ -73,7 +73,8 @@ export class RaceModel {
             displayName: this.raceResponse.displayName,
             winner: this.winner ? this.winner.json : null,
             predictions: this.predictions.map(p => p.json),
-            imageUrl:""
+            imageUrl:"",
+            info: this.info
         };
         return raceResponse;
     }
@@ -92,4 +93,5 @@ export interface RaceResponse {
     winner?: DriverResponse;
     predictions: PredictionResponse[];
     imageUrl:string;
+    info:string;
 }
