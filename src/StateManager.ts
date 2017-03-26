@@ -317,6 +317,7 @@ export class StateManager {
                     this._googleAuth = gapi.auth2.getAuthInstance();
                     this._publishWatches("googleLogin");
                     this._googleAuth.isSignedIn.listen(signedIn => {
+                        alert("signed")
                         if (signedIn) {
                             const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
                             this.completeGoogleLogin(user);
