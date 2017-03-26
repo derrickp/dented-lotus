@@ -16,6 +16,7 @@ export interface DbRace {
     trivia?: string;
     cutoff?: string;
     winner?: string;
+    info?: string;
 }
 
 export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
