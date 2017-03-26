@@ -135,6 +135,7 @@ export const userRoutes: IRouteConfiguration[] = [
             handler: (req, res) => {
                 // If we get here with a user, then we are good to go. Let's issue that token
                 // If not, then the error bubbles up from the verify step
+                console.log(req.pre["user"]);
                 res({
                     id_token: createToken(req.pre["user"]),
                     user: req.pre["user"]
