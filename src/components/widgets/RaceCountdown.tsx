@@ -45,21 +45,18 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
         const dFromNow = getDurationFromNow(this.nextRace.raceDate);
         this.setState({ timeRemaining: dFromNow.fullDuration });
     }
-    render() {
-        if (!this.nextRace) {
-            return <span className="race-countdown">Loading race countdown...</span>;
-        }
-        const allSeasonDFromNow = getDurationFromNow("04/20/2017");
-
+    render() { 
+        const allSeasonDFromNow = getDurationFromNow("04/20/2017"); 
         const jumbo =
             <Jumbotron className="jumbotron">
                 <div className="container">
                 <h1>Next Race!</h1>
-                    <div className="row">
+                    { this.nextRace ? <div className="row">
                         <div className="col-md-4 col-sm-8">
                             <p>{this.nextRace.raceResponse.displayName + " " + this.state.timeRemaining}</p>
                         </div>
-                    </div>
+                    </div>: <span className="race-countdown">Loading race countdown...</span>
+                    }
                     <div className="row">
                         <div className="col-md-4 col-sm-8">
                             <Button block={true} onClick={this.props.clickMakeNextRacePicks} bsSize="large" bsStyle="primary" >Make Your Picks</Button></div>
