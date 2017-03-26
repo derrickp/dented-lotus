@@ -87,13 +87,11 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             });
         });
 
-        this.stateManager.watch("googleLogin", () => {
-            alert("have google api");
+        this.stateManager.watch("googleLogin", () => { 
             if (this._mounted) this.setState({ haveGoogleApi: true });
         });
 
-        this.stateManager.watch("facebookLogin", () => {
-            alert("have facebook api");
+        this.stateManager.watch("facebookLogin", () => { 
             if (this._mounted) this.setState({ haveFacebookApi: true });
         });
         this.stateManager.initialize();

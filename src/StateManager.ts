@@ -299,18 +299,15 @@ export class StateManager {
         }
     }
 
-    doGoogleLogin(): Promise<void> {
-        alert("InDoGoogleLogin");
+    doGoogleLogin(): Promise<void> { 
         return new Promise<void>((resolve, reject) => {
-            this._googleAuth.signIn().then(() => {
-                alert("DoneGoogleLogIn");
+            this._googleAuth.signIn().then(() => { 
                 resolve();
             });
         });
     }
 
-    private _initGoogle() {
-        alert("GoogleInit");
+    private _initGoogle() { 
         if (window["gapi"]) {
             gapi.load("auth2", () => {
                 gapi.auth2.init({
