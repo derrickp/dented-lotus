@@ -299,18 +299,26 @@ export class StateManager {
         }
     }
 
-    doGoogleLogin(): Promise<void> { 
-        return new Promise<void>((resolve, reject) => {
-            this._googleAuth.signIn().then(() => { 
-                resolve();
-            }).catch((error: Error) => {
-                console.error(error.message);
-                alert(error.message);  
+    doGoogleLogin(): Promise<void> {
+        try {
+            return new Promise<void>((resolve, reject) => {
+                this._googleAuth.signIn().then(() => {
+                    alert("signed into google");
+                    resolve();
+                }).catch((error: Error) => {
+                    console.error(error.message);
+                    alert(error.message);
+                });
             });
-        });
+        }
+        catch (exception) {
+            alert("Failed to sign in");
+            return Promise.reject(new Error("Failed to sign in"));
+        }
+
     }
 
-    private _initGoogle() { 
+    private _initGoogle() {
         if (window["gapi"]) {
             gapi.load("auth2", () => {
                 gapi.auth2.init({
@@ -335,13 +343,13 @@ export class StateManager {
                     console.error("component:GoogleLogin:" + reason);
                 });
             });
-        } else { 
-                const interval = setInterval(() => {
-                    if (window["gapi"]) {
-                        clearInterval(interval);
-                        this._initGoogle();
-                    }
-                }, 1000); 
+        } else {
+            const interval = setInterval(() => {
+                if (window["gapi"]) {
+                    clearInterval(interval);
+                    this._initGoogle();
+                }
+            }, 1000);
         }
     }
 
