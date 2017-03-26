@@ -34,7 +34,7 @@ export class RaceInfo extends React.Component<RaceInfoProps, any>{
                         <img className="img-responsive" src={race.track.trackResponse.image || this.defaultTrackImage}/>
                     </div>
                     <div className="col-lg-9 col-md-9 col-sm-9 col-xs-12 ">
-                        {race.track.trackResponse && <p>Track: {race.track.trackResponse.name}, {race.track.trackResponse.country}</p>}
+                        {race.track.trackResponse && <h3>Track: {race.track.trackResponse.name}, {race.track.trackResponse.country}</h3>}
                         {race.winner && <p>Winner: {race.winner.name}</p>}
                         {race.track.trackResponse && <p>{race.track.trackResponse.info}</p>} 
                         <TriviaComponent trivia={race.track.trackResponse.trivia}/>
