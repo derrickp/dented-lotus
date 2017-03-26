@@ -18,7 +18,8 @@ export async function getTrackResponses(keys?: string[]): Promise<TrackResponse[
             trivia: trackRow.trivia ? JSON.parse(trackRow.trivia) : [],
             length: trackRow.length,
             title: trackRow.title,
-            info:trackRow.info
+            info:trackRow.info,
+            image:trackRow.image
         };
         tracks.push(track);
     }
@@ -96,4 +97,5 @@ export interface DbTrack {
     latitude?: number;
     longitude?: number;
     info?:string;
+    image?:string;
 }
