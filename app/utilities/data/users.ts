@@ -5,6 +5,7 @@ import { SignupInfo } from "../../../common/models/Signup";
 const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const userSelect = "select * from full_user_vw";
+const allPublicUsersSelect = "select * from public_users_vw";
 
 const userInsert = "INSERT INTO users (key, email, displayname, firstname, lastname, role, points)";
 
@@ -32,6 +33,19 @@ export function getFullUsers(keys?: string[]): Promise<UserResponse[]> {
             const innerKeys = keys.join("','");
             statement = statement + ` where key IN ('${innerKeys}')"`;
         }
+        db.all(statement, (err, rows: UserResponse[]) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(rows);
+        });
+    });
+}
+
+export function getAllPublicUsers(): Promise<UserResponse[]> {
+    return new Promise((resolve, reject) => {
+        let statement = allPublicUsersSelect; 
         db.all(statement, (err, rows: UserResponse[]) => {
             if (err) {
                 reject(err);

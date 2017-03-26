@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-
+import {Grid, Row, Col} from "react-bootstrap";
 import { Banner } from "./Banner";
 import { UserComponent } from "./User";
 import { StateManager } from "../StateManager";
@@ -14,7 +14,7 @@ import { BlogResponse } from "../../common/models/Blog";
 import { PredictionModel } from "../../common/models/Prediction";
 import { getUrlParameters } from "../utilities/PageUtilities";
 import { User } from "../../common/models/User";
-
+import {Scoreboard} from "./widgets/Scoreboard";
 import { GoogleLoginResponse } from "../../common/models/GoogleLoginResponse";
 
 export interface DentedLotusProps {
@@ -167,14 +167,16 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         }
     }
 
-    getHomePage() {
-        const components: JSX.Element[] = [];
-
-        if (this.stateManager.isLoggedIn) {
-            components.push(<RaceCountdown key={1} clickMakeAllSeasonPicks={this.launchAllSeasonPicks} clickMakeNextRacePicks={this.launchNextRacePicks} race={this.stateManager.nextRace} />);
-        }
-        components.push(<BlogsComponent key={2} blogs={this.state.blogs} numberBlogs={3} />);
-        return <div>{components}</div>
+    getHomePage() { 
+        return <div>
+            {this.stateManager.isLoggedIn && <RaceCountdown key={1} clickMakeAllSeasonPicks={this.launchAllSeasonPicks} clickMakeNextRacePicks={this.launchNextRacePicks} race={this.stateManager.nextRace} />}
+            <Grid>
+                <Row>
+                    <Col xs={12} mdPush={9} md={3}><Scoreboard stateManager={this.stateManager} type="users" title="Standings" count={5} /></Col>
+                    <Col xs={12} mdPull={3} md={9}><BlogsComponent key={2} blogs={this.state.blogs} numberBlogs={3} /></Col>
+                </Row>
+            </Grid>
+        </div>
     }
 
     render() {

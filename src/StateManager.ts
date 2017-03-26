@@ -1,6 +1,6 @@
 
 import { BlogResponse } from "../common/models/Blog";
-import { User, GoogleUser, FacebookUser } from "../common/models/User";
+import { User,PublicUser, GoogleUser, FacebookUser } from "../common/models/User";
 import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
 import { DriverModel, DriverModelContext, DriverResponse } from "../common/models/Driver";
@@ -24,7 +24,8 @@ import {
     getRace,
     saveTeams,
     signup,
-    getAllSeasonPredictions
+    getAllSeasonPredictions,
+    getAllPublicUsers
 } from "./utilities/ServerUtils"
 
 
@@ -46,6 +47,7 @@ export class StateManager {
     private _teamMap: Map<string, TeamModel> = new Map<string, TeamModel>();
 
     private _teams: Promise<TeamModel[]>;
+    private _allUsers:Promise<PublicUser[]>;
     get teams(): Promise<TeamModel[]> {
         this._teams = this._teams ? this._teams : new Promise<TeamModel[]>((resolve, reject) => {
             return getAllTeams().then(teamResponses => {
@@ -190,6 +192,14 @@ export class StateManager {
         });
 
         return this._drivers;
+    }
+    
+    get allUsers():Promise<PublicUser[]>{
+        return this._allUsers ? this._allUsers:new Promise<PublicUser[]>((resolve,reject)=>{
+            return getAllPublicUsers().then((users:PublicUser[]) => { 
+                resolve(users);
+            });
+        });
     }
 
     get blogs(): Promise<BlogResponse[]> {

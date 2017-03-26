@@ -9,7 +9,7 @@ import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";
 import { createToken, checkAndDecodeToken } from "../utilities/token";
-import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys, saveRequestedUser } from "../utilities/data/users";
+import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys, saveRequestedUser,getAllPublicUsers } from "../utilities/data/users";
 const base64url = require("base64-url");
 
 export const userRoutes: IRouteConfiguration[] = [
@@ -218,6 +218,19 @@ export const userRoutes: IRouteConfiguration[] = [
             auth: {
                 strategies: ['jwt'],
                 scope: ['user']
+            }
+        }
+    },
+    {
+        method: 'GET',
+        path: '/allusers',
+        config: {
+            cors: true,
+            handler: (req, res) => {
+                let credentials = req.auth.credentials; 
+                getAllPublicUsers().then(users => {   
+                    res(users);
+                }); 
             }
         }
     }

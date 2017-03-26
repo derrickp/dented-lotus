@@ -24,7 +24,7 @@ export class DriverModel implements Selectable {
     abbreviation: string;
     team: TeamModel;
     wins: number;
-    trivia: string[];
+    trivia: string[]; 
     /**
      *
      */

@@ -7,6 +7,7 @@ import { TeamResponse } from "../../common/models/Team";
 import { UserResponse } from "../../common/models/User";
 import { SignupInfo } from "../../common/models/Signup";
 import { BlogResponse } from "../../common/models/Blog";
+import { PublicUser } from "../../common/models/User";
 import { PredictionResponse } from "../../common/models/Prediction";
 import { AuthenticationPayload, AuthenticationResponse } from "../../common/models/Authentication";
  
@@ -217,6 +218,16 @@ export function getAllTeams( ): Promise<TeamResponse[]> {
             return response.json().then((teams: TeamResponse[]) => {
                 teams.sort((a,b)=>{ return a.name.localeCompare(b.name);});
                 resolve(teams);
+            });
+        });
+    });
+}
+
+export function getAllPublicUsers():Promise<PublicUser[]>{
+    return new Promise<PublicUser[]>((resolve, reject) => {
+        return fetch(`${baseUrl}/allusers`).then(response => {
+            return response.json().then((users: PublicUser[]) => { 
+                resolve(users);
             });
         });
     });

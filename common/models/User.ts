@@ -8,6 +8,10 @@ export interface UserResponse {
     points?: number;
     email?: string;
 }
+export interface PublicUser {
+    display:string;
+    points:number;
+} 
 
 export namespace UserRoles {
     export const ADMIN = "admin";
