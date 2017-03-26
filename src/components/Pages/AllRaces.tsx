@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 import { RaceModel } from "../../../common/models/Race";
 import { PredictionModel } from "../../../common/models/Prediction";
 import { RacePage } from "../Pages";
-import { Accordion, Panel, Button } from "react-bootstrap";
+import { Accordion, Panel, Button,Grid } from "react-bootstrap";
 import { getDurationFromNow } from "../../../common/utils/date";
 
 export interface AllRacesProps {
@@ -34,7 +34,9 @@ export class AllRaces extends React.Component<AllRacesProps, AllRacesState> {
             const panel = this.getRacePanel(race);
             panels.push(panel);
         }
-        return <Accordion >{panels}</Accordion>
+        return <Grid>
+                <Accordion >{panels}</Accordion>
+                </Grid>
     }
 
     getRacePanel(race: RaceModel): JSX.Element {

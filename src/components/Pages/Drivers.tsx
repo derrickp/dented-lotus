@@ -7,6 +7,7 @@ import { DriverComponent } from "../widgets/DriverComponent";
 import { TeamComponent } from "../widgets/TeamComponent";
 import { Form, Input } from "formsy-react-components";
 import { TeamModel, TeamResponse } from "../../../common/models/Team";
+import { Panel, Button, PanelGroup,Grid } from "react-bootstrap";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
 
 export interface DriverProps {
@@ -57,12 +58,12 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
         if (this.props.userIsAdmin) {
             teams.push(<li key="admin"><TeamAdmin createTeam={this.props.createTeam} /></li>);
         }
-        return <div>
+        return <Grid>
             <h1>Drivers</h1>
             <ul className="no-padding">{drivers}</ul>
             <h1>Teams</h1>
             <ul>{teams}</ul>
-        </div>
+        </Grid>
     }
 }
 
@@ -135,7 +136,7 @@ export class DriverAdmin extends React.Component<DriverAdminProps, any>{
         } else {
             output = <button onClick={this.addNewClicked.bind(this)}>Add new driver</button>;
         }
-        return <div className="dl-panel">{output}</div>;
+        return <Grid >{output}</Grid>;
     }
 }
 

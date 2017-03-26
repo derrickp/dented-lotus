@@ -4,7 +4,7 @@ import { RaceModel } from "../../../common/models/Race";
 import { PredictionModel } from "../../../common/models/Prediction";
 import { getDurationFromNow } from "../../../common/utils/date";
 import { PredictionComponent } from "../widgets/Prediction";
-import { Panel, Button, PanelGroup } from "react-bootstrap";
+import { Panel, Button, PanelGroup,Grid } from "react-bootstrap";
 import {RaceInfo} from "../RaceInfo";
 
 export interface RaceProps {
@@ -95,10 +95,10 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
                     <div><h3>{this.props.race.raceResponse.displayName + "  " + this.props.race.raceDate}</h3></div>
                 );
                 return (
-                    <div>
+                    <Grid>
                         {title}
                         {content}
-                    </div>
+                    </Grid>
                 );
             }
         }
