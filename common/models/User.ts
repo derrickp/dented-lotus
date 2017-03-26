@@ -27,9 +27,11 @@ export class User {
     email: string;
     imageUrl: string;
     isAdmin: boolean;
+    key: string;
 
     constructor(dentedLotusUser: UserResponse, id_token: string) {
         if (dentedLotusUser) {
+            this.key = dentedLotusUser.key;
             this.displayName = dentedLotusUser.displayName;
             if (dentedLotusUser.role === UserRoles.ADMIN) {
                 this.isAdmin = true;

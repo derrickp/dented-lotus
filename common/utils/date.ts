@@ -1,5 +1,7 @@
 export const DATE_FORMAT = "MM/DD/YYYY";
 
+export const FULL_FORMAT = "MM/DD/YYYY HH:mm"
+
 import * as moment from "moment";
 
 export function getDurationFromNow(date: string): DurationFromNow {

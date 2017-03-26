@@ -1,4 +1,6 @@
+import * as moment from "moment";
 
+import { FULL_FORMAT } from "../common/utils/date";
 import { BlogResponse } from "../common/models/Blog";
 import { User,PublicUser, GoogleUser, FacebookUser } from "../common/models/User";
 import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
@@ -14,6 +16,7 @@ import {
     getAllDrivers,
     authenticate,
     saveDrivers,
+    saveBlog as serverSaveBlog,
     createDriver as serverCreateDriver,
     getAllRaces,
     saveRaces,
@@ -36,17 +39,45 @@ export class StateManager {
     googleLoaded: boolean;
     private _watches: Map<string, Function[]> = new Map<string, Function[]>();
 
+    private _blogs: BlogResponse[] = [];
+
     private _tracks: Promise<TrackResponse[]>;
     private _drivers: Promise<DriverModel[]>;
     private _races: Promise<RaceModel[]>;
-    private _blogs: Promise<BlogResponse[]>;
+    private _teams: Promise<TeamModel[]>;
     private _user: User;
 
     private _raceMap: Map<string, RaceModel> = new Map<string, RaceModel>();
     private _driverMap: Map<string, DriverModel> = new Map<string, DriverModel>();
     private _teamMap: Map<string, TeamModel> = new Map<string, TeamModel>();
 
-    private _teams: Promise<TeamModel[]>;
+    constructor() {
+        this.signup = this.signup.bind(this);
+        this.signOut = this.signOut.bind(this);
+        this.completeGoogleLogin = this.completeGoogleLogin.bind(this);
+        this.saveDriver = this.saveDriver.bind(this);
+        this.saveRace = this.saveRace.bind(this);
+        this.saveTeam = this.saveTeam.bind(this);
+        this.completeFacebookLogin = this.completeFacebookLogin.bind(this);
+        this.saveBlog = this.saveBlog.bind(this);
+
+        this.doFacebookLogin = this.doFacebookLogin.bind(this);
+        this.doGoogleLogin = this.doGoogleLogin.bind(this);
+    }
+
+    initialize() {
+        this._initFacebook();
+        this._initGoogle();
+
+        this.teams.then(() => {
+            console.log("got teams");
+        });
+        this.drivers.then(() => {
+            console.log("got drivers");
+        });
+        this.refreshBlogs();
+    }
+
     private _allUsers:Promise<PublicUser[]>;
     get teams(): Promise<TeamModel[]> {
         this._teams = this._teams ? this._teams : new Promise<TeamModel[]>((resolve, reject) => {
@@ -172,6 +203,10 @@ export class StateManager {
         };
     }
 
+    get blogs() {
+        return this._blogs;
+    }
+
     get tracks(): Promise<TrackResponse[]> {
         this._tracks = this._tracks ? this._tracks : getAllTracks();
         return this._tracks;
@@ -202,15 +237,17 @@ export class StateManager {
         });
     }
 
-    get blogs(): Promise<BlogResponse[]> {
-        this._blogs = this._blogs ? this._blogs : new Promise((resolve, reject) => {
+    refreshBlogs(): Promise<BlogResponse[]> {
+        return new Promise((resolve, reject) => {
             return getBlogs().then(blogResponses => {
-                blogResponses.sort((a: BlogResponse, b: BlogResponse) => { return b.postDate.localeCompare(a.postDate) });
+                blogResponses.sort((a: BlogResponse, b: BlogResponse) => {
+                    return (moment(b.postDate, FULL_FORMAT).diff(moment(a.postDate, FULL_FORMAT)));
+                });
+                this._blogs = blogResponses;
                 this._publishWatches("blogs");
                 resolve(blogResponses);
             });
         });
-        return this._blogs;
     }
 
     private _allSeasonPredictions: Promise<PredictionModel[]>;
@@ -224,28 +261,6 @@ export class StateManager {
                 }
                 resolve(allSeasonPredictions);
             });
-        });
-    }
-
-    constructor() {
-        this.signup = this.signup.bind(this);
-        this.signOut = this.signOut.bind(this);
-        this.completeGoogleLogin = this.completeGoogleLogin.bind(this);
-        this.saveDriver = this.saveDriver.bind(this);
-        this.saveRace = this.saveRace.bind(this);
-        this.saveTeam = this.saveTeam.bind(this);
-        this.completeFacebookLogin = this.completeFacebookLogin.bind(this);
-
-        this.doFacebookLogin = this.doFacebookLogin.bind(this);
-        this.doGoogleLogin = this.doGoogleLogin.bind(this);
-        this._initFacebook();
-        this._initGoogle();
-
-        this.teams.then(() => {
-            console.log("got teams");
-        });
-        this.drivers.then(() => {
-            console.log("got drivers");
         });
     }
 
@@ -298,8 +313,9 @@ export class StateManager {
                 gapi.auth2.init({
                     client_id: "1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com"
                 }).then(() => {
-                    this._publishWatches("googleLogin");
+                    this.googleLoaded = true;
                     this._googleAuth = gapi.auth2.getAuthInstance();
+                    this._publishWatches("googleLogin");
                     this._googleAuth.isSignedIn.listen(signedIn => {
                         if (signedIn) {
                             const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
@@ -390,6 +406,22 @@ export class StateManager {
             return saveRaces(2017, [model.json], this.user.id_token).then(() => {
                 resolve(true);
             })
+        });
+    }
+
+    saveBlog(blog: BlogResponse): Promise<void> {
+        const finalBlog: BlogResponse = {
+            author: {
+                key: this.user.key
+            },
+            message: blog.message,
+            postDate: moment().format(FULL_FORMAT),
+            title: blog.title
+        };
+        return serverSaveBlog(finalBlog, this.user.id_token).then(() => {
+            return this.refreshBlogs();
+        }).then(() => {
+            return Promise.resolve();
         });
     }
 

@@ -31,7 +31,6 @@ export function verifyUniqueUser(req, res) {
 }
 
 function verifyFacebook(token: string): Promise<FacebookAuthResponse> {
-    console.log("checking facebook info");
     const fields = ["id", "name", "email", "first_name", "last_name"];
     const urlFields = fields.join("%2C");
     return new Promise<FacebookAuthResponse>((resolve, reject) => {
@@ -40,7 +39,6 @@ function verifyFacebook(token: string): Promise<FacebookAuthResponse> {
                 if (response.ok) {
                     return response.json().then((json: FacebookAuthResponse) => {
                         resolve(json);
-                        console.log(json);
                     });
                 }
                 else {
@@ -51,7 +49,6 @@ function verifyFacebook(token: string): Promise<FacebookAuthResponse> {
 }
 
 function verifyGoogleId(token: string): Promise<GoogleAuthResponse> {
-    console.log("Checking google id token");
     return new Promise<GoogleAuthResponse>((resolve, reject) => {
         const GoogleAuth = require('google-auth-library');
         const auth = new GoogleAuth;

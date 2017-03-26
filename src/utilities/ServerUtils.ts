@@ -33,6 +33,26 @@ export function getBlogs(): Promise<BlogResponse[]> {
     });
 }
 
+export function saveBlog(blog: BlogResponse, id_token: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        return fetch(`${baseUrl}/blogs`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + id_token
+            },
+            body: JSON.stringify(blog)
+        }).then(response => {
+            if (response.ok) {
+                resolve();
+            }
+            else {
+                reject(new Error("error saving blog"));
+            }
+        })
+    });
+}
+
 export function getAllTracks(): Promise<TrackResponse[]> {
     return new Promise<TrackResponse[]>((resolve, reject) => {
         return fetch(`${baseUrl}/tracks`).then(response => {
