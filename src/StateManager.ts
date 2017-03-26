@@ -341,7 +341,7 @@ export class StateManager {
                     clearInterval(interval);
                     this._initGoogle();
                 }
-            }, 10);
+            }, 1000);
         }
     }
 
