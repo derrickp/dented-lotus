@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Button, Glyphicon, Panel } from "react-bootstrap";
 import { RaceModel } from "../../common/models/Race";
+import {TriviaComponent} from "./widgets/TriviaComponent";
 
 
 export interface RaceInfoProps {
@@ -36,6 +37,7 @@ export class RaceInfo extends React.Component<RaceInfoProps, any>{
                         {race.track.trackResponse && <p>Track: {race.track.trackResponse.name}, {race.track.trackResponse.country}</p>}
                         {race.winner && <p>Winner: {race.winner.name}</p>}
                         {race.track.trackResponse && <p>{race.track.trackResponse.info}</p>} 
+                        <TriviaComponent trivia={race.track.trackResponse.trivia}/>
                     </div>
                 </div>
             </div>
