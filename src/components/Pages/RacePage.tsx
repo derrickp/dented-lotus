@@ -68,8 +68,9 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
         );
         const dFromNow = getDurationFromNow(race.cutoff);
         const timeRemaining = dFromNow.timeRemaining;
-        const predictionsStyle = timeRemaining > 0 ? "primary" : "danger";
-        const predictions = race.predictions.map((p) => { return <PredictionComponent save={this.saveUserPicks} key={p.json.key} prediction={p} /> });
+        const allowedPrediction = timeRemaining > 0;
+        const predictionsStyle = allowedPrediction ? "primary" : "danger";
+        const predictions = race.predictions.map((p) => { return <PredictionComponent allowedPrediction={allowedPrediction} save={this.saveUserPicks} key={p.json.key} prediction={p} /> });
         const predictionsPanel = <Panel eventKey={ActiveKeys.PREDICTIONS} bsStyle={predictionsStyle} header={predictionsTitle} expanded={true} defaultExpanded={true} collapsible={true}>
             {predictions}
         </Panel>;

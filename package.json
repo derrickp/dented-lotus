@@ -80,7 +80,6 @@
   "scripts": {
     "start": "cross-env DBNAME=\"production.dentedlotus.sqlite\" node app.js",
     "dev-start": "cross-env DBNAME=\"dev.dentedlotus.sqlite\" nodemon app.js",
-    "start-dev": "concurrently --kill-others \"gulp\" \"tsc -w\" && npm run webpack && nodemon app.js",
     "deploy": "gulp deploy",
     "webpack": "webpack && echo Webpack complete",
     "copy-static-files": "cpy index.html dist && cpy src/images/*.* dist/images && cpy favicon.ico dist",

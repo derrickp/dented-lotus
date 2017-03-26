@@ -10,6 +10,7 @@ import { MenuItem, FormControl, Well, FormGroup } from "react-bootstrap";
 export interface PredictionProps {
     prediction: PredictionModel;
     save: (prediction: PredictionModel) => Promise<boolean>;
+    allowedPrediction: boolean;
 }
 
 export interface PredictionState {
@@ -58,7 +59,7 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
         }
         const formControl =
             <FormGroup key={prediction.json.key} validationState={this.state.validationState} bsSize="large">
-                <FormControl defaultValue={userChoices} onChange={this.onChange} id={prediction.json.key} componentClass="select" placeholder="Make your pick">
+                <FormControl disabled={!this.props.allowedPrediction} defaultValue={userChoices} onChange={this.onChange} id={prediction.json.key} componentClass="select" placeholder="Make your pick">
                     {options}
                 </FormControl>
             </FormGroup>;

@@ -34,8 +34,9 @@ export class AllSeasonPicks extends React.Component<AllSeasonPicksProps, AllSeas
         );
         const dFromNow = getDurationFromNow("04/20/2017");
         const timeRemaining = dFromNow.timeRemaining;
-        const predictionsStyle = timeRemaining > 0 ? "primary" : "danger";
-        const predictions = this.props.predictions.map((p) => { return <PredictionComponent save={this.savePrediction} key={p.json.key} prediction={p} /> });
+        const allowedPrediction = timeRemaining > 0; 
+        const predictionsStyle = allowedPrediction ? "primary" : "danger";
+        const predictions = this.props.predictions.map((p) => { return <PredictionComponent allowedPrediction={allowedPrediction} save={this.savePrediction} key={p.json.key} prediction={p} /> });
         return <Panel bsStyle={predictionsStyle} header={predictionsTitle} expanded={true} defaultExpanded={true} collapsible={false}>
             {predictions}
         </Panel>;
