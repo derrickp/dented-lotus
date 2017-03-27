@@ -187,7 +187,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             <Grid>
                 <Row>
                     <Col xs={12} mdPush={9} md={3}><Scoreboard stateManager={this.stateManager} type="users" title="Standings" count={5} /></Col>
-                    {/*<Col xs={12} mdPull={3} md={9}><Blogs key={2} blogs={this.state.blogs} showAddButton={false} saveNewBlog={null} numBlogs={3} /></Col>*/}
+                    <Col xs={12} mdPull={3} md={9}><Blogs key={2} blogs={this.state.blogs} showAddButton={false} saveNewBlog={null} numBlogs={3} /></Col>
                 </Row>
             </Grid>
         </div>

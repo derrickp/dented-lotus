@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { DriverModel } from "../../../common/models/Driver";
 import { Form, Input } from "formsy-react-components";
+import { Grid, Row, Col, Panel } from "react-bootstrap";
 import { TeamModel } from "../../../common/models/Team";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
 
@@ -94,35 +95,38 @@ function DisplayDriver(props: EditDriverProps) {
     let flag = props.driver.flag;
     let wins = props.driver.wins || 0;
     let points = props.driver.points || 0;
-    return <div className="panel panel-default" >
-        <div className="panel-heading">
-            <div className="row">
-                <h3 className="name col-md-10 col-xs-10">{props.driver.firstName}&nbsp;{props.driver.lastName}</h3>
-                <div className="img-container col-md-2 col-xs-2">
-                    <img className="flag img-responsive" title={props.driver.nationality} src={flag} />
-                </div>
-            </div>
-        </div>
-        <div className="panel-body container">
-            <div className="row">
-                <div className="small-driver-info col-md-3">
-                    <div id="form-field-4">{points}</div>
-                    <label htmlFor="form-field-4">Points</label>
-                </div>
-                <div className="small-driver-info col-md-3">
-                    <div id="form-field-5">{wins}</div>
-                    <label htmlFor="form-field-5">Wins</label>
-                </div>
-                <div className="small-driver-info col-md-3">
-                    <div id="form-field-5">{props.driver.team.display}</div>
-                    <label htmlFor="form-field-6">Team</label>
-                </div>
-                <div className="small-driver-info col-md-3">
-                    <img className="img-responsive center-block" src={imageUrl} />
-                </div>
-            </div>
-                
-        {editButton}
-        </div>
+    let header = <div >
+        <h3 className="name inline-block">{props.driver.firstName}&nbsp;{props.driver.lastName}</h3><img className="flag inline-block" title={props.driver.nationality} src={flag} />
     </div>
+    return <Panel header={header}>
+        <div>
+            <Row>
+                <Col className="driver-info center-block" md={3}>
+                    <div className="info-panel">
+                        <div>{points}</div>
+                        <label >Points</label>
+                    </div>
+                </Col>
+                <Col className="driver-info center-block" md={3}>
+                    <div className="info-panel">
+                        <div >{wins}</div>
+                        <label >Wins</label>
+                    </div>
+                </Col>
+                <Col className="driver-info center-block" md={3}>
+                    <div className="info-panel">
+                        <div >{props.driver.team.display}</div>
+                        <label>Team</label>
+                    </div>
+                </Col>
+                <Col md={3}>
+                    <div className=" ">
+                        <img className="img-responsive center-block" src={imageUrl} />
+                    </div>
+                </Col>
+            </Row>
+
+            {editButton}
+        </div>
+    </Panel>
 }
