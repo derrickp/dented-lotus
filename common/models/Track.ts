@@ -8,6 +8,8 @@ export interface TrackResponse {
     description?: string;
     latitude?: number;
     longitude?: number;
+    info?:string;
+    image?:string;
 }
 
 export class TrackModel {

@@ -17,7 +17,6 @@ export const driverRoutes: IRouteConfiguration[] = [
                 try {
                     const keys = request.params["key"] ? [request.params["key"]] : [];
                     const drivers = await getDriverResponses(false, keys);
-                    console.log(drivers);
                     reply(drivers);
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
@@ -68,12 +67,7 @@ export const driverRoutes: IRouteConfiguration[] = [
             cors: true,
             handler: async (request, reply) => {
                 const drivers: DriverResponse[] = request.payload;
-                console.log(drivers);
                 for (const driver of drivers) {
-                    if (driver.key) {
-                        reply(Boom.badRequest("cannot create a driver with a pre-defined key"));
-                        return;
-                    }
                     if (!driver.lastName) {
                         reply(Boom.badRequest("need a driver last name"));
                         return;

@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { PropsBase } from "../../utilities/ComponentUtilities"; 
 import { Form, Input } from "formsy-react-components";
 import { TeamModel } from "../../../common/models/Team";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";

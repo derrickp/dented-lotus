@@ -2,7 +2,7 @@ import * as sqlite3 from "sqlite3";
 
 import { TeamResponse } from "../../../common/models/Team";
 
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const teamSelect = "select * from teams_vw";
 
@@ -13,7 +13,6 @@ export function getTeams(keys?: string[]): Promise<DbTeam[]> {
             const innerKeys = keys.join("','");
             statement = statement + " where key IN ('" + innerKeys + "')";
         }
-        console.log(statement);
         db.all(statement, (err: Error, rows: DbTeam[]) => {
             if (err) {
                 reject(err);

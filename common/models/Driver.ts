@@ -10,6 +10,7 @@ export interface DriverModelContext {
 } 
 
 export class DriverModel implements Selectable {
+    private _context: DriverModelContext;
     key: string;
     active: boolean;
     firstName: string;
@@ -21,10 +22,9 @@ export class DriverModel implements Selectable {
     birthdate: string;
     number: number;
     abbreviation: string;
-    team: TeamModel; //TeamModel;
+    team: TeamModel;
     wins: number;
-    trivia: string[];
-    private save: (model:DriverModel)=>Promise<boolean>;
+    trivia: string[]; 
     /**
      *
      */
@@ -40,17 +40,13 @@ export class DriverModel implements Selectable {
         this.active = driverResponse.active;
         this.trivia = driverResponse.trivia;
         this.wins = driverResponse.wins; 
-        this.team = new TeamModel(driverResponse.team);
-
-        // TeamModel.getTeamByAbbreviation(driverResponse.team).then((team)=>{
-        //     this.team = team;
-        // });
-
-
+        this.points = driverResponse.points;
+        this.team = driverResponse.team && context.getTeam(driverResponse.team);
+        this._context = context;
     } 
 
     public update( ){
-       return this.save(this);
+       return this._context.saveDriver(this);
     }
 
     get display() {
@@ -77,6 +73,7 @@ export class DriverModel implements Selectable {
             abbreviation: this.abbreviation,
             active: this.active,
             birthdate: this.birthdate,
+            points: +this.points,
             nationality: this.nationality,
             team: this.team.json,
             trivia: this.trivia,

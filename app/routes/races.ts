@@ -28,6 +28,7 @@ export const raceRoutes: IRouteConfiguration[] = [
                 const season = Number.parseInt(request.params["season"]);
                 if (isNaN(season)) {
                     reply(Boom.badRequest("Invalid season"));
+                    return;
                 }
                 try {
                     const credentials: Credentials = request.auth.credentials;
@@ -73,7 +74,6 @@ export const raceRoutes: IRouteConfiguration[] = [
             cors: true,
             handler: async (request, reply) => {
                 const races: RaceResponse[] = request.payload;
-                console.log(request.payload);
                 const season: number = Number.parseInt(request.params["season"]);
                 if (isNaN(season)) {
                     reply(Boom.badRequest("Invalid season"));
@@ -97,6 +97,10 @@ export const raceRoutes: IRouteConfiguration[] = [
             auth: {
                 strategies: ['jwt'],
                 scope: ['admin']
+            },
+            payload:{
+                parse:false,
+                maxBytes: 20000000
             }
         }
     },
@@ -106,22 +110,21 @@ export const raceRoutes: IRouteConfiguration[] = [
         config: {
             cors: true,
             handler: async (request, reply) => {
-                const adds: PredictionResponse[] = [];
+                const adds: DbRacePrediction[] = request.payload;
                 const raceKey = request.params["raceKey"];
-                console.log(request.payload);
                 try {
                     const dbAdds: DbRacePrediction[] = [];
                     for (const add of adds) {
                         const dbAdd: DbRacePrediction = {
                             race: raceKey,
-                            prediction: add.key,
+                            prediction: add.prediction,
                             value: add.value,
-                            modifier: add.modifier
+                            modifier: add.modifier ? add.modifier : 1.0
                         };
                         dbAdds.push(dbAdd);
                     }
                     await updateRacePredictions(raceKey, dbAdds);
-                    reply("done").code(201);
+                    reply({success: "done"}).code(201);
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
                 }
@@ -193,7 +196,8 @@ function getRaceResponse(season: number, raceRow: DbRace): RaceResponse {
         trivia: raceRow.trivia ? JSON.parse(raceRow.trivia) : [],
         predictions: [],
         winner: undefined,
-        imageUrl:""
+        imageUrl:"",
+        info:raceRow.info
     };
     return race;
 }

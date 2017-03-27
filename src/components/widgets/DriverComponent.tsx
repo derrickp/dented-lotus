@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { PropsBase } from "../../utilities/ComponentUtilities";
 import { DriverModel } from "../../../common/models/Driver";
 import { Form, Input } from "formsy-react-components";
 import { TeamModel } from "../../../common/models/Team";
@@ -89,15 +88,41 @@ function EditDriver(props: EditDriverProps) {
 function DisplayDriver(props: EditDriverProps) {
     let editButton;
     if (props.userIsAdmin) {
-        editButton = <button onClick={props.onEditClicked}>Edit</button>;
+        editButton = <div className="row"><button onClick={props.onEditClicked}>Edit</button></div>;
     }
-    return <div className="driver">
-        <label htmlFor="form-field-1">First Name:</label><span id="form-field-1">{props.driver.firstName}</span><br />
-        <label htmlFor="form-field-2">Last Name:</label><span id="form-field-2">{props.driver.lastName}</span><br />
-        <label htmlFor="form-field-3">Nationality:</label><span id="form-field-3">{props.driver.nationality}</span><br />
-        <label htmlFor="form-field-4">Points:</label><span id="form-field-4">{props.driver.points}</span><br />
-        <label htmlFor="form-field-5">Wins:</label><span id="form-field-5">{props.driver.wins}</span><br />
-        <label htmlFor="form-field-6">Team:</label><span id="form-field-5">{props.driver.team.display}</span><br />
+    let imageUrl = "images/drivers/" + props.driver.key + ".jpg";
+    let flag = props.driver.flag;
+    let wins = props.driver.wins || 0;
+    let points = props.driver.points || 0;
+    return <div className="panel panel-default" >
+        <div className="panel-heading">
+            <div className="row">
+                <h3 className="name col-md-10 col-xs-10">{props.driver.firstName}&nbsp;{props.driver.lastName}</h3>
+                <div className="img-container col-md-2 col-xs-2">
+                    <img className="flag img-responsive" title={props.driver.nationality} src={flag} />
+                </div>
+            </div>
+        </div>
+        <div className="panel-body container">
+            <div className="row">
+                <div className="small-driver-info col-md-3">
+                    <div id="form-field-4">{points}</div>
+                    <label htmlFor="form-field-4">Points</label>
+                </div>
+                <div className="small-driver-info col-md-3">
+                    <div id="form-field-5">{wins}</div>
+                    <label htmlFor="form-field-5">Wins</label>
+                </div>
+                <div className="small-driver-info col-md-3">
+                    <div id="form-field-5">{props.driver.team.display}</div>
+                    <label htmlFor="form-field-6">Team</label>
+                </div>
+                <div className="small-driver-info col-md-3">
+                    <img className="img-responsive center-block" src={imageUrl} />
+                </div>
+            </div>
+                
         {editButton}
+        </div>
     </div>
 }

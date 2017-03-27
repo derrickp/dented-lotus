@@ -9,9 +9,8 @@ import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";
 import { createToken, checkAndDecodeToken } from "../utilities/token";
-import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys, saveRequestedUser } from "../utilities/data/users";
-
-const base64url = require('base64-url');
+import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys, saveRequestedUser,getAllPublicUsers } from "../utilities/data/users";
+const base64url = require("base64-url");
 
 export const userRoutes: IRouteConfiguration[] = [
     {
@@ -136,6 +135,7 @@ export const userRoutes: IRouteConfiguration[] = [
             handler: (req, res) => {
                 // If we get here with a user, then we are good to go. Let's issue that token
                 // If not, then the error bubbles up from the verify step
+                console.log(req.pre["user"]);
                 res({
                     id_token: createToken(req.pre["user"]),
                     user: req.pre["user"]
@@ -219,6 +219,19 @@ export const userRoutes: IRouteConfiguration[] = [
             auth: {
                 strategies: ['jwt'],
                 scope: ['user']
+            }
+        }
+    },
+    {
+        method: 'GET',
+        path: '/allusers',
+        config: {
+            cors: true,
+            handler: (req, res) => {
+                let credentials = req.auth.credentials; 
+                getAllPublicUsers().then(users => {   
+                    res(users);
+                }); 
             }
         }
     }

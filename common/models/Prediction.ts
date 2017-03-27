@@ -8,12 +8,12 @@ export interface PredictionResponse {
     title: string;
     type: string;
     allSeason: boolean;
-    numChoices: number;
-    choices: DriverResponse[] | TeamResponse[];
-    value: number;
-    modifier: number;
+    choices?: DriverResponse[] | TeamResponse[];
+    value?: number;
+    modifier?: number;
     outcome?: DriverResponse[] | TeamResponse[];
-    userPicks?: string[];
+    userPick?: string;
+    raceKey?: string;
 }
 
 export interface PredictionContext {
@@ -26,7 +26,6 @@ export class PredictionModel {
     private _context: PredictionContext;
     predictionResponse: PredictionResponse;
     choices: Selectable[] = [];
-    userPicks: string[] = [];
 
     constructor(response: PredictionResponse, context: PredictionContext) {
         this.predictionResponse = response;
@@ -38,10 +37,11 @@ export class PredictionModel {
                 this.choices.push(context.getTeam(choice as TeamResponse));
             }
         }
-        for (const userPick of response.userPicks) {
-            this.userPicks.push(userPick);
-        }
         this._context = context;
+    }
+
+    saveUserPicks(): Promise<boolean> {
+        return this._context.saveUserPicks(this);
     }
 
     get json(): PredictionResponse {

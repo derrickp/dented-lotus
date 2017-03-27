@@ -39,7 +39,6 @@ export const trackRoutes: IRouteConfiguration[] = [
                 saveTracks(tracks).then(success => {
                     return getTracks();
                 }).then(tracks => {
-                    console.log(tracks);
                     reply(tracks).code(201);
                 }).catch((error: Error) => {
                     reply(Boom.badRequest(error.message));

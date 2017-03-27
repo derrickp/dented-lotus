@@ -8,11 +8,11 @@
       "dom.iterable"
     ],
     "moduleResolution": "node",
-    "baseUrl": "src",
-    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
     "noImplicitAny": false,
-    "sourceMap": true, 
+    "sourceMap": false, 
     "jsx": "react",
+    "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": [

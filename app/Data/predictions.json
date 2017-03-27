@@ -1,51 +1,79 @@
 [
-    {
-        "title": "Best of the Slowest",
-        "description": "Best driver of the slowest of the pack",
-        "type": "driver",
-        "allSeason": false,
-        "numChoices": 1
-    },
-    {
-        "title": "Fastest Lap",
-        "description": "Pretty self-explanatory. Who gets the fastest lap?",
-        "type": "driver",
-        "allSeason": false,
-        "numChoices": 1
-    },
-    {
-        "title": "Top 3",
-        "description": "Top 3 drivers of the race",
-        "type": "driver",
-        "allSeason": false,
-        "numChoices": 3
-    },
-    {
-        "title": "Most exciting driver",
-        "description": "Which driver do you think will be the most exciting, or best to watch",
-        "type": "driver",
-        "allSeason": false,
-        "numChoices": 1
-    },
-    {
-        "title": "Best radio",
-        "description": "Which driver had the best radio message",
-        "type": "driver",
-        "allSeason": false,
-        "numChoices": 1
-    },
-    {
-        "title": "Most exciting team",
-        "description": "This isn't the 'best' team, but is instead the team you think put on the best show",
-        "type": "team",
-        "allSeason": true,
-        "numChoices": 1
-    },
-    {
-        "title": "Pastor Maldonado award",
-        "description": "Which driver is going to be involved in the most incidents. It's the 'always in the wrong place at the wrong time' award",
-        "type": "driver",
-        "allSeason": true,
-        "numChoices": 1
-    }
+  {
+    "key": "top-3",
+    "allSeason": false,
+    "title": "Top 3",
+    "description": "Top 3 drivers of the race",
+    "type": "driver"
+  },
+  {
+    "key": "fastest-lap",
+    "allSeason": false,
+    "title": "Fastest Lap",
+    "description": "Pretty self-explanatory. Who gets the fastest lap?",
+    "type": "driver"
+  },
+  {
+    "key": "most-exciting-team",
+    "allSeason": true,
+    "title": "Most exciting team",
+    "description": "This isn't the 'best' team, but is instead the team you think put on the best show throughout the entire season",
+    "type": "team"
+  },
+  {
+    "key": "best-of-the-slowest",
+    "allSeason": false,
+    "title": "Best of the Slowest",
+    "description": "Best driver of the slowest of the pack",
+    "type": "driver"
+  },
+  {
+    "key": "pastor-maldonado-award",
+    "allSeason": true,
+    "title": "Pastor Maldonado award",
+    "description": "Which driver is going to be involved in the most incidents. It's the 'always in the wrong place at the wrong time' award",
+    "type": "driver"
+  },
+  {
+    "key": "first-out",
+    "allSeason": false,
+    "title": "First Out",
+    "description": "Which driver is going to be the first one out of the race. They had to have started the race however, doesn't count if they don't make it to the start of the race.",
+    "type": "driver"
+  },
+  {
+    "key": "biggest-surprise-driver-edition",
+    "allSeason": true,
+    "title": "Biggest Surprise (Driver edition)",
+    "description": "What driver do you think will be the biggest surpise of the season. This could be in a good or bad way.",
+    "type": "driver"
+  },
+  {
+    "key": "fastest-pit",
+    "allSeason": false,
+    "title": "Fastest Pit",
+    "description": "Which driver is going to have the fastest pit stop of the race",
+    "type": "driver"
+  },
+  {
+    "key": "best-radio",
+    "allSeason": false,
+    "title": "Best radio",
+    "description": "Which driver had the best radio message",
+    "type": "driver"
+  },
+  {
+    "key": "most-exciting-driver",
+    "allSeason": false,
+    "title": "Most exciting driver",
+    "description": "Which driver do you think will be the most exciting, or best to watch",
+    "type": "driver"
+  },
+  {
+    "key": "biggest-surprise-team-edition",
+    "allSeason": true,
+    "title": "Biggest Surprise (Team edition)",
+    "description": "What team do you think will be the biggest surpise of the season. This could be in a good or bad way.",
+    "type": "team"
+  }
 ]

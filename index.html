@@ -2,26 +2,50 @@
 <html>
 
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <title>Project Dented Lotus</title>
     <link href="//fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="react-draft-wysiwyg.css" />
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
-    <link href="//fonts.googleapis.com/css?family=Orbitron" rel="stylesheet"/>
-    <link href='//fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'/>
+    <link href="//fonts.googleapis.com/css?family=Orbitron" rel="stylesheet" />
+    <link href='//fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css' />
     <meta name="google-signin-client_id" content="1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com">
     <meta name="google-site-verification" content="Vt70DizD2LVzE5kPECKIOt752LMJZcHbBVKg-IYncS0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
 
 <body>
+    <script src="es6-shim.js"></script>
+    <script src="fetch.js"></script>
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '239771216489037',
+                cookie: true,
+                xfbml: true,
+                version: 'v2.8'
+            });
+            FB.AppEvents.logPageView();
+        };
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
     <div id="page-wrap">
-    <div id="example"></div>
-    <!-- Dependencies -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.js"></script>
-    <script src="//apis.google.com/js/platform.js" async defer></script>
-    <!-- Main -->
-    <script src="bundle.js"></script>
+        <div id="dentedlotus"></div>
+        <!-- Dependencies -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.js"></script>
+        <script src="//apis.google.com/js/platform.js" async defer></script>
+        <script src="https://apis.google.com/js/client:platform.js" async defer></script> 
+        <!-- Main -->
+        <script src="bundle.js"></script>
     </div>
 </body>
 

@@ -1,7 +1,7 @@
 import * as sqlite3 from "sqlite3";
 import { RaceResponse } from "../../../common/models/Race";
 
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const raceSelect = "select * from races_vw";
 
@@ -16,6 +16,7 @@ export interface DbRace {
     trivia?: string;
     cutoff?: string;
     winner?: string;
+    info?: string;
 }
 
 export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
@@ -26,7 +27,6 @@ export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
             const innerKeys = keys.join("','");
             whereStatement = " and key IN ('" + innerKeys + "')";
         }
-        console.log(`${selectStatement} ${whereStatement}`);
         db.all(`${selectStatement} ${whereStatement}`, (err, rows) => {
             if (err) {
                 reject(err);

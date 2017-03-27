@@ -1,20 +1,18 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { PropsBase } from "../../utilities/ComponentUtilities";
 import { RaceModel } from "../../../common/models/Race";
 import { PredictionModel } from "../../../common/models/Prediction";
 import { RacePage } from "../Pages";
-import { Accordion, Panel, Button } from "react-bootstrap";
+import { Accordion, Panel, Button,Grid } from "react-bootstrap";
 import { getDurationFromNow } from "../../../common/utils/date";
 
 export interface AllRacesProps {
-    races: Promise<RaceModel[]>;
+    races: RaceModel[];
     raceClick: (race: RaceModel) => void;
-    selectedRace?: Promise<RaceModel>;
+    selectedRace?: RaceModel;
 }
 
 export interface AllRacesState {
-    races: RaceModel[];
     expandedRace: RaceModel;
 }
 
@@ -23,36 +21,27 @@ export class AllRaces extends React.Component<AllRacesProps, AllRacesState> {
     constructor(props: AllRacesProps) {
         super(props);
         this.state = {
-            races: null,
             expandedRace: null
         };
-        props.races.then(raceModels => {
-            if (props.selectedRace) {
-                props.selectedRace.then(selectedRace => {
-                    this.setState({ races: raceModels, expandedRace: selectedRace })
-                });
-            }
-            else {
-                this.setState({ races: raceModels });
-            }
-        });
     }
 
     render() {
-        if (!this.state.races) {
+        if (!this.props.races) {
             return <div>Loading...</div>;
         }
         const panels: JSX.Element[] = [];
-        for (const race of this.state.races) {
+        for (const race of this.props.races) {
             const panel = this.getRacePanel(race);
             panels.push(panel);
         }
-        return <Accordion >{panels}</Accordion>
+        return <Grid>
+                <Accordion >{panels}</Accordion>
+                </Grid>
     }
 
     getRacePanel(race: RaceModel): JSX.Element {
         const expanded = race === this.state.expandedRace;
-        const dFromNow = getDurationFromNow(race.raceDate);
+        const dFromNow = getDurationFromNow(race.cutoff);
         const buttonText = dFromNow.duration.seconds() <= 0 ? "View Picks" : "Make Picks";
         const buttonStyle = dFromNow.duration.seconds() <= 0 ? "danger" : "primary";
 

@@ -7,8 +7,8 @@ export interface RaceModelContext {
     getTrack?: (response: TrackResponse) => TrackModel;
     getDriver?: (response: DriverResponse) => DriverModel;
     saveRace?: (model: RaceModel) => Promise<boolean>;
-    saveUserPicks?: (raceKey: string, prediction: PredictionModel) => Promise<boolean>;
     getPrediction?: (response: PredictionResponse) => PredictionModel;
+    refresh?:(race:RaceModel)=>Promise<void>;
 }
 
 export class RaceModel {
@@ -24,7 +24,7 @@ export class RaceModel {
     cutoff?: string;
     predictions: PredictionModel[];
     imageUrl:string;
-
+    info:string;
 
     constructor(race: RaceResponse, context?: RaceModelContext) {
         this.raceResponse = race;
@@ -49,11 +49,14 @@ export class RaceModel {
         if (race.winner) {
             this.winner = this._context.getDriver(race.winner);
         }
-        this.saveUserPicks = this.saveUserPicks.bind(this);
     }
 
     async initialize(): Promise<void> {
         
+    }
+
+    refresh():Promise<void>{
+        return this._context.refresh(this);
     }
 
     save(): Promise<boolean> {
@@ -61,13 +64,6 @@ export class RaceModel {
             return Promise.reject(new Error("Need valid context to save"));
         }
         return this._context.saveRace(this);
-    }
-
-    saveUserPicks(prediction: PredictionModel): Promise<boolean> {
-        if (!this._context) {
-            return Promise.reject(new Error("Need valid context to save"));
-        }
-        return this._context.saveUserPicks(this.key, prediction);
     }
 
     get json(): RaceResponse {
@@ -82,7 +78,8 @@ export class RaceModel {
             displayName: this.raceResponse.displayName,
             winner: this.winner ? this.winner.json : null,
             predictions: this.predictions.map(p => p.json),
-            imageUrl:""
+            imageUrl:"",
+            info: this.info
         };
         return raceResponse;
     }
@@ -101,4 +98,5 @@ export interface RaceResponse {
     winner?: DriverResponse;
     predictions: PredictionResponse[];
     imageUrl:string;
+    info:string;
 }

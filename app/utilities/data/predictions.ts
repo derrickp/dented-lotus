@@ -6,7 +6,7 @@ import { PredictionResponse } from "../../../common/models/Prediction";
 import { getDriverResponses } from "./drivers";
 import { getTeamResponses } from "./teams";
 
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const predictionsSelect = "select * from predictions_vw";
 const racePredictionSelect = "select * from racepredictions_vw";
@@ -36,19 +36,19 @@ export async function getPredictionResponses(raceKeys: string[], credentials: Cr
             modifier: racePredictionRow.modifier,
             description: thisPrediction.description,
             title: thisPrediction.title,
-            numChoices: thisPrediction.numChoices,
             type: thisPrediction.type,
             outcome: [],
-            userPicks: [],
+            userPick: "",
             choices: [],
+            raceKey: racePredictionRow.race
         };
 
         // Get all of the user picks for this prediction
-        prediction.userPicks = userPicks.filter(up => {
+        prediction.userPick = userPicks.filter(up => {
             return up.prediction === prediction.key;
         }).map(up => {
             return up.choice;
-        });
+        })[0];
 
         // Get the choices for this prediction.
         const possibleChoices = await getPredictionChoices(prediction.key, racePredictionRow.race);
@@ -156,7 +156,6 @@ export function getUserPicks(userKey: string, raceKeys?: string[]): Promise<DbUs
         if (raceKeys && raceKeys.length) {
             statement = statement + " and race in ('" + raceKeys.join("','") + "')";
         }
-        console.log(statement);
         db.all(statement, (err, rows: DbUserPick[]) => {
             if (err) {
                 reject(err);
@@ -167,20 +166,69 @@ export function getUserPicks(userKey: string, raceKeys?: string[]): Promise<DbUs
     });
 }
 
-export function getPredictions(keys?: string[]): Promise<PredictionResponse[]> {
+export function getAllSeasonValues(): Promise<DbRacePrediction[]> {
     return new Promise((resolve, reject) => {
-        let whereStatement: string;
-        if (keys && keys.length) {
-            const innerKeys = keys.join("','");
-            whereStatement = `where key IN ('${innerKeys}')`;
-        }
-        console.log(predictionsSelect + " " + whereStatement);
-        db.all(predictionsSelect + " " + whereStatement, (err, rows) => {
+        const statement = `${racePredictionSelect} where race == '2017-season'`;
+        db.all(statement, (err, rows: DbRacePrediction[]) => {
             if (err) {
                 reject(err);
                 return;
             }
             resolve(rows);
+        });
+    });
+}
+
+export function getAllSeasonPredictions(): Promise<PredictionResponse[]> {
+    return new Promise((resolve: (predictions: PredictionResponse[]) => void, reject: (error: Error) => void) => {
+        const statement = `${predictionsSelect} where allseason == 1`
+        console.log(statement);
+        db.all(statement, (err, rows: DbBasePrediction[]) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            const predictions: PredictionResponse[] = [];
+            for (const row of rows) {
+                const prediction: PredictionResponse = {
+                    key: row.key,
+                    allSeason: row.allSeason != 0 ? true : false,
+                    title: row.title,
+                    description: row.description,
+                    type: row.type
+                };
+                predictions.push(prediction);
+            }
+            resolve(predictions);
+            return;
+        });
+    });
+}
+
+export function getPredictions(keys?: string[]): Promise<PredictionResponse[]> {
+    return new Promise((resolve: (predictions: PredictionResponse[]) => void, reject: (error: Error) => void) => {
+        let whereStatement: string;
+        if (keys && keys.length) {
+            const innerKeys = keys.join("','");
+            whereStatement = `where key IN ('${innerKeys}')`;
+        }
+        db.all(predictionsSelect + " " + whereStatement, (err, rows: DbBasePrediction[]) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            const predictions: PredictionResponse[] = [];
+            for (const row of rows) {
+                const prediction: PredictionResponse = {
+                    key: row.key,
+                    allSeason: row.allSeason != 0 ? true : false,
+                    title: row.title,
+                    description: row.description,
+                    type: row.type
+                };
+                predictions.push(prediction);
+            }
+            resolve(predictions);
             return;
         });
     });
@@ -192,12 +240,10 @@ export function getRacePredictions(raceKeys?: string[]): Promise<DbRacePredictio
         if (raceKeys && raceKeys.length) {
             const innerKeys = raceKeys.join("','");
             statement = `${racePredictionSelect} WHERE race in ('${innerKeys}')`;
-            console.log(statement);
         }
         else {
             statement = racePredictionSelect;
         }
-        console.log(statement);
         db.all(statement, (err, rows: DbRacePrediction[]) => {
             if (err) {
                 reject(err);
@@ -312,8 +358,8 @@ export function updatePredictions(predictions: PredictionResponse[]): Promise<bo
     return new Promise<boolean>((resolve, reject) => {
         try {
             const insert = `INSERT OR REPLACE INTO predictions
-            (key, description, title, type, allseason, numchoices) 
-            VALUES (?1, ?2, ?3, ?4, ?5, ?6)`;
+            (key, description, title, type, allseason) 
+            VALUES (?1, ?2, ?3, ?4, ?5)`;
             db.serialize(() => {
                 db.exec("BEGIN;", (beginError) => {
                     if (beginError) {
@@ -327,8 +373,7 @@ export function updatePredictions(predictions: PredictionResponse[]): Promise<bo
                             2: prediction.description,
                             3: prediction.title,
                             4: prediction.type,
-                            5: prediction.allSeason ? 1 : 0,
-                            6: prediction.numChoices
+                            5: prediction.allSeason ? 1 : 0
                         };
                         db.run(insert, valuesObject);
                     }
@@ -356,6 +401,14 @@ export interface DbRacePrediction {
     prediction: string;
     modifier: number;
     value: number;
+}
+
+export interface DbBasePrediction {
+    key: string;
+    description: string;
+    title: string;
+    type: string;
+    allSeason: number;
 }
 
 export interface DbUserPick {
