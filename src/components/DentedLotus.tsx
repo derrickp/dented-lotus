@@ -173,7 +173,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             case Pages.TRACKS:
                 return <Tracks tracks={this.stateManager.tracks} />;
             case Pages.DRIVERS:
-                return <Drivers drivers={this.state.drivers} teams={this.state.teams} userIsAdmin={true} createDriver={this.stateManager.createDriver} createTeam={this.stateManager.createTeam} />
+                return <Drivers drivers={this.state.drivers} teams={this.state.teams} userIsAdmin={this.stateManager.user.isAdmin} createDriver={this.stateManager.createDriver} createTeam={this.stateManager.createTeam} />
             case Pages.ALL_SEASON_PICKS:
                 return <AllSeasonPicks predictions={this.state.allSeasonPredictions} />
             default:
