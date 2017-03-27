@@ -165,7 +165,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             case Pages.RACE:
                 return <RacePage race={this.state.race} small={false} isAdmin={this.stateManager.user.isAdmin}></RacePage>;
             case Pages.BLOGS:
-                return <Blogs numBlogs={-1} blogs={this.state.blogs} saveNewBlog={this.stateManager.saveBlog} showAddButton={this.stateManager.isLoggedIn}></Blogs>
+                return <Blogs numBlogs={-1} blogs={this.state.blogs} title="Blogs" fromHomePanel={false}  saveNewBlog={this.stateManager.saveBlog} showAddButton={this.stateManager.isLoggedIn}></Blogs>
             case Pages.USER:
                 return <div>User!!!!</div>;
             case Pages.ALL_RACES:
@@ -187,7 +187,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             <Grid>
                 <Row>
                     <Col xs={12} mdPush={9} md={3}><Scoreboard stateManager={this.stateManager} type="users" title="Standings" count={5} /></Col>
-                    <Col xs={12} mdPull={3} md={9}><Blogs key={2} blogs={this.state.blogs} showAddButton={false} saveNewBlog={null} numBlogs={3} /></Col>
+                    <Col xs={12} mdPull={3} md={9}><Blogs key={2} blogs={this.state.blogs} fromHomePanel={true} showAddButton={false} saveNewBlog={null} numBlogs={3} /></Col>
                 </Row>
             </Grid>
         </div>

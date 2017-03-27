@@ -12,7 +12,8 @@
                 "run",
                 "build"
             ],
-            "showOutput": "silent"
+            "showOutput": "silent",
+            "isBuildCommand": true
         },
         {
             "taskName": "compile-less",
@@ -33,8 +34,7 @@
             "args": [
                 "run",
                 "webpack"
-            ],
-            "isBuildCommand": true
+            ]
         },
         {
             "taskName": "update",

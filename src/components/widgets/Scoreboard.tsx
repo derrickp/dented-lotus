@@ -67,16 +67,15 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
     }
 
     render() {
-        return <Panel>
-            <h3>{this.props.title}</h3>
+        return <Panel header={this.props.title}>
             <Table striped bordered condensed responsive>
                 <thead>
                     <tr>
-                        <th>#</th><th>Name</th><th>Points</th>
+                        <th>#</th><th>Name</th><th className="center-text">Points</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {this.state.entrants.map((e, i) => { return <tr key={e.key}><td>{e.position}</td><td>{e.display}</td><td>{e.points}</td></tr> })}
+                    {this.state.entrants.map((e, i) => { return <tr key={e.key}><td>{e.position}</td><td>{e.display}</td><td className="center-text">{e.points}</td></tr> })}
                 </tbody>
             </Table>
         </Panel>

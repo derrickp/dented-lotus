@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Well } from "react-bootstrap";
+import { Well, Panel } from "react-bootstrap";
 
 import { BlogResponse } from "../../../common/models/Blog";
 import { FULL_FORMAT } from "../../../common/utils/date";
@@ -23,16 +23,13 @@ export function Blog(props: BlogProps) {
     const bottomStyle: React.CSSProperties = {
         paddingBottom: "1em"
     };
+    let header = <span><span>{props.blog.title}</span><span className="right" >{moment(props.blog.postDate, FULL_FORMAT).format("dddd, MMMM Do YYYY, h:mm a")}</span></span>
     return (
-        <div>
-            <h3>{props.blog.title}</h3>
-            <div>
-                By: {props.blog.author.displayName}
-            </div>
+        <Panel header={header}> 
             <div style={bottomStyle}>
-                Date: {moment(props.blog.postDate, FULL_FORMAT).format("dddd, MMMM Do YYYY, h:mm a")}
-            </div>
+                By: {props.blog.author.displayName}
+            </div> 
             <Editor editorState={editorState} toolbarHidden={true} readOnly={true}></Editor>
-        </div>
+        </Panel>
     );
 }
