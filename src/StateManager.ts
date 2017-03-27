@@ -2,7 +2,7 @@ import * as moment from "moment";
 
 import { FULL_FORMAT } from "../common/utils/date";
 import { BlogResponse } from "../common/models/Blog";
-import { User, PublicUser, GoogleUser, FacebookUser } from "../common/models/User";
+import { User, PublicUser, GoogleUser, FacebookUser, UserContext } from "../common/models/User";
 import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
 import { DriverModel, DriverModelContext, DriverResponse } from "../common/models/Driver";
@@ -28,7 +28,8 @@ import {
     saveTeams,
     signup,
     getAllSeasonPredictions,
-    getAllPublicUsers
+    getAllPublicUsers,
+    saveUserInfo
 } from "./utilities/ServerUtils"
 
 
@@ -93,6 +94,19 @@ export class StateManager {
         return this._teams;
     }
 
+    refreshTeams() {
+        this._teams = null;
+        this.teams.then((teams) => {
+            this._publishWatches("teams");
+        });
+    }
+
+    refreshDrivers() {
+        this._drivers = null;
+        this.drivers.then(drivers => {
+            this._publishWatches("drivers");
+        });
+    }
 
     get user(): User {
         return this._user;
@@ -318,12 +332,6 @@ export class StateManager {
                     this.googleLoaded = true;
                     this._googleAuth = gapi.auth2.getAuthInstance();
                     this._publishWatches("googleLogin");
-                    // this._googleAuth.isSignedIn.listen(signedIn => {
-                    //     if (signedIn) {
-                    //         const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
-                    //         this.completeGoogleLogin(user);
-                    //     }
-                    // });
                     const loggedIn = this._googleAuth.isSignedIn.get();
                     if (loggedIn) {
                         const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
@@ -506,6 +514,25 @@ export class StateManager {
         return model;
     }
 
+    get userContext(): UserContext {
+        const context: UserContext = {
+            saveUser: (user: User) => {
+                return saveUserInfo(user.json, this.user.id_token).then(() => {
+                    this._publishWatches("user");
+                });
+            },
+            getDriver: (key: string) => {
+                if (this._driverMap.has(key)) return this._driverMap.get(key);
+                return null;
+            },
+            getTeam: (key: string) => {
+                if (this._teamMap.has(key)) return this._teamMap.get(key);
+                return null;
+            }
+        };
+        return context;
+    }
+
     completeFacebookLogin(args: FB.LoginStatusResponse): Promise<void> {
         const authPayload: AuthenticationPayload = {
             auth_token: args.authResponse.accessToken,
@@ -513,7 +540,7 @@ export class StateManager {
         };
 
         return authenticate(authPayload).then(authResponse => {
-            const user = new FacebookUser(args, authResponse.user, authResponse.id_token);
+            const user = new FacebookUser(args, authResponse.user, authResponse.id_token, this.userContext);
             this.user = user;
         }).catch((error: Error) => {
             console.log(error.message);
@@ -527,7 +554,7 @@ export class StateManager {
             authType: AuthenticationTypes.GOOGLE
         };
         return authenticate(authPayload).then(authResponse => {
-            const googleUser = new GoogleUser(response, authResponse.user, authResponse.id_token);
+            const googleUser = new GoogleUser(response, authResponse.user, authResponse.id_token, this.userContext);
             this.user = googleUser;
         });
     }

@@ -7,7 +7,7 @@ const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 const userSelect = "select * from full_user_vw";
 const allPublicUsersSelect = "select * from public_users_vw";
 
-const userInsert = "INSERT INTO users (key, email, displayname, firstname, lastname, role, points)";
+const userInsert = "INSERT INTO users (key, email, displayname, firstname, lastname, role, points, imageurl)";
 
 export function getUsersByEmail(emails?: string[]): Promise<UserResponse[]> {
 	return new Promise<UserResponse[]>((resolve, reject) => {
@@ -31,7 +31,7 @@ export function getFullUsers(keys?: string[]): Promise<UserResponse[]> {
         let statement = userSelect;
         if (keys && keys.length) {
             const innerKeys = keys.join("','");
-            statement = statement + ` where key IN ('${innerKeys}')"`;
+            statement = statement + ` where key IN ('${innerKeys}')`;
         }
         db.all(statement, (err, rows: UserResponse[]) => {
             if (err) {
@@ -86,29 +86,6 @@ export function deleteUser(key): Promise<boolean> {
     });
 }
 
-export function saveRequestedUser(info: SignupInfo): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-        if (!info.email) {
-            reject(new Error("must have email"));
-            return;
-        }
-        const insert = `INSERT OR REPLACE INTO requestedusers (email, requestdate, name) VALUES (?1, ?2, ?3)`;
-        const values = {
-            1: info.email,
-            2: info.requestDate,
-            3: info.name
-        };
-        db.run(insert, values, (err) => {
-            if (err) {
-                reject(err);
-            }
-            else {
-                resolve(true);
-            }
-        });
-    });
-}
-
 export function saveUser(user: UserResponse): Promise<boolean> {
     return new Promise((resolve, reject) => {
         if (!user) {
@@ -116,7 +93,7 @@ export function saveUser(user: UserResponse): Promise<boolean> {
             return;
         }
 
-        let valuesStatement = "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7);";
+        let valuesStatement = "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);";
         let valuesObject = {
             1: user.key,
             2: user.email,
@@ -124,7 +101,8 @@ export function saveUser(user: UserResponse): Promise<boolean> {
             4: user.firstName ? user.firstName : "",
             5: user.lastName ? user.lastName : "",
             6: user.role,
-            7: user.points ? user.points : 0
+            7: user.points ? user.points : 0,
+            8: user.imageUrl
         };
         var insertStatement = userInsert + " " + valuesStatement;
         db.run(insertStatement, valuesObject, (err) => {
@@ -137,7 +115,7 @@ export function saveUser(user: UserResponse): Promise<boolean> {
     });
 }
 
-export function updateUser(user): Promise<boolean> {
+export function updateUser(user: UserResponse): Promise<boolean> {
     return new Promise((resolve, reject) => {
         if (!user) {
             reject(new Error("must have a user to update"));
@@ -166,13 +144,14 @@ export function updateUser(user): Promise<boolean> {
             updateFields.push("points = ?5");
             updateObject[5] = user.points;
         }
-        if (user.password) {
-            updateFields.push("pass = ?6");
-            updateObject[6] = user.password;
+        if (user.imageUrl) {
+            updateFields.push("imageurl = ?6");
+            updateObject[6] = user.imageUrl;
         }
 
         if (!updateFields.length) {
             reject("nothing to update");
+            return;
         }
 
         let fieldStatement = updateFields.join(",");
@@ -185,14 +164,7 @@ export function updateUser(user): Promise<boolean> {
                 reject(err);
                 return;
             }
-            getFullUsers(user.key).then(users => {
-                let newUser = users[0];
-                if (!newUser) {
-                    reject("could not find user in database");
-                    return;
-                }
-                resolve(newUser);
-            });
+            resolve(true);
         });
     });
 }

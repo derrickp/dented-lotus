@@ -9,7 +9,7 @@ import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";
 import { createToken, checkAndDecodeToken } from "../utilities/token";
-import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys, saveRequestedUser,getAllPublicUsers } from "../utilities/data/users";
+import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys, getAllPublicUsers } from "../utilities/data/users";
 const base64url = require("base64-url");
 
 export const userRoutes: IRouteConfiguration[] = [
@@ -18,7 +18,7 @@ export const userRoutes: IRouteConfiguration[] = [
         path: '/users/{key}',
         config: {
             cors: true,
-            handler: (req, res) => {
+            handler: async (req, res) => {
                 let credentials: Credentials = req.auth.credentials;
                 let isAdmin = credentials.scope.indexOf('admin') >= 0;
                 const key = req.params["key"];
@@ -27,60 +27,35 @@ export const userRoutes: IRouteConfiguration[] = [
                     res(Boom.badRequest("cannot save values for a different user"));
                     return;
                 }
+                try {
+                    const userPayload: UserResponse = req.payload;
 
-                let newUser: UserResponse = {
-                    displayName: req.payload.displayName,
-                    firstName: req.payload.firstName,
-                    lastName: req.payload.lastName,
-                    key: key
-                };
-
-                if (isAdmin) {
-                    newUser.role = req.payload.role;
-                    newUser.points = req.payload.points;
-                }
-
-                // Get the existing user out of the database.
-                getFullUsers([key]).then(users => {
-                    let existingUser = users[0];
+                    const fullUsers = await getFullUsers([key]);
+                    let existingUser = fullUsers[0];
                     if (!existingUser) {
                         res(Boom.badRequest("user key provided was not found"));
                         return;
                     }
-
-
-
-                    updateUser(newUser).then(updatedUser => {
-                        res(updatedUser);
-                        return;
-                    }).catch(error => {
-                        console.log(error);
-                        res(Boom.badRequest(error));
-                    });
-                });
+                    const newUser: UserResponse = {
+                        key: key,
+                        displayName: userPayload.displayName ? userPayload.displayName : existingUser.displayName,
+                        firstName: userPayload.firstName ? userPayload.firstName : existingUser.firstName,
+                        lastName: userPayload.lastName ? userPayload.lastName : existingUser.lastName,
+                        imageUrl: userPayload.imageUrl ? userPayload.imageUrl : existingUser.imageUrl
+                    }
+                    newUser.role = userPayload.role && isAdmin ? userPayload.role : existingUser.role;
+                    newUser.points = userPayload.points && isAdmin ? userPayload.points : existingUser.points;
+                    await updateUser(newUser);
+                    res({success: true});
+                }
+                catch (exception) {
+                    console.log(exception);
+                    res(Boom.badRequest(exception));
+                }
             },
             auth: {
                 strategies: ['jwt'],
                 scope: ['user']
-            }
-        }
-    },
-    {
-        method: 'POST',
-        path: '/signup',
-        config: {
-            pre: [
-                { method: verifyUniqueUser, assign: 'user' }
-            ],
-            cors: true,
-            handler: async (request, reply) => {
-                try {
-                    const info: SignupInfo = request.payload;
-                    await saveRequestedUser(info);
-                    reply({ status: "success" });
-                } catch (exception) {
-                    reply(Boom.badRequest(exception));
-                }
             }
         }
     },
@@ -135,7 +110,6 @@ export const userRoutes: IRouteConfiguration[] = [
             handler: (req, res) => {
                 // If we get here with a user, then we are good to go. Let's issue that token
                 // If not, then the error bubbles up from the verify step
-                console.log(req.pre["user"]);
                 res({
                     id_token: createToken(req.pre["user"]),
                     user: req.pre["user"]
@@ -228,10 +202,10 @@ export const userRoutes: IRouteConfiguration[] = [
         config: {
             cors: true,
             handler: (req, res) => {
-                let credentials = req.auth.credentials; 
-                getAllPublicUsers().then(users => {   
+                let credentials = req.auth.credentials;
+                getAllPublicUsers().then(users => {
                     res(users);
-                }); 
+                });
             }
         }
     }
