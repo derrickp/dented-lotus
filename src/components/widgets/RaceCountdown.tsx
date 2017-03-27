@@ -53,7 +53,8 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
                 <h1>Next Race!</h1>
                     { this.nextRace ? <div className="row">
                         <div className="col-md-4 col-sm-8">
-                            <p>{this.nextRace.raceResponse.displayName + " " + this.state.timeRemaining}</p>
+                            <p>{this.nextRace.raceResponse.displayName}</p>
+                            <p>{this.state.timeRemaining}</p>
                         </div>
                     </div>: <span className="race-countdown">Loading race countdown...</span>
                     }
