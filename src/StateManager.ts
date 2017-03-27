@@ -304,9 +304,6 @@ export class StateManager {
             this._googleAuth.signIn().then(() => {
                 const user = this._googleAuth.currentUser.get();
                 return this.completeGoogleLogin(user).then(resolve);
-            }).catch(error => {
-                console.error(error.message);
-                alert(error.message);  
             });
         });
 
