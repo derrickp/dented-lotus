@@ -53,13 +53,13 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
                 e.key = UUID();
                 e.position = i + 1;
             })
-            entrants.sort((a, b) => {
-                if (this.state.sortDir && this.state.sortDir == "ASC") {
-                    return a.points - b.points;
-                } else {
-                    return b.points - a.points;
-                }
-            })
+            // entrants.sort((a, b) => {
+            //     if (this.state.sortDir && this.state.sortDir == "ASC") {
+            //         return a.points - b.points;
+            //     } else {
+            //         return b.points - a.points;
+            //     }
+            // })
             this.setState({
                 entrants: entrants.slice(0, this.props.count)
             })
