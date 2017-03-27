@@ -7,7 +7,7 @@ import { DriverComponent } from "../widgets/DriverComponent";
 import { TeamComponent } from "../widgets/TeamComponent";
 import { Form, Input } from "formsy-react-components";
 import { TeamModel, TeamResponse } from "../../../common/models/Team";
-import { Panel, Button, PanelGroup,Grid } from "react-bootstrap";
+import { Panel, Button, PanelGroup, Grid } from "react-bootstrap";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
 
 export interface DriverProps {
@@ -27,20 +27,20 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
         super(props);
         this.state = {
             userIsAdmin: props.userIsAdmin
-        };   
-    } 
+        };
+    }
     render() {
         if (!this.props.drivers.length) {
             return <div>Loading...</div>;
         }
         let output = null;
-        let drivers = this.props.drivers.sort((a,b)=>{ 
+        let drivers = this.props.drivers.sort((a, b) => {
             let out = b.points - a.points;
-            if (!out){
+            if (!out) {
                 out = a.lastName.localeCompare(b.lastName);
             }
             return out;
-    }).map(driver => {
+        }).map(driver => {
             return <li key={driver.key} >
                 <DriverComponent userIsAdmin={this.state.userIsAdmin} allTeams={this.props.teams} key={driver.abbreviation} driver={driver} small={true} />
             </li>
@@ -50,7 +50,7 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
         }
 
         let teams = this.props.teams.map((team) => {
-            return <li key={team.abbreviation} className="dl-panel">
+            return <li key={team.key} className="dl-panel">
                 <TeamComponent userIsAdmin={this.state.userIsAdmin} allTeams={this.props.teams} key={team.abbreviation} team={team} small={true} />
             </li>
         });
@@ -88,7 +88,7 @@ export class DriverAdmin extends React.Component<DriverAdminProps, any>{
         trivia: [""],
         wins: 0
     }
-    driver:DriverResponse;
+    driver: DriverResponse;
     constructor(props) {
         super(props);
         this.driver = this.defaultDriver;
@@ -112,7 +112,7 @@ export class DriverAdmin extends React.Component<DriverAdminProps, any>{
     onValueChanged(name: string, value: any) {
         this.driver[name] = value;
     }
-    teamChanged(option:SelectOption) {
+    teamChanged(option: SelectOption) {
         this.driver.team = option.value.json;
     }
 

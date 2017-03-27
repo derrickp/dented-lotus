@@ -526,7 +526,6 @@ export class StateManager {
             auth_token: response.getAuthResponse().id_token,
             authType: AuthenticationTypes.GOOGLE
         };
-
         return authenticate(authPayload).then(authResponse => {
             const googleUser = new GoogleUser(response, authResponse.user, authResponse.id_token);
             this.user = googleUser;
