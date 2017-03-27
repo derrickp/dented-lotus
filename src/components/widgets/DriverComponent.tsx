@@ -126,7 +126,7 @@ function DisplayDriver(props: EditDriverProps) {
                 </Col>
             </Row>
 
-            {this.props.userIsAdmin && editButton}
+            {props.userIsAdmin && editButton}
         </div>
     </Panel>
 }
