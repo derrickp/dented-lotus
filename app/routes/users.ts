@@ -60,8 +60,7 @@ export const userRoutes: IRouteConfiguration[] = [
         }
     },
     {
-        method: 'POST',
-<<<<<<< HEAD
+        method: 'POST', 
         path: '/signup',
         config: {
             pre: [
@@ -81,9 +80,7 @@ export const userRoutes: IRouteConfiguration[] = [
         }
     },
     {
-        method: 'POST',
-=======
->>>>>>> a8e664111852cb24babc985940cf4029f7673d6c
+        method: 'POST', 
         path: '/users',
         config: {
             // Before the route handler runs, verify that
@@ -132,11 +129,8 @@ export const userRoutes: IRouteConfiguration[] = [
             cors: true,
             handler: (req, res) => {
                 // If we get here with a user, then we are good to go. Let's issue that token
-                // If not, then the error bubbles up from the verify step
-<<<<<<< HEAD
-                console.log("Auth Request:", req.pre["user"]);
-=======
->>>>>>> a8e664111852cb24babc985940cf4029f7673d6c
+                // If not, then the error bubbles up from the verify step 
+                console.log("Auth Request:", req.pre["user"]); 
                 res({
                     id_token: createToken(req.pre["user"]),
                     user: req.pre["user"]
