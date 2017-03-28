@@ -1,0 +1,22 @@
+[
+    {
+        "prediction": "fastest-lap",
+        "value": 100
+    },
+    {
+        "prediction": "best-radio",
+        "value": 100
+    },
+    {
+        "prediction": "first-out",
+        "value": 100
+    },
+    {
+        "prediction": "most-exciting-driver",
+        "value": 100
+    },
+    {
+        "prediction": "fastest-pit",
+        "value": 100
+    }
+]

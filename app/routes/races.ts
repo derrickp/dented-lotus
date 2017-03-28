@@ -3,7 +3,7 @@
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 import { Credentials } from "../../common/models/Authentication";
-import { getRaces, saveRaces, DbRace } from "../utilities/data/races";
+import { getRaces, saveRaces, DbRace, FinalPredictionPick, saveFinalRacePredictions } from "../utilities/data/races";
 import { getDriverResponses } from "../utilities/data/drivers";
 import { getTrackResponses } from "../utilities/data/tracks";
 import {
@@ -154,6 +154,28 @@ export const raceRoutes: IRouteConfiguration[] = [
             auth: {
                 strategies: ['jwt'],
                 scope: ['admin']
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "/admin/races/{raceKey}/predictions/finals",
+        config: {
+            cors: true,
+            handler: async (request, reply) => {
+                const raceKey = request.params["raceKey"];
+                const finalPredictionPicks: FinalPredictionPick[] = request.payload;
+                try {
+                    await saveFinalRacePredictions(raceKey, finalPredictionPicks);
+                    reply({ success: true });
+                }
+                catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
+            },
+            auth: {
+                strategies: ["jwt"],
+                scope: ["admin"]
             }
         }
     },

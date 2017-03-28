@@ -19,6 +19,11 @@ export interface DbRace {
     info?: string;
 }
 
+export interface FinalPredictionPick {
+    prediction: string;
+    final: string;
+}
+
 export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
     return new Promise<DbRace[]>((resolve, reject) => {
         let selectStatement = `${raceSelect} where season = ${season}`;
@@ -34,6 +39,44 @@ export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
             }
             resolve(rows);
         });
+    });
+}
+
+export function saveFinalRacePredictions(raceKey: string, finalPicks: FinalPredictionPick[]): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        const insert = `INSERT INTO racepredictionsfinals
+        (prediction, race, final)
+        VALUES (?1, ?2, ?3)`;
+        try {
+            db.serialize(() => {
+                db.exec("BEGIN;", (beginError: Error) => {
+                    if (beginError) {
+                        reject(beginError);
+                        return;
+                    }
+                    for (const finalPick of finalPicks) {
+                        const values = {
+                            1: finalPick.prediction,
+                            2: raceKey,
+                            3: finalPick.final
+                        };
+                        db.run(insert, values);
+                    }
+                    db.exec("COMMIT;", (err: Error) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                        resolve();
+                    });
+                });
+            });
+        }
+        catch (exception) {
+            console.log(exception);
+            db.exec("ROLLBACK;");
+            reject(exception);
+        }
     });
 }
 

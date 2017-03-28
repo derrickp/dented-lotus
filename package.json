@@ -73,7 +73,9 @@
     "webpack-dev-server": "^1.6.5",
     "whatwg-fetch": "^2.0.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
   "scripts": {
     "start": "cross-env DBNAME=\"production.dentedlotus.sqlite\" node app.js",
     "dev-start": "cross-env DBNAME=\"dev.dentedlotus.sqlite\" nodemon app.js",

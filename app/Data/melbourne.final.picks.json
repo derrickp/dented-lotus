@@ -1,0 +1,22 @@
+[
+    {
+        "prediction": "top-3",
+        "final": "hamilton"
+    },
+    {
+        "prediction": "most-exciting-driver",
+        "final": "verstappen"
+    },
+    {
+        "prediction": "first-out",
+        "final": "alonso"
+    },
+    {
+        "prediction": "best-radio",
+        "final": "grosjean"
+    },
+    {
+        "prediction": "fastest-lap",
+        "final": "raikonnen"
+    }
+]
