@@ -131,7 +131,7 @@ export async function verifyCredentials(req, res) {
         }
     }
     catch (exception) {
-        res(Boom.badRequest('Incorrect token!'));
+        res(Boom.badRequest(exception));
     }
 }
 
