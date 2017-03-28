@@ -9,7 +9,7 @@ import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";
 import { createToken, checkAndDecodeToken } from "../utilities/token";
-import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys, getAllPublicUsers } from "../utilities/data/users";
+import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys, getAllPublicUsers, saveRequestedUser } from "../utilities/data/users";
 const base64url = require("base64-url");
 
 export const userRoutes: IRouteConfiguration[] = [

@@ -26,6 +26,29 @@ export function getUsersByEmail(emails?: string[]): Promise<UserResponse[]> {
 	});	
 }
 
+export function saveRequestedUser(info: SignupInfo): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+        if (!info.email) {
+            reject(new Error("must have email"));
+            return;
+        }
+        const insert = `INSERT OR REPLACE INTO requestedusers (email, requestdate, name) VALUES (?1, ?2, ?3)`;
+        const values = {
+            1: info.email,
+            2: info.requestDate,
+            3: info.name
+        };
+        db.run(insert, values, (err) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(true);
+            }
+        });
+    });
+}
+
 export function getFullUsers(keys?: string[]): Promise<UserResponse[]> {
     return new Promise((resolve, reject) => {
         let statement = userSelect;
