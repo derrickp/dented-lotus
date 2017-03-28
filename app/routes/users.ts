@@ -75,6 +75,7 @@ export const userRoutes: IRouteConfiguration[] = [
             cors: true,
             handler: async (request, reply) => {
                 try {
+                    console.log("New user request: ", request.payload);
                     const info: SignupInfo = request.payload;
                     await saveRequestedUser(info);
                     reply({ status: "success" });
@@ -135,7 +136,7 @@ export const userRoutes: IRouteConfiguration[] = [
             handler: (req, res) => {
                 // If we get here with a user, then we are good to go. Let's issue that token
                 // If not, then the error bubbles up from the verify step
-                console.log(req.pre["user"]);
+                console.log("Auth Request:", req.pre["user"]);
                 res({
                     id_token: createToken(req.pre["user"]),
                     user: req.pre["user"]
