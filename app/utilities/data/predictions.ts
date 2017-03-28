@@ -182,7 +182,6 @@ export function getAllSeasonValues(): Promise<DbRacePrediction[]> {
 export function getAllSeasonPredictions(): Promise<PredictionResponse[]> {
     return new Promise((resolve: (predictions: PredictionResponse[]) => void, reject: (error: Error) => void) => {
         const statement = `${predictionsSelect} where allseason == 1`
-        console.log(statement);
         db.all(statement, (err, rows: DbBasePrediction[]) => {
             if (err) {
                 reject(err);

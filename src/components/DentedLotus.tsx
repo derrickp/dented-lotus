@@ -5,7 +5,7 @@ import { Banner } from "./Banner";
 import { UserComponent } from "./User";
 import { StateManager } from "../StateManager";
 import { RaceCountdown } from "./widgets/RaceCountdown";
-import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, AllSeasonPicks, Blogs } from "./Pages";
+import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, AllSeasonPicks, Blogs, Profile } from "./Pages";
 import { RaceModel } from "../../common/models/Race";
 import { TeamModel } from "../../common/models/Team";
 import { DriverModel } from "../../common/models/Driver";
@@ -176,6 +176,8 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
                 return <Drivers drivers={this.state.drivers} teams={this.state.teams} userIsAdmin={this.stateManager.user && this.stateManager.user.isAdmin} createDriver={this.stateManager.createDriver} createTeam={this.stateManager.createTeam} />
             case Pages.ALL_SEASON_PICKS:
                 return <AllSeasonPicks predictions={this.state.allSeasonPredictions} />
+            case Pages.PROFILE:
+                return <Profile drivers={this.state.drivers} teams={this.state.teams} user={this.stateManager.user} thisUser={this.stateManager.user}></Profile>
             default:
                 return this.getHomePage();
         }

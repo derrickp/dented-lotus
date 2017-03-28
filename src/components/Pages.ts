@@ -5,8 +5,9 @@ import { Tracks } from "./Pages/Tracks";
 import { Drivers } from "./Pages/Drivers";
 import { AllSeasonPicks } from "./Pages/AllSeasonPicks"
 import { Blogs } from "./Pages/Blogs";
+import { Profile } from "./Pages/Profile";
 
-export { RacePage, AllRaces, TrackPage, Tracks, Drivers, AllSeasonPicks, Blogs };
+export { RacePage, AllRaces, TrackPage, Tracks, Drivers, AllSeasonPicks, Blogs, Profile };
 
 export class Pages {
     static HOME = "home";

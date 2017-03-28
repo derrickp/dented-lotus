@@ -10,11 +10,11 @@ import { BlogResponse } from "../../common/models/Blog";
 import { PublicUser } from "../../common/models/User";
 import { PredictionResponse } from "../../common/models/Prediction";
 import { AuthenticationPayload, AuthenticationResponse } from "../../common/models/Authentication";
- 
+
 let baseUrl = `${window.location.origin}`;
-if (baseUrl.indexOf(":8080") == -1){
- baseUrl += ":8080";   
-} 
+if (baseUrl.indexOf(":8080") == -1) {
+    baseUrl += ":8080";
+}
 
 export function getBlogs(): Promise<BlogResponse[]> {
     return new Promise<BlogResponse[]>((resolve, reject) => {
@@ -28,7 +28,7 @@ export function getBlogs(): Promise<BlogResponse[]> {
                 }
             });
         }).catch(error => {
-            reject(error);  
+            reject(error);
         });
     });
 }
@@ -232,23 +232,46 @@ export function getAllSeasonPredictions(id_token: string): Promise<PredictionRes
     });
 }
 
-export function getAllTeams( ): Promise<TeamResponse[]> {
+export function getAllTeams(): Promise<TeamResponse[]> {
     return new Promise<TeamResponse[]>((resolve, reject) => {
         return fetch(`${baseUrl}/teams/`).then(response => {
             return response.json().then((teams: TeamResponse[]) => {
-                teams.sort((a,b)=>{ return a.name.localeCompare(b.name);});
+                teams.sort((a, b) => { return a.name.localeCompare(b.name); });
                 resolve(teams);
             });
         });
     });
 }
 
-export function getAllPublicUsers():Promise<PublicUser[]>{
+export function getAllPublicUsers(): Promise<PublicUser[]> {
     return new Promise<PublicUser[]>((resolve, reject) => {
         return fetch(`${baseUrl}/allusers`).then(response => {
-            return response.json().then((users: PublicUser[]) => { 
+            return response.json().then((users: PublicUser[]) => {
                 resolve(users);
             });
+        });
+    });
+}
+
+export function saveUserInfo(user: UserResponse, id_token: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        return fetch(`${baseUrl}/users/${user.key}`, {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + id_token
+            },
+            body: JSON.stringify(user)
+        }).then(response => {
+            if (response.ok) {
+                resolve();
+                return;
+            }
+            else {
+                return response.json().then(json => {
+                    reject(new Error(json.message));
+                });
+            }
         });
     });
 }
@@ -288,7 +311,7 @@ export function saveUserPicks(picks: UserPickPayload[], id_token: string): Promi
                 }
             });
         }).catch(error => {
-            reject(error);  
+            reject(error);
         });
     });
 }
