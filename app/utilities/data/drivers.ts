@@ -62,7 +62,7 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
 
 
         } catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }

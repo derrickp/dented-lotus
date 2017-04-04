@@ -3,7 +3,14 @@
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 import { Credentials } from "../../common/models/Authentication";
-import { getRaces, saveRaces, DbRace, FinalPredictionPick, saveFinalRacePredictions } from "../utilities/data/races";
+import {
+    getRaces,
+    saveRaces,
+    DbRace,
+    FinalPredictionPick,
+    saveFinalRacePredictions,
+    getFinalRacePredictions
+} from "../utilities/data/races";
 import { getDriverResponses } from "../utilities/data/drivers";
 import { getTrackResponses } from "../utilities/data/tracks";
 import {
@@ -11,8 +18,11 @@ import {
     updateRacePredictions,
     DbRacePrediction,
     deleteRacePredictions,
-    savePredictionChoices
+    savePredictionChoices,
+    getPredictionsForRace,
+    getUserPicks
 } from "../utilities/data/predictions";
+import { getFullUsers, updateUser } from "../utilities/data/users";
 import { RaceResponse } from "../../common/models/Race";
 import { TrackResponse } from "../../common/models/Track";
 import { DriverResponse } from "../../common/models/Driver";
@@ -98,8 +108,8 @@ export const raceRoutes: IRouteConfiguration[] = [
                 strategies: ['jwt'],
                 scope: ['admin']
             },
-            payload:{
-                parse:false,
+            payload: {
+                parse: false,
                 maxBytes: 20000000
             }
         }
@@ -124,7 +134,7 @@ export const raceRoutes: IRouteConfiguration[] = [
                         dbAdds.push(dbAdd);
                     }
                     await updateRacePredictions(raceKey, dbAdds);
-                    reply({success: "done"}).code(201);
+                    reply({ success: "done" }).code(201);
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
                 }
@@ -180,6 +190,62 @@ export const raceRoutes: IRouteConfiguration[] = [
         }
     },
     {
+        method: "POST",
+        path: "/admin/races/{raceKey}/score",
+        config: {
+            cors: true,
+            handler: async (request, reply) => {
+                try {
+                    const raceKey = request.params["raceKey"];
+                    const users = await getFullUsers();
+                    const finalPicks = await getFinalRacePredictions(raceKey);
+                    const racePredictions = await getPredictionsForRace(raceKey);
+                    // For every user we will need to get their picks, and their points, and award them points if they were right
+                    for (const user of users) {
+                        const initPoints = user.points;
+                        // 1. Get their picks
+                        const userPicks = await getUserPicks(user.key, [raceKey]);
+                        // 2. Loop through the race predictions
+                        for (const rp of racePredictions) {
+                            const finalPick = finalPicks.filter(fp => {
+                                return fp.prediction === rp.prediction;
+                            })[0];
+                            // If we don't have a final pick, then this prediction hasn't been finalized...
+                            if (!finalPick) {
+                                continue;
+                            }
+                            const userPick = userPicks.filter(up => up.prediction === rp.prediction)[0];
+                            // If user pick doesn't exist, the user didn't make a pick for this prediction. Continue
+                            if (!userPick) {
+                                continue;
+                            }
+                            // 3. Compare their pick choice to finals
+                            if (finalPick.final.includes(userPick.choice)) {
+                                // 4. Award points if correct
+                                const predictionPoints = rp.value * rp.modifier;
+                                console.log(`${rp.value} ${rp.modifier} ${predictionPoints}`)
+                                user.points += predictionPoints;
+                            }
+                        }
+                        console.log(`${user.email} ${user.points}`);
+                        if (user.points !== initPoints) {
+                            await updateUser({ key: user.key, points: user.points });
+                        }
+                    }
+                    // Once we're here all user info has been saved
+                    reply({ success: true });
+                }
+                catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
+            },
+            auth: {
+                strategies: ["jwt"],
+                scope: ["admin"]
+            }
+        }
+    },
+    {
         method: "DELETE",
         path: "/admin/races/predictions/{raceKey}",
         config: {
@@ -218,8 +284,8 @@ function getRaceResponse(season: number, raceRow: DbRace): RaceResponse {
         trivia: raceRow.trivia ? JSON.parse(raceRow.trivia) : [],
         predictions: [],
         winner: undefined,
-        imageUrl:"",
-        info:raceRow.info
+        imageUrl: "",
+        info: raceRow.info
     };
     return race;
 }

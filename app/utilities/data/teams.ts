@@ -94,7 +94,7 @@ export async function saveTeams(teams: TeamResponse[]): Promise<boolean> {
                 });
             });
         } catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }

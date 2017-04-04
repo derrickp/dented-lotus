@@ -61,7 +61,7 @@ export function saveTracks(tracks: TrackResponse[]): Promise<boolean> {
                 });
             });
         } catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }

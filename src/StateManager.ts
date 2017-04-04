@@ -543,7 +543,7 @@ export class StateManager {
             const user = new FacebookUser(args, authResponse.user, authResponse.id_token, this.userContext);
             this.user = user;
         }).catch((error: Error) => {
-            console.log(error.message);
+            console.error(error.message);
             alert(error.message);
         });
     }

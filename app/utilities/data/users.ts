@@ -171,7 +171,6 @@ export function updateUser(user: UserResponse): Promise<boolean> {
             updateFields.push("imageurl = ?6");
             updateObject[6] = user.imageUrl;
         }
-
         if (!updateFields.length) {
             reject("nothing to update");
             return;

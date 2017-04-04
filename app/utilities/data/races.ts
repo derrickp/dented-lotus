@@ -42,6 +42,20 @@ export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
     });
 }
 
+export function getFinalRacePredictions(raceKey): Promise<FinalPredictionPick[]> {
+    return new Promise<FinalPredictionPick[]>((resolve, reject) => {
+        const select = `select * from racepredictionsfinals where race = '${raceKey}'`;
+        db.all(select, (err, rows: FinalPredictionPick[]) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
 export function saveFinalRacePredictions(raceKey: string, finalPicks: FinalPredictionPick[]): Promise<void> {
     return new Promise<void>((resolve, reject) => {
         const insert = `INSERT INTO racepredictionsfinals
@@ -73,7 +87,7 @@ export function saveFinalRacePredictions(raceKey: string, finalPicks: FinalPredi
             });
         }
         catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }
@@ -171,7 +185,7 @@ export async function saveRaces(season, newRaces: RaceResponse[]): Promise<boole
                 });
             });
         } catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }

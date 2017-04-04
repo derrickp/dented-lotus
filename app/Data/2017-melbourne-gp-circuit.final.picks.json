@@ -1,19 +1,19 @@
 [
     {
         "prediction": "top-3",
-        "final": "hamilton"
+        "final": "vettel,hamilton,bottas"
     },
     {
         "prediction": "most-exciting-driver",
-        "final": "verstappen"
+        "final": "ocon"
     },
     {
         "prediction": "first-out",
-        "final": "alonso"
+        "final": "grosjean"
     },
     {
         "prediction": "best-radio",
-        "final": "grosjean"
+        "final": "none"
     },
     {
         "prediction": "fastest-lap",

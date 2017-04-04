@@ -60,7 +60,7 @@ function verifyGoogleId(token: string): Promise<GoogleAuthResponse> {
             //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3],
             (error, login) => {
                 if (error) {
-                    console.log(error);
+                    console.error(error);
                     reject(error);
                     return;
                 }

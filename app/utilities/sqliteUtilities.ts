@@ -40,7 +40,7 @@ export function addNewRadioMessage(newMessage): Promise<boolean> {
             });
         }
         catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }

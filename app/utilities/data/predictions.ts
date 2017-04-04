@@ -142,7 +142,7 @@ export function savePredictionChoices(prediction: string, race: string, choices:
                     });
                 });
             } catch (exception) {
-                console.log(exception);
+                console.error(exception);
                 db.exec("ROLLBACK;");
                 reject(exception);
             }
@@ -233,6 +233,20 @@ export function getPredictions(keys?: string[]): Promise<PredictionResponse[]> {
     });
 }
 
+export function getPredictionsForRace(raceKey: string): Promise<DbRacePrediction[]> {
+    return new Promise<DbRacePrediction[]>((resolve, reject) => {
+        let statement: string = `${racePredictionSelect} WHERE race = '${raceKey}'`;
+        db.all(statement, (err, rows: DbRacePrediction[]) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(rows);
+            return;
+        });
+    });
+}
+
 export function getRacePredictions(raceKeys?: string[]): Promise<DbRacePrediction[]> {
     return new Promise<DbRacePrediction[]>((resolve, reject) => {
         let statement: string;
@@ -289,7 +303,7 @@ export function saveUserPicks(userPicks: DbUserPick[]): Promise<boolean> {
                 });
             });
         } catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }
@@ -346,7 +360,7 @@ export function updateRacePredictions(race: string, updates: DbRacePrediction[])
             });
         }
         catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }
@@ -388,7 +402,7 @@ export function updatePredictions(predictions: PredictionResponse[]): Promise<bo
             });
         }
         catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }
