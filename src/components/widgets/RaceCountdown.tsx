@@ -27,6 +27,7 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
     }
 
     componentDidMount() {
+        this.tick();
         this.interval = setInterval(this.tick, 1000);
     }
 

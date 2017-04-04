@@ -12,7 +12,6 @@
                 "run",
                 "build"
             ],
-            "showOutput": "silent",
             "isBuildCommand": true
         },
         {

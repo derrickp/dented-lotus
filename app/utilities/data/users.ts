@@ -1,7 +1,6 @@
 import * as sqlite3 from "sqlite3";
 
 import { UserResponse } from "../../../common/models/User";
-import { SignupInfo } from "../../../common/models/Signup";
 const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const userSelect = "select * from full_user_vw";
@@ -24,29 +23,6 @@ export function getUsersByEmail(emails?: string[]): Promise<UserResponse[]> {
 			resolve(rows);
 		});
 	});	
-}
-
-export function saveRequestedUser(info: SignupInfo): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-        if (!info.email) {
-            reject(new Error("must have email"));
-            return;
-        }
-        const insert = `INSERT OR REPLACE INTO requestedusers (email, requestdate, name) VALUES (?1, ?2, ?3)`;
-        const values = {
-            1: info.email,
-            2: info.requestDate,
-            3: info.name
-        };
-        db.run(insert, values, (err) => {
-            if (err) {
-                reject(err);
-            }
-            else {
-                resolve(true);
-            }
-        });
-    });
 }
 
 export function getFullUsers(keys?: string[]): Promise<UserResponse[]> {

@@ -119,7 +119,6 @@ export class GoogleUser extends User {
     logOut(): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             const auth2 = gapi.auth2.getAuthInstance();
-
             auth2.signOut().then(() => {
                 console.log('User signed out.');
                 resolve(true);
@@ -128,9 +127,8 @@ export class GoogleUser extends User {
             });
         });
     }
-
-
 }
+
 export class FacebookUser extends User {
     authToken: string;
     constructor(fbResponse: FB.LoginStatusResponse, dentedLotusUser: UserResponse, id_token: string, context: UserContext) {

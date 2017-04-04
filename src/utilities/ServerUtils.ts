@@ -5,7 +5,6 @@ import { RaceResponse } from "../../common/models/Race";
 import { UserPickPayload } from "../../common/models/Prediction";
 import { TeamResponse } from "../../common/models/Team";
 import { UserResponse } from "../../common/models/User";
-import { SignupInfo } from "../../common/models/Signup";
 import { BlogResponse } from "../../common/models/Blog";
 import { PublicUser } from "../../common/models/User";
 import { PredictionResponse } from "../../common/models/Prediction";
@@ -312,27 +311,6 @@ export function saveUserPicks(picks: UserPickPayload[], id_token: string): Promi
             });
         }).catch(error => {
             reject(error);
-        });
-    });
-}
-
-export function signup(info: SignupInfo): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-        return fetch(`${baseUrl}/signup`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(info)
-        }).then(response => {
-            return response.json().then(json => {
-                if (response.ok) {
-                    resolve(true);
-                }
-                else {
-                    reject(new Error(json.message));
-                }
-            });
         });
     });
 }

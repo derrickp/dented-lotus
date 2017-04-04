@@ -218,6 +218,5 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             <Banner key={"banner"} doFacebookLogin={fbLogin} user={this.stateManager.user} logout={this.stateManager.signOut} loggedIn={this.state.loggedIn} doGoogleLogin={googleLogin} changePage={this.changePage} title="Project Dented Lotus" />
             {mainContent}
         </div>;
-
     }
 }

@@ -8,7 +8,6 @@ import { TrackResponse, TrackModel } from "../common/models/Track";
 import { DriverModel, DriverModelContext, DriverResponse } from "../common/models/Driver";
 import { PredictionResponse, PredictionModel, PredictionContext, UserPickPayload } from "../common/models/Prediction";
 import { TeamModel, TeamResponse } from "../common/models/Team";
-import { SignupInfo } from "../common/models/Signup";
 import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
 import {
     getAllTracks,
@@ -26,11 +25,10 @@ import {
     getDriver,
     getRace,
     saveTeams,
-    signup,
     getAllSeasonPredictions,
     getAllPublicUsers,
     saveUserInfo
-} from "./utilities/ServerUtils"
+} from "./utilities/ServerUtils";
 
 
 export class StateManager {
@@ -39,11 +37,7 @@ export class StateManager {
     fbLoaded: boolean;
     googleLoaded: boolean;
 
-    races: RaceModel[] = [];
     blogs: BlogResponse[] = [];
-    teams: TeamModel[] = [];
-    drivers: DriverModel[] = [];
-    tracks: TrackResponse[] = [];
     publicUsers: PublicUser[] = [];
 
     private _watches: Map<string, Function[]> = new Map<string, Function[]>();
@@ -52,9 +46,9 @@ export class StateManager {
     private _raceMap: Map<string, RaceModel> = new Map<string, RaceModel>();
     private _driverMap: Map<string, DriverModel> = new Map<string, DriverModel>();
     private _teamMap: Map<string, TeamModel> = new Map<string, TeamModel>();
+    private _trackMap: Map<string, TrackResponse> = new Map<string, TrackResponse>();
 
     constructor() {
-        this.signup = this.signup.bind(this);
         this.signOut = this.signOut.bind(this);
         this.completeGoogleLogin = this.completeGoogleLogin.bind(this);
         this.saveDriver = this.saveDriver.bind(this);
@@ -81,6 +75,10 @@ export class StateManager {
         this.refreshAllUsers();
     }
 
+    get teams(): TeamModel[] {
+        return Array.from(this._teamMap.values());
+    }
+
     refreshTeams(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             return getAllTeams().then(teamResponses => {
@@ -89,7 +87,6 @@ export class StateManager {
                     const team = this._getTeam(teamResponse);
                     teams.push(team);
                 }
-                this.teams = teams;
                 this._publishWatches("teams");
                 resolve();
             });
@@ -102,11 +99,15 @@ export class StateManager {
                 const driverModels: DriverModel[] = driverResponses.map(dr => {
                     return this._getDriver(dr);
                 });
-                this.drivers = driverModels.sort((a, b) => { return a.team.name.localeCompare(b.team.name); });
                 this._publishWatches("drivers");
                 resolve();
             });
         });
+    }
+
+    get drivers() {
+        const drivers = Array.from(this._driverMap.values()).sort((a, b) => { return a.team.name.localeCompare(b.team.name); });
+        return drivers;
     }
 
     get user(): User {
@@ -118,10 +119,13 @@ export class StateManager {
         this._publishWatches("user");
     }
 
+    get races() {
+        return Array.from(this._raceMap.values());
+    }
+
     refreshRaces(): Promise<void> {
         if (!this.isLoggedIn) return Promise.resolve();
         return this._getAllRaces().then(raceModels => {
-            this.races = raceModels;
             this._publishWatches("races");
         });
     }
@@ -219,10 +223,17 @@ export class StateManager {
         };
     }
 
+    get tracks(): TrackResponse[] {
+        return Array.from(this._trackMap.values());
+    }
+
     refreshTracks(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
+            this._trackMap.clear();
             return getAllTracks().then(trackResponses => {
-                this.tracks = trackResponses;
+                for (const trackResponse of trackResponses) {
+                    this._trackMap.set(trackResponse.key, trackResponse);
+                }
                 this._publishWatches("tracks");
                 resolve();
             });
@@ -545,16 +556,6 @@ export class StateManager {
         return authenticate(authPayload).then(authResponse => {
             const googleUser = new GoogleUser(response, authResponse.user, authResponse.id_token, this.userContext);
             this.user = googleUser;
-        });
-    }
-
-    signup(type: string, info: SignupInfo): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            return signup(info).then(success => {
-                resolve(true);
-            }).catch((error: Error) => {
-                reject(error);
-            });
         });
     }
 }
