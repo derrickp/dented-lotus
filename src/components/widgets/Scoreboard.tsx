@@ -39,31 +39,22 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
      */
     constructor(props: ScoreboardProps) {
         super(props);
-        let entrants;
-        switch (props.type) {
-            case ScoreboardType.DRIVERS:
-                entrants = props.drivers;
-                break;
-            case ScoreboardType.USERS:
-                entrants = props.publicUsers;
-                break;
-        }
-
-        entrants.forEach((e, i) => {
-            e.key = e.key ? e.ekey : UUID();
-            e.position = i + 1;
-        });
 
         this.state = {
-            entrants: entrants.slice(0, this.props.count)
+            entrants: this.getEntrants(props)
         }
     }
 
     componentWillReceiveProps(newProps: ScoreboardProps) {
+
+        this.setState({ entrants: this.getEntrants(newProps) });
+    }
+
+    getEntrants(props: ScoreboardProps): CanShowOnScoreboard[] {
         let entrants: CanShowOnScoreboard[];
-        switch (newProps.type) {
+        switch (props.type) {
             case ScoreboardType.DRIVERS:
-                entrants = newProps.drivers.slice(0, newProps.count).map((driver: DriverModel, index: number) => {
+                entrants = props.drivers.slice(0, props.count).map((driver: DriverModel, index: number) => {
                     const entrant: CanShowOnScoreboard = {
                         key: driver.key,
                         display: driver.name,
@@ -74,9 +65,9 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
                 });
                 break;
             case ScoreboardType.USERS:
-                entrants = newProps.publicUsers.sort((publicUser1, publicUser2) => {
+                entrants = props.publicUsers.sort((publicUser1, publicUser2) => {
                     return publicUser2.points - publicUser1.points;
-                }).slice(0, newProps.count).map((publicUser: PublicUser, index: number) => {
+                }).slice(0, props.count).map((publicUser: PublicUser, index: number) => {
                     const entrant: CanShowOnScoreboard = {
                         key: UUID(),
                         display: publicUser.display,
@@ -87,8 +78,7 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
                 });
                 break;
         }
-
-        this.setState({ entrants: entrants });
+        return entrants;
     }
 
     render() {
