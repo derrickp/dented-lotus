@@ -9,14 +9,13 @@ import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, AllSeasonPicks, 
 import { RaceModel } from "../../common/models/Race";
 import { TeamModel } from "../../common/models/Team";
 import { DriverModel } from "../../common/models/Driver";
+import { TrackResponse, TrackModel } from "../../common/models/Track";
 import { BlogResponse } from "../../common/models/Blog";
 import { PredictionModel } from "../../common/models/Prediction";
 import { getUrlParameters } from "../utilities/PageUtilities";
-import { User } from "../../common/models/User";
+import { User, PublicUser } from "../../common/models/User";
 import {Scoreboard} from "./widgets/Scoreboard";
-window.onerror = function(error) {
-    alert(error);
-};
+
 export interface DentedLotusProps {
     stateManager: StateManager;
 }
@@ -35,7 +34,10 @@ export interface DentedLotusState {
     race: RaceModel;
     drivers: DriverModel[];
     blogs: BlogResponse[];
+    tracks: TrackResponse[];
     allSeasonPredictions: PredictionModel[];
+    publicUsers: PublicUser[];
+    user: User;
     haveGoogleApi: boolean;
     haveFacebookApi: boolean;
 }
@@ -59,32 +61,37 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             races: [],
             teams: [],
             blogs: [],
+            tracks: [],
+            publicUsers: [],
             allSeasonPredictions: [],
+            user: null,
             haveGoogleApi: this.stateManager.googleLoaded,
             haveFacebookApi: this.stateManager.fbLoaded
         };
+
         this.launchNextRacePicks = this.launchNextRacePicks.bind(this);
-        this.changePage = this.changePage.bind(this);
         this.changeRace = this.changeRace.bind(this);
-        this.launchAllSeasonPicks = this.launchAllSeasonPicks.bind(this);
+        this.changePage = this.changePage.bind(this);
 
         this.stateManager.watch("user", () => {
+            this.setState({ user: this.stateManager.user });
             this.onUserChange();
         });
+
         this.stateManager.watch("races", () => {
-            this.stateManager.races.then(races => {
-                this.setState({ races: races });
-            });
+            this.setState({ races: this.stateManager.races });
         });
+
         this.stateManager.watch("teams", () => {
-            this.stateManager.teams.then(teams => {
-                this.setState({ teams: teams });
-            });
+            this.setState({ teams: this.stateManager.teams });
         });
+
         this.stateManager.watch("drivers", () => {
-            this.stateManager.drivers.then(drivers => {
-                this.setState({ drivers: drivers });
-            });
+            this.setState({ drivers: this.stateManager.drivers });
+        });
+
+        this.stateManager.watch("tracks", () => {
+            this.setState({ tracks: this.stateManager.tracks });
         });
 
         this.stateManager.watch("googleLogin", () => { 
@@ -94,11 +101,16 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         this.stateManager.watch("facebookLogin", () => { 
             if (this._mounted) this.setState({ haveFacebookApi: true });
         });
-        this.stateManager.initialize();
 
         this.stateManager.watch("blogs", () => {
             this.setState({ blogs: this.stateManager.blogs });
         });
+
+        this.stateManager.watch("publicUsers", () => {
+            this.setState({ publicUsers: this.stateManager.publicUsers });
+        });
+
+        this.stateManager.initialize();
     }
 
     componentDidMount() {
@@ -113,6 +125,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             parameters.page = Pages.HOME;
             this.setState({ loggedIn: loggedIn, parameters: parameters });
         } else {
+            this.stateManager.refreshRaces();
             this.setState({ loggedIn: loggedIn });
         }
     }
@@ -120,10 +133,8 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     launchNextRacePicks() {
         let parameters = this.state.parameters;
         parameters.page = Pages.RACE;
-        this.stateManager.nextRace.then(race => {
-            return this.stateManager.getRace(race.key);
-        }).then(race => {
-            this.setState({ parameters: parameters, race: race });
+        this.stateManager.getRace(this.stateManager.nextRace.key).then(raceModel => {
+            this.setState({ parameters: parameters, race: raceModel });
         });
     }
 
@@ -142,8 +153,8 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         
         switch(page) {
             case Pages.BLOGS:
-                this.stateManager.refreshBlogs().then((blogs) => {
-                    this.setState({ parameters: parameters });
+                this.stateManager.refreshBlogs().then(() => {
+                    this.setState({ parameters: parameters, blogs: this.stateManager.blogs });
                 });
                 break;
             default:
@@ -171,7 +182,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             case Pages.ALL_RACES:
                 return <AllRaces raceClick={this.changeRace} races={this.state.races} selectedRace={this.state.race} />;
             case Pages.TRACKS:
-                return <Tracks tracks={this.stateManager.tracks} />;
+                return <Tracks tracks={this.state.tracks} />;
             case Pages.DRIVERS:
                 return <Drivers drivers={this.state.drivers} teams={this.state.teams} userIsAdmin={this.stateManager.user && this.stateManager.user.isAdmin} createDriver={this.stateManager.createDriver} createTeam={this.stateManager.createTeam} />
             case Pages.ALL_SEASON_PICKS:
@@ -188,7 +199,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             {this.stateManager.isLoggedIn && <RaceCountdown key={1} clickMakeAllSeasonPicks={this.launchAllSeasonPicks} clickMakeNextRacePicks={this.launchNextRacePicks} race={this.stateManager.nextRace} />}
             <Grid>
                 <Row>
-                    <Col xs={12} mdPush={9} md={3}><Scoreboard stateManager={this.stateManager} type="users" title="Standings" count={5} /></Col>
+                    <Col xs={12} mdPush={9} md={3}><Scoreboard publicUsers={this.state.publicUsers} drivers={this.state.drivers} user={this.state.user} type="users" title="Standings" count={this.state.publicUsers.length} /></Col>
                     <Col xs={12} mdPull={3} md={9}><Blogs key={2} blogs={this.state.blogs} fromHomePanel={true} showAddButton={false} saveNewBlog={null} numBlogs={3} /></Col>
                 </Row>
             </Grid>

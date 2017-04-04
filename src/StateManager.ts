@@ -38,14 +38,15 @@ export class StateManager {
     private _googleAuth: gapi.auth2.GoogleAuth;
     fbLoaded: boolean;
     googleLoaded: boolean;
+
+    races: RaceModel[] = [];
+    blogs: BlogResponse[] = [];
+    teams: TeamModel[] = [];
+    drivers: DriverModel[] = [];
+    tracks: TrackResponse[] = [];
+    publicUsers: PublicUser[] = [];
+
     private _watches: Map<string, Function[]> = new Map<string, Function[]>();
-
-    private _blogs: BlogResponse[] = [];
-
-    private _tracks: Promise<TrackResponse[]>;
-    private _drivers: Promise<DriverModel[]>;
-    private _races: Promise<RaceModel[]>;
-    private _teams: Promise<TeamModel[]>;
     private _user: User;
 
     private _raceMap: Map<string, RaceModel> = new Map<string, RaceModel>();
@@ -69,42 +70,42 @@ export class StateManager {
     initialize() {
         this._initFacebook();
         this._initGoogle();
-
-        this.teams.then(() => {
+        this.refreshTeams().then(() => {
             console.log("got teams");
         });
-        this.drivers.then(() => {
+        this.refreshDrivers().then(() => {
             console.log("got drivers");
         });
         this.refreshBlogs();
+        this.refreshTracks();
+        this.refreshAllUsers();
     }
 
-    private _allUsers: Promise<PublicUser[]>;
-    get teams(): Promise<TeamModel[]> {
-        this._teams = this._teams ? this._teams : new Promise<TeamModel[]>((resolve, reject) => {
+    refreshTeams(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
             return getAllTeams().then(teamResponses => {
                 const teams: TeamModel[] = [];
                 for (const teamResponse of teamResponses) {
-                    const team = this.getTeam(teamResponse);
+                    const team = this._getTeam(teamResponse);
                     teams.push(team);
                 }
-                resolve(teams);
+                this.teams = teams;
+                this._publishWatches("teams");
+                resolve();
             });
         });
-        return this._teams;
     }
 
-    refreshTeams() {
-        this._teams = null;
-        this.teams.then((teams) => {
-            this._publishWatches("teams");
-        });
-    }
-
-    refreshDrivers() {
-        this._drivers = null;
-        this.drivers.then(drivers => {
-            this._publishWatches("drivers");
+    refreshDrivers(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            return getAllDrivers().then((driverResponses: DriverModel[]) => {
+                const driverModels: DriverModel[] = driverResponses.map(dr => {
+                    return this._getDriver(dr);
+                });
+                this.drivers = driverModels.sort((a, b) => { return a.team.name.localeCompare(b.team.name); });
+                this._publishWatches("drivers");
+                resolve();
+            });
         });
     }
 
@@ -117,10 +118,12 @@ export class StateManager {
         this._publishWatches("user");
     }
 
-    get races(): Promise<RaceModel[]> {
-        if (!this.isLoggedIn) return Promise.resolve(null);
-        this._races = this._races ? this._races : this._getRaces();
-        return this._races;
+    refreshRaces(): Promise<void> {
+        if (!this.isLoggedIn) return Promise.resolve();
+        return this._getAllRaces().then(raceModels => {
+            this.races = raceModels;
+            this._publishWatches("races");
+        });
     }
 
     getRace(key: string): Promise<RaceModel> {
@@ -131,7 +134,6 @@ export class StateManager {
                     this._raceMap.delete(model.key);
                 }
                 this._raceMap.set(model.key, model);
-                this._publishWatches("races");
                 resolve(model);
             });
         });
@@ -151,7 +153,7 @@ export class StateManager {
                 return new TrackModel(response);
             },
             getDriver: (response: DriverResponse): DriverModel => {
-                return this.getDriver(response);
+                return this._getDriver(response);
             },
             getPrediction: (response: PredictionResponse): PredictionModel => {
                 return new PredictionModel(response, this.predictionContext);
@@ -160,16 +162,16 @@ export class StateManager {
         return context;
     }
 
-    private _getRaces(): Promise<RaceModel[]> {
+    private _getAllRaces(): Promise<RaceModel[]> {
         return new Promise<RaceModel[]>((resolve, reject) => {
+            this._raceMap.clear();
             return getAllRaces(2017, this.user.id_token).then((raceResponses: RaceResponse[]) => {
                 const raceModels: RaceModel[] = raceResponses.map(rr => {
                     return new RaceModel(rr, this.raceModelContext);
                 });
                 for (const raceModel of raceModels) {
-                    if (!this._raceMap.has(raceModel.key)) this._raceMap.set(raceModel.key, raceModel);
+                    this._raceMap.set(raceModel.key, raceModel);
                 }
-                this._publishWatches("races");
                 resolve(raceModels);
             });
         });
@@ -190,7 +192,7 @@ export class StateManager {
                 return saveUserPicks(payload, this.user.id_token);
             },
             getDriver: (response: DriverResponse) => {
-                return this.getDriver(response);
+                return this._getDriver(response);
             },
             getTeam: (response: TeamResponse) => {
                 return new TeamModel(response);
@@ -198,7 +200,7 @@ export class StateManager {
         }
     }
 
-    getDriver(response: DriverResponse): DriverModel {
+    private _getDriver(response: DriverResponse): DriverModel {
         if (this._driverMap.has(response.key)) return this._driverMap.get(response.key);
         const driverModel = new DriverModel(response, this.driverContext);
         this._driverMap.set(response.key, driverModel);
@@ -212,59 +214,48 @@ export class StateManager {
                 return this.saveDriver(driver);
             },
             getTeam: (response: TeamResponse) => {
-                return this.getTeam(response);
+                return this._getTeam(response);
             }
         };
     }
 
-    get blogs() {
-        return this._blogs;
-    }
-
-    get tracks(): Promise<TrackResponse[]> {
-        this._tracks = this._tracks ? this._tracks : getAllTracks();
-        return this._tracks;
+    refreshTracks(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            return getAllTracks().then(trackResponses => {
+                this.tracks = trackResponses;
+                this._publishWatches("tracks");
+                resolve();
+            });
+        });
     }
 
     get isLoggedIn(): boolean {
         return this.user != null && this.user.isLoggedIn;
     }
 
-    get drivers(): Promise<DriverModel[]> {
-        this._drivers = this._drivers ? this._drivers : new Promise<DriverModel[]>((resolve, reject) => {
-            return getAllDrivers().then((driverResponses: DriverModel[]) => {
-                const driverModels: DriverModel[] = driverResponses.map(dr => {
-                    return this.getDriver(dr);
-                });
-                resolve(driverModels.sort((a, b) => { return a.team.name.localeCompare(b.team.name); }));
-            });
-        });
-
-        return this._drivers;
-    }
-
-    get allUsers(): Promise<PublicUser[]> {
-        return this._allUsers ? this._allUsers : new Promise<PublicUser[]>((resolve, reject) => {
+    refreshAllUsers(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
             return getAllPublicUsers().then((users: PublicUser[]) => {
-                resolve(users);
+                this.publicUsers = users;
+                this._publishWatches("publicUsers");
+                resolve();
             });
         });
     }
 
-    refreshBlogs(): Promise<BlogResponse[]> {
-        return new Promise((resolve, reject) => {
+    refreshBlogs(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
             return getBlogs().then(blogResponses => {
                 blogResponses.sort((a: BlogResponse, b: BlogResponse) => {
                     return (moment(b.postDate, FULL_FORMAT).diff(moment(a.postDate, FULL_FORMAT)));
                 });
-                this._blogs = blogResponses;
+                this.blogs = blogResponses;
                 this._publishWatches("blogs");
-                resolve(blogResponses);
+                resolve();
             });
         });
     }
 
-    private _allSeasonPredictions: Promise<PredictionModel[]>;
     get allSeasonPredictions(): Promise<PredictionModel[]> {
         return new Promise<PredictionModel[]>((resolve, reject) => {
             return getAllSeasonPredictions(this.user.id_token).then(predictionResponses => {
@@ -369,20 +360,18 @@ export class StateManager {
         }
     }
 
-    get nextRace(): Promise<RaceModel> {
-        return new Promise<RaceModel>((resolve, reject) => {
-            return this.races.then((races: RaceModel[]) => {
-                let nextRace: RaceModel;
-                races.some(r => {
-                    if (!r.complete) {
-                        nextRace = r;
-                        return true;
-                    }
-                    return false;
-                });
-                resolve(nextRace);
-            });
-        });
+    get nextRace(): RaceModel {
+        if (!this.races.length) {
+            return null;
+        }
+        let nextRace: RaceModel;
+        for (const race of this.races) {
+            if (!race.complete) {
+                nextRace = race;
+                break;
+            }
+        }
+        return nextRace;
     }
 
     signOut(): void {
@@ -403,7 +392,7 @@ export class StateManager {
                         if (this._driverMap.has(newDriverResponse.key)) {
                             this._driverMap.delete(newDriverResponse.key);
                         }
-                        newDriverModels.push(this.getDriver(newDriverResponse));
+                        newDriverModels.push(this._getDriver(newDriverResponse));
                     }
                 }
                 resolve(newDriverModels[0]);
@@ -445,7 +434,7 @@ export class StateManager {
                     if (this._driverMap.has(newDriverResponse.key)) {
                         this._driverMap.delete(newDriverResponse.key);
                     }
-                    const newDriverModel = this.getDriver(newDriverResponse);
+                    const newDriverModel = this._getDriver(newDriverResponse);
                 }
                 resolve(true);
             });
@@ -462,7 +451,7 @@ export class StateManager {
                         if (this._driverMap.has(newDriverResponse.key)) {
                             this._driverMap.delete(newDriverResponse.key);
                         }
-                        newDriverModels.push(this.getDriver(newDriverResponse));
+                        newDriverModels.push(this._getDriver(newDriverResponse));
                     }
                 }
                 resolve(newDriverModels);
@@ -480,7 +469,7 @@ export class StateManager {
                         if (this._teamMap.has(newTeamResponse.key)) {
                             this._teamMap.delete(newTeamResponse.key);
                         }
-                        newTeamModels.push(this.getTeam(newTeamResponse));
+                        newTeamModels.push(this._getTeam(newTeamResponse));
                     }
                 }
                 resolve(true);
@@ -498,7 +487,7 @@ export class StateManager {
                         if (this._teamMap.has(newTeamResponse.key)) {
                             this._teamMap.delete(newTeamResponse.key);
                         }
-                        newTeamModels.push(this.getTeam(newTeamResponse));
+                        newTeamModels.push(this._getTeam(newTeamResponse));
                     }
                 }
                 resolve(newTeamModels);
@@ -506,7 +495,7 @@ export class StateManager {
         });
     }
 
-    getTeam(teamResponse: TeamResponse): TeamModel {
+    private _getTeam(teamResponse: TeamResponse): TeamModel {
         if (this._teamMap.has(teamResponse.key)) return this._teamMap.get(teamResponse.key);
         const model = new TeamModel(teamResponse);
         this._teamMap.set(teamResponse.key, model);

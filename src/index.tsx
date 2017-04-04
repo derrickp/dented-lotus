@@ -4,6 +4,10 @@ import * as ReactDOM from "react-dom";
 import { StateManager } from "./StateManager";
 import {DentedLotus} from "./components/DentedLotus";
 
+window.onerror = function(error) {
+    alert(error);
+};
+
 // Create our singleton little state manager. This will be the arbiter for data in the application.
 // It will be the single source for data. Allowing us to easily manage it all in one location.
 const stateManager = new StateManager();

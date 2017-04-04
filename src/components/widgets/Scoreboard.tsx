@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Button, Glyphicon, Panel, Table } from "react-bootstrap";
 import { DriverModel } from "../../../common/models/Driver";
-import { User } from "../../../common/models/User";
+import { User, PublicUser } from "../../../common/models/User";
 import { StateManager } from "../../StateManager";
 import * as UUID from "uuid/v1";
 export class ScoreboardType {
@@ -14,9 +14,12 @@ export interface ScoreboardProps {
     count: number;
     /**Scoreboard Type: Drivers or Users */
     type: string;
-    stateManager: StateManager;
+    publicUsers: PublicUser[];
+    user: User;
+    drivers: DriverModel[];
     title: string;
 }
+
 export interface CanShowOnScoreboard {
     points: number;
     display: string;
@@ -36,34 +39,56 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
      */
     constructor(props: ScoreboardProps) {
         super(props);
-        let prom;
+        let entrants;
         switch (props.type) {
             case ScoreboardType.DRIVERS:
-                prom = props.stateManager.drivers;
+                entrants = props.drivers;
                 break;
             case ScoreboardType.USERS:
-                prom = props.stateManager.allUsers;
+                entrants = props.publicUsers;
                 break;
         }
+
+        entrants.forEach((e, i) => {
+            e.key = e.key ? e.ekey : UUID();
+            e.position = i + 1;
+        });
+
         this.state = {
-            entrants: []
+            entrants: entrants.slice(0, this.props.count)
         }
-        prom.then((entrants: CanShowOnScoreboard[]) => {
-            entrants.forEach((e, i) => {
-                e.key = UUID();
-                e.position = i + 1;
-            })
-            // entrants.sort((a, b) => {
-            //     if (this.state.sortDir && this.state.sortDir == "ASC") {
-            //         return a.points - b.points;
-            //     } else {
-            //         return b.points - a.points;
-            //     }
-            // })
-            this.setState({
-                entrants: entrants.slice(0, this.props.count)
-            })
-        })
+    }
+
+    componentWillReceiveProps(newProps: ScoreboardProps) {
+        let entrants: CanShowOnScoreboard[];
+        switch (newProps.type) {
+            case ScoreboardType.DRIVERS:
+                entrants = newProps.drivers.slice(0, newProps.count).map((driver: DriverModel, index: number) => {
+                    const entrant: CanShowOnScoreboard = {
+                        key: driver.key,
+                        display: driver.name,
+                        points: driver.points,
+                        position: index + 1
+                    };
+                    return entrant;
+                });
+                break;
+            case ScoreboardType.USERS:
+                entrants = newProps.publicUsers.sort((publicUser1, publicUser2) => {
+                    return publicUser2.points - publicUser1.points;
+                }).slice(0, newProps.count).map((publicUser: PublicUser, index: number) => {
+                    const entrant: CanShowOnScoreboard = {
+                        key: UUID(),
+                        display: publicUser.display,
+                        points: publicUser.points,
+                        position: index + 1
+                    };
+                    return entrant;
+                });
+                break;
+        }
+
+        this.setState({ entrants: entrants });
     }
 
     render() {

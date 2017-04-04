@@ -6,7 +6,7 @@ import * as moment from "moment";
 import { Jumbotron, Button, ButtonToolbar } from "react-bootstrap";
 
 export interface RaceCountdownProps {
-    race: Promise<RaceModel>;
+    race: RaceModel;
     clickMakeNextRacePicks: () => void;
     clickMakeAllSeasonPicks: () => void;
 }
@@ -17,7 +17,6 @@ export interface RaceCountdownState {
 
 export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
     interval;
-    nextRace: RaceModel;
     /**
      *
      */
@@ -25,9 +24,6 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
         super(props);
         this.state = { timeRemaining: "" };
         this.tick = this.tick.bind(this);
-        props.race.then(race => {
-            this.nextRace = race;
-        });
     }
 
     componentDidMount() {
@@ -39,32 +35,34 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
     }
 
     tick() {
-        if (!this.nextRace) {
+        if (!this.props.race) {
             return;
         }
-        const dFromNow = getDurationFromNow(this.nextRace.raceDate);
+        const dFromNow = getDurationFromNow(this.props.race.raceDate);
         this.setState({ timeRemaining: dFromNow.fullDuration });
     }
-    render() { 
-        const allSeasonDFromNow = getDurationFromNow("04/20/2017"); 
+    render() {
+        const allSeasonDFromNow = getDurationFromNow("04/20/2017");
         const jumbo =
             <Jumbotron className="jumbotron">
                 <div className="container">
-                <h1>Next Race!</h1>
-                    { this.nextRace ? <div className="row">
-                        <div className="col-md-4 col-sm-8">
-                            <p>{this.nextRace.raceResponse.displayName}</p>
-                            <p>{this.state.timeRemaining}</p>
+                    <h1>Next Race!</h1>
+                    {this.props.race ? <div>
+                        <div className="row">
+                            <div className="col-md-4 col-sm-8">
+                                <p>{this.props.race.raceResponse.displayName}</p>
+                                <p>{this.state.timeRemaining}</p>
+                            </div>
                         </div>
-                    </div>: <span className="race-countdown">Loading race countdown...</span>
+                        <div className="row">
+                            <div className="col-md-4 col-sm-8">
+                                <Button block={true} onClick={this.props.clickMakeNextRacePicks} bsSize="large" bsStyle="primary" >Make Your Picks</Button></div>
+                            <div className="col-md-4 col-sm-8">
+                                {allSeasonDFromNow.timeRemaining > 0 && <Button block={true} bsSize="large" bsStyle="primary" onClick={this.props.clickMakeAllSeasonPicks}>Make All Season Picks</Button>}
+                            </div>
+                        </div>
+                    </div> : <span className="race-countdown">Loading race countdown...</span>
                     }
-                    <div className="row">
-                        <div className="col-md-4 col-sm-8">
-                            <Button block={true} onClick={this.props.clickMakeNextRacePicks} bsSize="large" bsStyle="primary" >Make Your Picks</Button></div>
-                        <div className="col-md-4 col-sm-8">
-                            {allSeasonDFromNow.timeRemaining > 0 && <Button block={true} bsSize="large" bsStyle="primary" onClick={this.props.clickMakeAllSeasonPicks}>Make All Season Picks</Button>}
-                        </div>
-                    </div>
                 </div>
             </Jumbotron>;
         return jumbo;

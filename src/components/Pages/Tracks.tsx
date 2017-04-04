@@ -4,39 +4,31 @@ import { TrackResponse as TrackModel } from "../../../common/models/Track";
 import { TrackPage } from "./TrackPage";
 
 export interface TracksProps {
-    tracks: Promise<TrackModel[]>;
+    tracks: TrackModel[];
 }
 
 export interface TracksState {
-    tracks: TrackModel[];
 }
 
 export class Tracks extends React.Component<TracksProps, TracksState> {
     constructor(props: TracksProps) {
         super(props);
-        this.state = {
-            tracks: []
-        };
-        this.props.tracks.then(tracks => {
-            tracks.sort((track1, track2) => {
-                if (track1.name < track2.name) {
-                    return -1;
-                }
-                if (track1.name > track2.name) {
-                    return 1;
-                }
-                return 0;
-            });
-            this.setState({tracks: tracks});
+
+        const tracks = this.props.tracks.sort((track1, track2) => {
+            return track1.name.localeCompare(track2.name);
         });
+
+        this.state = { };
     }
 
     render() {
-        if (!this.state.tracks.length) {
+        if (!this.props.tracks.length) {
             return <div>Loading...</div>;
         }
-        const entries = this.state.tracks.map(track => {
-            return <li key={track.key} className="dl-panel"><TrackPage key={track.key} track={track} small={true}/></li>
+        const entries = this.props.tracks.sort((track1, track2) => {
+            return track1.name.localeCompare(track2.name);
+        }).map(track => {
+            return <li key={track.key} className="dl-panel"><TrackPage key={track.key} track={track} small={true} /></li>
         });
         return <ul>{entries}</ul>
     }
