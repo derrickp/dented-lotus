@@ -11,3 +11,6 @@ dist/**
 !webpack.config.js
 !gulpfile.js
 !.eslintrc.js
+_db_backups
+*.log
+*.out
