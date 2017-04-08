@@ -8,7 +8,15 @@ import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";
 import { createToken, checkAndDecodeToken } from "../utilities/token";
-import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys, getAllPublicUsers } from "../utilities/data/users";
+import {
+    getFullUsers,
+    updateUser,
+    saveUser,
+    getUsersByEmail,
+    getUsersByKeys,
+    getAllPublicUsers,
+    deleteUser
+} from "../utilities/data/users";
 const base64url = require("base64-url");
 
 export const userRoutes: IRouteConfiguration[] = [
@@ -45,7 +53,7 @@ export const userRoutes: IRouteConfiguration[] = [
                     newUser.role = userPayload.role && isAdmin ? userPayload.role : existingUser.role;
                     newUser.points = userPayload.points && isAdmin ? userPayload.points : existingUser.points;
                     await updateUser(newUser);
-                    res({success: true});
+                    res({ success: true });
                 }
                 catch (exception) {
                     console.error(exception);
@@ -59,7 +67,7 @@ export const userRoutes: IRouteConfiguration[] = [
         }
     },
     {
-        method: 'POST', 
+        method: 'POST',
         path: '/users',
         config: {
             // Before the route handler runs, verify that
@@ -124,13 +132,19 @@ export const userRoutes: IRouteConfiguration[] = [
         path: '/users/{key}',
         config: {
             cors: true,
-            handler: (req, res) => {
+            handler: async (req, res) => {
                 let credentials = req.auth.credentials;
                 if (req.params["key"] === credentials.key) {
                     res(Boom.badRequest("cannot delete own user"));
                     return;
                 }
-
+                try {
+                    await deleteUser(req.params["key"]);
+                    res({ success: true });
+                }
+                catch (exception) {
+                    res(Boom.badRequest(exception));
+                }
             },
             auth: {
                 strategies: ['jwt'],
