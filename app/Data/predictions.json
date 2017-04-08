@@ -3,7 +3,7 @@
     "key": "top-3",
     "allSeason": false,
     "title": "Top 3",
-    "description": "Top 3 drivers of the race",
+    "description": "One of the top 3 at the end of the race",
     "type": "driver"
   },
   {
@@ -75,5 +75,19 @@
     "title": "Biggest Surprise (Team edition)",
     "description": "What team do you think will be the biggest surpise of the season. This could be in a good or bad way.",
     "type": "team"
+  },
+  {
+    "key": "most-positions-gained",
+    "allSeason": false,
+    "title": "Most positions gained",
+    "description": "The driver that will finish the most places ahead of where they started (started on the grid in 17th, finished in 10th)",
+    "type": "driver"
+  },
+  {
+    "key": "most-positions-lost",
+    "allSeason": false,
+    "title": "Most positions lost",
+    "description": "The driver that finished the most places behind where they started (started on the grid in 4th, finished in 10th). They have to actually place at the end of the race (no DNF)",
+    "type": "driver"
   }
 ]

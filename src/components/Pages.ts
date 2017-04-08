@@ -20,4 +20,5 @@ export class Pages {
     static ALL_SEASON_PICKS = "all-season-picks";
     static BLOGS = "blogs";
     static PROFILE = "profile";
+    static PREDICTIONS_ADMIN = "predictions-admin";
 }

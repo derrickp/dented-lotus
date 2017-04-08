@@ -154,7 +154,12 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         switch(page) {
             case Pages.BLOGS:
                 this.stateManager.refreshBlogs().then(() => {
-                    this.setState({ parameters: parameters, blogs: this.stateManager.blogs });
+                    this.setState({ parameters: parameters });
+                });
+                break;
+            case Pages.PREDICTIONS_ADMIN:
+                this.stateManager.refreshRaces().then(() => {
+                    this.setState({ parameters: parameters });
                 });
                 break;
             default:
@@ -189,6 +194,8 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
                 return <AllSeasonPicks predictions={this.state.allSeasonPredictions} />
             case Pages.PROFILE:
                 return <Profile drivers={this.state.drivers} teams={this.state.teams} user={this.stateManager.user} thisUser={this.stateManager.user}></Profile>
+            case Pages.PREDICTIONS_ADMIN:
+                return <div>Predictions Admin</div>;
             default:
                 return this.getHomePage();
         }

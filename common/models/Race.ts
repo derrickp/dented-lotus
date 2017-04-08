@@ -8,7 +8,8 @@ export interface RaceModelContext {
     getDriver?: (response: DriverResponse) => DriverModel;
     saveRace?: (model: RaceModel) => Promise<boolean>;
     getPrediction?: (response: PredictionResponse) => PredictionModel;
-    refresh?:(race:RaceModel)=>Promise<void>;
+    saveRacePredictions?: (model: RaceModel) => Promise<void>;
+    refresh?: (race: RaceModel) => Promise<RaceModel>;
 }
 
 export class RaceModel {
@@ -23,8 +24,8 @@ export class RaceModel {
     qualiDate?: string;
     cutoff?: string;
     predictions: PredictionModel[];
-    imageUrl:string;
-    info:string;
+    imageUrl: string;
+    info: string;
 
     constructor(race: RaceResponse, context?: RaceModelContext) {
         this.raceResponse = race;
@@ -42,7 +43,7 @@ export class RaceModel {
         else {
             this.cutoff = this.raceDate;
         }
-        this.predictions = race.predictions.map((p)=>{return context.getPrediction(p);});
+        this.predictions = race.predictions ? race.predictions.map((p) => { return context.getPrediction(p); }) : [];
         this.imageUrl = race.imageUrl;
         this._context = context;
         this.track = this._context.getTrack(race.track);
@@ -51,12 +52,10 @@ export class RaceModel {
         }
     }
 
-    async initialize(): Promise<void> {
-        
-    }
-
-    refresh():Promise<void>{
-        return this._context.refresh(this);
+    refresh(): Promise<void> {
+        return this._context.refresh(this).then(raceResponse => {
+            
+        });
     }
 
     save(): Promise<boolean> {
@@ -64,6 +63,24 @@ export class RaceModel {
             return Promise.reject(new Error("Need valid context to save"));
         }
         return this._context.saveRace(this);
+    }
+
+    addPrediction(predictionResponse: PredictionResponse) {
+        const predictionIndex = this.predictions.findIndex(p => p.predictionResponse.key === predictionResponse.key);
+        const prediction = this._context.getPrediction(predictionResponse)
+        if (predictionIndex) {
+            this.predictions.splice(predictionIndex, 1, prediction);
+        }
+        else {
+            this.predictions.push(prediction);
+        }
+    }
+
+    removePrediction(predictionResponse: PredictionResponse) {
+        const predictionIndex = this.predictions.findIndex(p => p.predictionResponse.key === predictionResponse.key);
+        if (predictionIndex >= 0) {
+            this.predictions.splice(predictionIndex, 1);
+        }
     }
 
     get json(): RaceResponse {
@@ -78,7 +95,7 @@ export class RaceModel {
             displayName: this.raceResponse.displayName,
             winner: this.winner ? this.winner.json : null,
             predictions: this.predictions.map(p => p.json),
-            imageUrl:"",
+            imageUrl: "",
             info: this.info
         };
         return raceResponse;
@@ -97,6 +114,19 @@ export interface RaceResponse {
     cutoff?: string;
     winner?: DriverResponse;
     predictions: PredictionResponse[];
-    imageUrl:string;
-    info:string;
+    imageUrl: string;
+    info: string;
+}
+
+export interface RacePrediction {
+    race: string;
+    prediction: string;
+    modifier: number;
+    value: number;
+}
+
+export interface PredictionChoices {
+    race: string;
+    prediction: string;
+    choices: string;
 }

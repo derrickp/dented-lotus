@@ -1,7 +1,7 @@
 
 import { TrackResponse } from "../../common/models/Track";
 import { DriverResponse } from "../../common/models/Driver";
-import { RaceResponse } from "../../common/models/Race";
+import { RaceResponse, RacePrediction, PredictionChoices } from "../../common/models/Race";
 import { UserPickPayload } from "../../common/models/Prediction";
 import { TeamResponse } from "../../common/models/Team";
 import { UserResponse } from "../../common/models/User";
@@ -94,7 +94,7 @@ export function getAllRaces(season: number, id_token: string): Promise<RaceRespo
 export function saveRaces(season: number, races: RaceResponse[], id_token: string): Promise<RaceResponse[]> {
     if (!id_token) return Promise.reject(new Error("Unauthorized"));
     return new Promise<RaceResponse[]>((resolve, reject) => {
-        return fetch(`${baseUrl}/races/${season}`, {
+        return fetch(`${baseUrl}/admin/races/${season}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -105,6 +105,50 @@ export function saveRaces(season: number, races: RaceResponse[], id_token: strin
             return response.json().then((raceResponses: RaceResponse[]) => {
                 resolve(raceResponses);
             });
+        });
+    });
+}
+
+export function saveRacePredictions(raceKey: string, racePredictions: RacePrediction[], id_token: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        return fetch(`${baseUrl}/admin/races/${raceKey}/predictions`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + id_token
+            },
+            body: JSON.stringify(racePredictions)
+        }).then(response => {
+            if (response.ok) {
+                resolve();
+            }
+            else {
+                return response.json().then(json => {
+                    reject(new Error(json.message));
+                });
+            }
+        });
+    });
+}
+
+export function savePredictionChoices(raceKey: string, predictionChoices: PredictionChoices[], id_token: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        return fetch(`${baseUrl}/admin/races/${raceKey}/predictions/choices`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + id_token
+            },
+            body: JSON.stringify(predictionChoices)
+        }).then(response => {
+            if (response.ok) {
+                resolve();
+            }
+            else {
+                return response.json().then(json => {
+                    reject(new Error(json.message));
+                });
+            }
         });
     });
 }

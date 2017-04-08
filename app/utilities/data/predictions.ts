@@ -3,6 +3,7 @@ import * as sqlite3 from "sqlite3";
 
 import { Credentials } from "../../../common/models/Authentication";
 import { PredictionResponse } from "../../../common/models/Prediction";
+import { RacePrediction } from "../../../common/models/Race";
 import { getDriverResponses } from "./drivers";
 import { getTeamResponses } from "./teams";
 
@@ -98,7 +99,7 @@ export function getPredictionChoices(prediction: string, race: string): Promise<
     });
 }
 
-export function savePredictionChoices(prediction: string, race: string, choices: string[]): Promise<boolean> {
+export function savePredictionChoices(prediction: string, race: string, choice: string): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         if (!prediction || !race) {
             reject(new Error("need race key and prediction key"));
@@ -120,18 +121,12 @@ export function savePredictionChoices(prediction: string, race: string, choices:
                             reject(beginError);
                             return;
                         }
-
-                        for (const choice of choices) {
-                            if (!choice) {
-                                continue;
-                            }
-                            const valuesObject = {
-                                1: race,
-                                2: prediction,
-                                3: choice,
-                            };
-                            db.run(insert, valuesObject);
-                        }
+                        const valuesObject = {
+                            1: race,
+                            2: prediction,
+                            3: choice,
+                        };
+                        db.run(insert, valuesObject);
                         db.exec("COMMIT;", (commitError) => {
                             if (commitError) {
                                 reject(commitError);
@@ -166,10 +161,10 @@ export function getUserPicks(userKey: string, raceKeys?: string[]): Promise<DbUs
     });
 }
 
-export function getAllSeasonValues(): Promise<DbRacePrediction[]> {
+export function getAllSeasonValues(): Promise<RacePrediction[]> {
     return new Promise((resolve, reject) => {
         const statement = `${racePredictionSelect} where race == '2017-season'`;
-        db.all(statement, (err, rows: DbRacePrediction[]) => {
+        db.all(statement, (err, rows: RacePrediction[]) => {
             if (err) {
                 reject(err);
                 return;
@@ -233,10 +228,10 @@ export function getPredictions(keys?: string[]): Promise<PredictionResponse[]> {
     });
 }
 
-export function getPredictionsForRace(raceKey: string): Promise<DbRacePrediction[]> {
-    return new Promise<DbRacePrediction[]>((resolve, reject) => {
+export function getPredictionsForRace(raceKey: string): Promise<RacePrediction[]> {
+    return new Promise<RacePrediction[]>((resolve, reject) => {
         let statement: string = `${racePredictionSelect} WHERE race = '${raceKey}'`;
-        db.all(statement, (err, rows: DbRacePrediction[]) => {
+        db.all(statement, (err, rows: RacePrediction[]) => {
             if (err) {
                 reject(err);
                 return;
@@ -247,8 +242,8 @@ export function getPredictionsForRace(raceKey: string): Promise<DbRacePrediction
     });
 }
 
-export function getRacePredictions(raceKeys?: string[]): Promise<DbRacePrediction[]> {
-    return new Promise<DbRacePrediction[]>((resolve, reject) => {
+export function getRacePredictions(raceKeys?: string[]): Promise<RacePrediction[]> {
+    return new Promise<RacePrediction[]>((resolve, reject) => {
         let statement: string;
         if (raceKeys && raceKeys.length) {
             const innerKeys = raceKeys.join("','");
@@ -257,7 +252,7 @@ export function getRacePredictions(raceKeys?: string[]): Promise<DbRacePredictio
         else {
             statement = racePredictionSelect;
         }
-        db.all(statement, (err, rows: DbRacePrediction[]) => {
+        db.all(statement, (err, rows: RacePrediction[]) => {
             if (err) {
                 reject(err);
                 return;
@@ -327,7 +322,7 @@ export function deleteRacePredictions(race: string, keys: string[]): Promise<boo
     });
 }
 
-export function updateRacePredictions(race: string, updates: DbRacePrediction[]): Promise<boolean> {
+export function updateRacePredictions(race: string, updates: RacePrediction[]): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         try {
             const insert = `INSERT OR REPLACE INTO racepredictions
@@ -407,13 +402,6 @@ export function updatePredictions(predictions: PredictionResponse[]): Promise<bo
             reject(exception);
         }
     });
-}
-
-export interface DbRacePrediction {
-    race: string;
-    prediction: string;
-    modifier: number;
-    value: number;
 }
 
 export interface DbBasePrediction {

@@ -16,14 +16,14 @@ import { getTrackResponses } from "../utilities/data/tracks";
 import {
     getPredictionResponses,
     updateRacePredictions,
-    DbRacePrediction,
+
     deleteRacePredictions,
     savePredictionChoices,
     getPredictionsForRace,
     getUserPicks
 } from "../utilities/data/predictions";
 import { getFullUsers, updateUser } from "../utilities/data/users";
-import { RaceResponse } from "../../common/models/Race";
+import { RacePrediction, RaceResponse, PredictionChoices } from "../../common/models/Race";
 import { TrackResponse } from "../../common/models/Track";
 import { DriverResponse } from "../../common/models/Driver";
 import { PredictionResponse } from "../../common/models/Prediction";
@@ -99,7 +99,7 @@ export const raceRoutes: IRouteConfiguration[] = [
                 }
                 try {
                     const success = await saveRaces(season, races);
-                    reply("done").code(201);
+                    reply({ success: true }).code(201);
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
                 }
@@ -120,12 +120,12 @@ export const raceRoutes: IRouteConfiguration[] = [
         config: {
             cors: true,
             handler: async (request, reply) => {
-                const adds: DbRacePrediction[] = request.payload;
+                const adds: RacePrediction[] = request.payload;
                 const raceKey = request.params["raceKey"];
                 try {
-                    const dbAdds: DbRacePrediction[] = [];
+                    const dbAdds: RacePrediction[] = [];
                     for (const add of adds) {
-                        const dbAdd: DbRacePrediction = {
+                        const dbAdd: RacePrediction = {
                             race: raceKey,
                             prediction: add.prediction,
                             value: add.value,
@@ -134,7 +134,7 @@ export const raceRoutes: IRouteConfiguration[] = [
                         dbAdds.push(dbAdd);
                     }
                     await updateRacePredictions(raceKey, dbAdds);
-                    reply({ success: "done" }).code(201);
+                    reply({ success: true }).code(201);
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
                 }
@@ -147,16 +147,17 @@ export const raceRoutes: IRouteConfiguration[] = [
     },
     {
         method: "POST",
-        path: "/admin/races/{raceKey}/predictions/{predictionKey}/choices",
+        path: "/admin/races/{raceKey}/predictions/choices",
         config: {
             cors: true,
             handler: async (request, reply) => {
                 const raceKey = request.params["raceKey"];
-                const predictionKey = request.params["predictionKey"];
-                const choices: string[] = request.payload;
+                const predictionChoices: PredictionChoices[] = request.payload;
                 try {
-                    await savePredictionChoices(predictionKey, raceKey, choices);
-                    reply("done");
+                    for (const predictionChoice of predictionChoices) {
+                        await savePredictionChoices(predictionChoice.prediction, raceKey, predictionChoice.choices);
+                    }
+                    reply({ success: true });
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
                 }

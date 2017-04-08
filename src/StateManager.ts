@@ -3,7 +3,7 @@ import * as moment from "moment";
 import { FULL_FORMAT } from "../common/utils/date";
 import { BlogResponse } from "../common/models/Blog";
 import { User, PublicUser, GoogleUser, FacebookUser, UserContext } from "../common/models/User";
-import { RaceModel, RaceResponse, RaceModelContext } from "../common/models/Race";
+import { RaceModel, RaceResponse, RaceModelContext, RacePrediction, PredictionChoices } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
 import { DriverModel, DriverModelContext, DriverResponse } from "../common/models/Driver";
 import { PredictionResponse, PredictionModel, PredictionContext, UserPickPayload } from "../common/models/Prediction";
@@ -27,7 +27,9 @@ import {
     saveTeams,
     getAllSeasonPredictions,
     getAllPublicUsers,
-    saveUserInfo
+    saveUserInfo,
+    savePredictionChoices as serverSavePredictionChoices,
+    saveRacePredictions as serverSaveRacePredictions
 } from "./utilities/ServerUtils";
 
 
@@ -143,12 +145,49 @@ export class StateManager {
         });
     }
 
+    saveRacePredictions(model: RaceModel): Promise<void> {
+        if (!this.user.isLoggedIn || !this.user.isAdmin) return Promise.reject("Unauthorized");
+        return new Promise<void>((resolve, reject) => {
+            // First save the actual predictions
+            if (model.predictions && model.predictions.length > 0) {
+                const racePredictions = model.predictions.map(pm => {
+                    const racePrediction: RacePrediction = {
+                        race: model.key,
+                        prediction: pm.predictionResponse.key,
+                        value: pm.predictionResponse.value,
+                        modifier: pm.predictionResponse.modifier
+                    };
+                    return racePrediction;
+                });
+                // Save them to the server
+                return serverSaveRacePredictions(model.key, racePredictions, this.user.id_token);
+            }
+            return Promise.resolve();
+        }).then(() => {
+            // Then save the choices if there are any.
+            if (model.predictions && model.predictions.length > 0) {
+                const all: PredictionChoices[] = [];
+                for (const prediction of model.predictions) {
+                    if (prediction.choices && prediction.choices.length) {
+                        const predictionChoices: PredictionChoices = {
+                            race: model.key,
+                            prediction: prediction.predictionResponse.key,
+                            choices: prediction.choices.map(c => c.key).join(",")
+                        };
+                        all.push(predictionChoices);
+                    }
+                }
+                // Save to the server
+                return serverSavePredictionChoices(model.key, all, this.user.id_token);
+            }
+            return Promise.resolve();
+        });
+    }
+
     get raceModelContext(): RaceModelContext {
         const context: RaceModelContext = {
             refresh: (race: RaceModel) => {
-                return this.getRace(race.key).then((newRace) => {
-                    race.track = newRace.track;
-                })
+                return this.getRace(race.key);
             },
             saveRace: (raceModel: RaceModel) => {
                 return this.saveRace(raceModel);
@@ -161,6 +200,9 @@ export class StateManager {
             },
             getPrediction: (response: PredictionResponse): PredictionModel => {
                 return new PredictionModel(response, this.predictionContext);
+            },
+            saveRacePredictions: (model: RaceModel) => {
+                return this.saveRacePredictions(model);
             }
         };
         return context;
