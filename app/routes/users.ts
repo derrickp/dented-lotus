@@ -143,50 +143,40 @@ export const userRoutes: IRouteConfiguration[] = [
         path: '/users/{key?}',
         config: {
             cors: true,
-            handler: (req, res) => {
+            handler: async (req, res) => {
                 let credentials = req.auth.credentials;
                 let isAdmin = credentials.scope.indexOf('admin') >= 0;
-                const key = req.params["key"];
+                const keys = req.params["key"] ? [req.params["key"]] : [];
+                console.log(keys);
                 // If the person is requesting their own info, then they can have it.
-                if (key === credentials.key) {
-                    getFullUsers(credentials.key).then(users => {
-                        if (!users) {
-                            throw Boom.badRequest("user information could not be found");
-                        }
-                        var user = users[0];
-                        if (!user) {
-                            throw Boom.badRequest("user information could not be found");
-                        }
-                        res(user);
-                    });
+                if (keys.length === 1 && keys[0] === credentials.key) {
+                    try {
+                        const users = await getFullUsers(keys);
+                        res(users);
+                    }
+                    catch (exception) {
+                        res(Boom.badRequest(exception));
+                    }
                 }
                 // If the person requesting information is a 
                 else if (isAdmin) {
-                    getFullUsers([key]).then(users => {
-                        if (key) {
-                            let user = users[0];
-                            if (!user) {
-                                throw Boom.badRequest("user key provided was not found");
-                            }
-                            res(user);
-                            return;
-                        }
+                    try {
+                        const users = await getFullUsers(keys);
                         res(users);
-                    });
+                    }
+                    catch (exception) {
+                        res(Boom.badRequest(exception));
+                    }
                 }
                 // They have authenticated, so we'll get them the basic info
                 else {
-                    getUsersByKeys([key]).then(users => {
-                        if (key) {
-                            let user = users[0];
-                            if (!user) {
-                                throw Boom.badRequest("user key provided was not found");
-                            }
-                            res(user);
-                            return;
-                        }
+                    try {
+                        const users = await getUsersByKeys(keys);
                         res(users);
-                    });
+                    }
+                    catch (exception) {
+                        res(Boom.badRequest(exception));
+                    }
                 }
             },
             auth: {
@@ -200,11 +190,12 @@ export const userRoutes: IRouteConfiguration[] = [
         path: '/allusers',
         config: {
             cors: true,
-            handler: (req, res) => {
-                let credentials = req.auth.credentials;
-                getAllPublicUsers().then(users => {
-                    res(users);
-                });
+            handler: async (req, res) => {
+                const users = await getUsersByKeys([]);
+                res(users);
+                // getAllPublicUsers().then(users => {
+                //     res(users);
+                // });
             }
         }
     }

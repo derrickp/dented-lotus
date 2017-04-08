@@ -28,7 +28,7 @@ export function getUsersByEmail(emails?: string[]): Promise<UserResponse[]> {
 export function getFullUsers(keys?: string[]): Promise<UserResponse[]> {
     return new Promise((resolve, reject) => {
         let statement = userSelect;
-        if (keys && keys.length) {
+        if (keys && keys.length > 0) {
             const innerKeys = keys.join("','");
             statement = statement + ` where key IN ('${innerKeys}')`;
         }

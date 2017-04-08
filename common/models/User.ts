@@ -17,8 +17,10 @@ export interface UserResponse {
     faveTeam?: string;
 }
 export interface PublicUser {
+    imageUrl: string;
     display: string;
     points: number;
+    key: string;
 }
 
 export namespace UserRoles {

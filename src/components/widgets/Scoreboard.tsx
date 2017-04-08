@@ -3,6 +3,9 @@ import { Button, Glyphicon, Panel, Table } from "react-bootstrap";
 import { DriverModel } from "../../../common/models/Driver";
 import { User, PublicUser } from "../../../common/models/User";
 import { StateManager } from "../../StateManager";
+
+import { UserScoreboard } from "./UserScoreboard";
+
 import * as UUID from "uuid/v1";
 export class ScoreboardType {
     static DRIVERS = "drivers";
@@ -82,17 +85,22 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
     }
 
     render() {
-        return <Panel header={this.props.title}>
-            <Table striped bordered condensed responsive>
-                <thead>
-                    <tr>
-                        <th>#</th><th>Name</th><th className="center-text">Points</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {this.state.entrants.map((e, i) => { return <tr key={e.key}><td>{e.position}</td><td>{e.display}</td><td className="center-text">{e.points}</td></tr> })}
-                </tbody>
-            </Table>
-        </Panel>
+        switch (this.props.type) {
+            case ScoreboardType.USERS:
+                return <UserScoreboard title={this.props.title} users={this.props.publicUsers}></UserScoreboard>;
+            default:
+                return <Panel header={this.props.title}>
+                    <Table striped bordered condensed responsive>
+                        <thead>
+                            <tr>
+                                <th>#</th><th>Name</th><th className="center-text">Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.state.entrants.map((e, i) => { return <tr key={e.key}><td>{e.position}</td><td>{e.display}</td><td className="center-text">{e.points}</td></tr> })}
+                        </tbody>
+                    </Table>
+                </Panel>;
+        }
     }
 }

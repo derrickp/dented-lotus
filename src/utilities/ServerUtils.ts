@@ -1,4 +1,6 @@
 
+import { getRandomInt } from "../../common/utils/numbers";
+import { DEFAULT_IMAGES } from "../../common/utils/images"
 import { TrackResponse } from "../../common/models/Track";
 import { DriverResponse } from "../../common/models/Driver";
 import { RaceResponse, RacePrediction, PredictionChoices } from "../../common/models/Race";
@@ -289,7 +291,16 @@ export function getAllTeams(): Promise<TeamResponse[]> {
 export function getAllPublicUsers(): Promise<PublicUser[]> {
     return new Promise<PublicUser[]>((resolve, reject) => {
         return fetch(`${baseUrl}/allusers`).then(response => {
-            return response.json().then((users: PublicUser[]) => {
+            return response.json().then((userResponses: UserResponse[]) => {
+                const users = userResponses.map(ur => {
+                    const user: PublicUser = {
+                        imageUrl: ur.imageUrl ? ur.imageUrl : getRandomImage(),
+                        display: ur.displayName,
+                        points: ur.points,
+                        key: ur.key
+                    };
+                    return user;
+                });
                 resolve(users);
             });
         });
@@ -357,4 +368,10 @@ export function saveUserPicks(picks: UserPickPayload[], id_token: string): Promi
             reject(error);
         });
     });
+}
+
+function getRandomImage(): string {
+    const num = getRandomInt(0, 2);
+    const imageUrl = DEFAULT_IMAGES[num];
+    return imageUrl; 
 }
