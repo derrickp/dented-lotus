@@ -25,7 +25,7 @@ export function UserScoreboard(props: UserScoreboardProps) {
             rightIcon={<div>{user.points}</div>}
             disabled={true}>
             </ListItem>);
-        items.push(<Divider inset={true}></Divider>);
+        items.push(<Divider key={i} inset={true}></Divider>);
     }
     return <Panel header={props.title}>
         <List>

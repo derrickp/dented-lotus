@@ -6,6 +6,7 @@ import { Selectable } from "../../../common/models/Selectable";
 import { PredictionModel, PredictionResponse } from "../../../common/models/Prediction";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
 import { MenuItem, FormControl, Well, FormGroup } from "react-bootstrap";
+import SnackBar from "material-ui/Snackbar";
 
 export interface PredictionProps {
     prediction: PredictionModel;
@@ -15,6 +16,8 @@ export interface PredictionProps {
 
 export interface PredictionState {
     validationState: "success" | "warning" | "error";
+    snackbarOpen: boolean;
+    snackbarText: string;
 }
 
 export class PredictionComponent extends React.Component<PredictionProps, PredictionState>{
@@ -24,8 +27,11 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
     constructor(props: PredictionProps) {
         super(props);
         this.onChange = this.onChange.bind(this);
+        this.handleRequestSnackbarClose = this.handleRequestSnackbarClose.bind(this);
         this.state = {
-            validationState: null
+            validationState: null,
+            snackbarOpen: false,
+            snackbarText: ""
         };
     }
 
@@ -34,10 +40,11 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
         this.props.prediction.predictionResponse.userPick = event.target.value;
         this.setState({ validationState: "warning" });
         this.props.save(this.props.prediction).then(success => {
-            this.setState({ validationState: success ? "success" : "error" });
-            if (!success) {
-                alert("Failed to save pick. Try again");
-            }
+            this.setState({
+                validationState: success ? "success" : "error",
+                snackbarOpen: true,
+                snackbarText: success ? "Pick saved successfully" : "Error saving pick. Try again."
+            });
             setTimeout(() => {
                 this.setState({ validationState: null });
             }, 1000);
@@ -46,6 +53,10 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
 
     getOption(selectable: Selectable): JSX.Element {
         return <option key={selectable.key} value={selectable.key}>{selectable.display}</option>;
+    }
+
+    handleRequestSnackbarClose() {
+        this.setState({ snackbarOpen: false });
     }
 
     render() {
@@ -63,10 +74,19 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
                     {options}
                 </FormControl>
             </FormGroup>;
-        return <Well bsSize="small">
-            <h3>{prediction.json.title}</h3>
-            <h4>{prediction.json.description}</h4>
-            {formControl}
-        </Well>;
+        return (
+            <div>
+                <Well bsSize="small">
+                    <h3>{prediction.json.title}</h3>
+                    <h4>{prediction.json.description}</h4>
+                    {formControl}
+                </Well>
+                <SnackBar open={this.state.snackbarOpen}
+                message={this.state.snackbarText}
+                autoHideDuration={2000}
+                onRequestClose={this.handleRequestSnackbarClose}>
+                </SnackBar>
+            </div>
+        );
     }
 }
