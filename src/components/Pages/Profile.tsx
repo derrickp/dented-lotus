@@ -165,6 +165,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                             <Paper style={styles.paper}>
                                 <Subheader>Basic Info</Subheader>
                                 <TextField
+                                    style={styles.fields}
                                     hintText={"Display Name"}
                                     floatingLabelText={"Display Name"}
                                     onChange={this.handleDisplayNameChange}
