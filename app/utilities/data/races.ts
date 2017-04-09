@@ -117,7 +117,7 @@ export async function saveRaces(season, newRaces: RaceResponse[]): Promise<boole
                         };
                         // track
                         if (race.track) {
-                            values[2] = race.track.key;
+                            values[2] = race.track;
                         }
                         else {
                             values[2] = existingRace ? existingRace.track : null;

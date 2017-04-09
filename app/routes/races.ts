@@ -91,7 +91,7 @@ export const raceRoutes: IRouteConfiguration[] = [
                 }
 
                 for (const race of races) {
-                    if (!race.key && (!race.track)) {
+                    if ((!race.track)) {
                         reply(Boom.badRequest("Need track to save new race"));
                         return;
                     }
@@ -107,10 +107,6 @@ export const raceRoutes: IRouteConfiguration[] = [
             auth: {
                 strategies: ['jwt'],
                 scope: ['admin']
-            },
-            payload: {
-                parse: false,
-                maxBytes: 20000000
             }
         }
     },
