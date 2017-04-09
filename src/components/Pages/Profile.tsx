@@ -132,8 +132,8 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         const styles = {
             paper: {
                 paddingTop: "0.5em",
-                paddingLeft: "5em",
-                paddingRight: "5em",
+                paddingLeft: "1em",
+                paddingRight: "1em",
                 paddingBottom: "2.5em",
                 marginTop: "0.5em"
             },
@@ -143,6 +143,12 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
             },
             button: {
                 marginTop: "2em"
+            },
+            image: {
+                width: "100%"
+            },
+            fields: {
+                width: "100%"
             }
         };
 
@@ -150,12 +156,12 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
             <div>
                 <Grid>
                     <Row>
-                        <Col xs={10} md={6}>
-                            <img src={this.state.imageUrl} ></img>
+                        <Col xs={12} md={4}>
+                            <img style={styles.image} src={this.state.imageUrl} ></img>
                             <br />
-                            { !disabled && <input style={styles.button} accept={"image/*"} onChange={this.handleImageChange} type="file" /> }
+                            {!disabled && <input style={styles.button} accept={"image/*"} onChange={this.handleImageChange} type="file" />}
                         </Col>
-                        <Col xs={10} md={6}>
+                        <Col xs={12} md={6} mdOffset={1}>
                             <Paper style={styles.paper}>
                                 <Subheader>Basic Info</Subheader>
                                 <TextField
@@ -167,6 +173,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                 </TextField>
                                 <br />
                                 <TextField
+                                    style={styles.fields}
                                     hintText={"First Name"}
                                     floatingLabelText={"First Name"}
                                     onChange={this.handleFirstNameChange}
@@ -175,6 +182,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                 </TextField>
                                 <br />
                                 <TextField
+                                    style={styles.fields}
                                     hintText={"Last Name"}
                                     floatingLabelText={"Last Name"}
                                     onChange={this.handleLastNameChange}
@@ -183,6 +191,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                 </TextField>
                                 <br />
                                 {showEmail && <TextField
+                                    style={styles.fields}
                                     hintText={"Email"}
                                     floatingLabelText={"Email"}
                                     disabled={true}
@@ -192,6 +201,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                 <Divider style={styles.divider} />
                                 <Subheader>Favourites</Subheader>
                                 <SelectField
+                                    style={styles.fields}
                                     floatingLabelText={"Favourite Driver"}
                                     onChange={this.handleFavouriteDriverChange}
                                     value={this.state.faveDriver}
@@ -200,6 +210,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                 </SelectField>
                                 <br />
                                 <SelectField
+                                    style={styles.fields}
                                     floatingLabelText={"Favourite Team"}
                                     onChange={this.handleFavouriteTeamChange}
                                     value={this.state.faveTeam}
@@ -213,9 +224,9 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                     </Row>
                 </Grid>
                 <Snackbar
-                open={this.state.snackOpen}
-                message={this.state.snackMessage}
-                autoHideDuration={this.state.snackTimeout}>
+                    open={this.state.snackOpen}
+                    message={this.state.snackMessage}
+                    autoHideDuration={this.state.snackTimeout}>
                 </Snackbar>
             </div>
         );
