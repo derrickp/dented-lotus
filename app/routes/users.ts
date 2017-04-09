@@ -48,8 +48,10 @@ export const userRoutes: IRouteConfiguration[] = [
                         displayName: userPayload.displayName ? userPayload.displayName : existingUser.displayName,
                         firstName: userPayload.firstName ? userPayload.firstName : existingUser.firstName,
                         lastName: userPayload.lastName ? userPayload.lastName : existingUser.lastName,
-                        imageUrl: userPayload.imageUrl ? userPayload.imageUrl : existingUser.imageUrl
-                    }
+                        imageUrl: userPayload.imageUrl ? userPayload.imageUrl : existingUser.imageUrl,
+                        faveDriver: userPayload.faveDriver ? userPayload.faveDriver : existingUser.faveDriver,
+                        faveTeam: userPayload.faveTeam ? userPayload.faveTeam : existingUser.faveTeam
+                    };
                     newUser.role = userPayload.role && isAdmin ? userPayload.role : existingUser.role;
                     newUser.points = userPayload.points && isAdmin ? userPayload.points : existingUser.points;
                     await updateUser(newUser);

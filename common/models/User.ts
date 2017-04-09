@@ -46,6 +46,8 @@ export class User {
     isAdmin: boolean;
     key: string;
     usingDefaultImage: boolean;
+    faveDriver: string;
+    faveTeam: string;
 
     constructor(dentedLotusUser: UserResponse, id_token: string, context: UserContext) {
         if (dentedLotusUser) {
@@ -55,6 +57,8 @@ export class User {
                 this.isAdmin = true;
             }
             this.imageUrl = dentedLotusUser.imageUrl;
+            this.faveDriver = dentedLotusUser.faveDriver;
+            this.faveTeam = dentedLotusUser.faveTeam;
         }
         this.id_token = id_token;
         this._context = context;
@@ -83,7 +87,9 @@ export class User {
             lastName: this.lastName,
             email: this.email,
             firstName: this.firstName,
-            imageUrl: this.usingDefaultImage ? "" : this.imageUrl
+            imageUrl: this.usingDefaultImage ? "" : this.imageUrl,
+            faveDriver: this.faveDriver,
+            faveTeam: this.faveTeam
         };
     }
 

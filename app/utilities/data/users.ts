@@ -147,6 +147,14 @@ export function updateUser(user: UserResponse): Promise<boolean> {
             updateFields.push("imageurl = ?6");
             updateObject[6] = user.imageUrl;
         }
+        if (user.faveDriver) {
+            updateFields.push("favedriver = ?7");
+            updateObject[7] = user.faveDriver;
+        }
+        if (user.faveTeam) {
+            updateFields.push("faveteam = ?8");
+            updateObject[8] = user.faveTeam;
+        }
         if (!updateFields.length) {
             reject("nothing to update");
             return;
@@ -154,8 +162,8 @@ export function updateUser(user: UserResponse): Promise<boolean> {
 
         let fieldStatement = updateFields.join(",");
         updateStatement += fieldStatement;
-        let where = " WHERE key = ?7";
-        updateObject[7] = user.key;
+        let where = " WHERE key = ?9";
+        updateObject[9] = user.key;
         updateStatement += where;
         db.run(updateStatement, updateObject, (err) => {
             if (err) {
