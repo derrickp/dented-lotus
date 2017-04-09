@@ -27,6 +27,7 @@ import {
     saveTeams,
     getAllSeasonPredictions,
     getAllPublicUsers,
+    getUser as serverGetUser,
     saveUserInfo,
     savePredictionChoices as serverSavePredictionChoices,
     saveRacePredictions as serverSaveRacePredictions
@@ -293,6 +294,14 @@ export class StateManager {
                 this._publishWatches("publicUsers");
                 resolve();
             });
+        });
+    }
+
+    getUser(key: string): Promise<User> {
+        return new Promise<User>((resolve, reject) => {
+            return serverGetUser(key, this.user.id_token).then(userResponse => {
+                resolve(new User(userResponse, "", this.userContext));
+            }).catch(reject);
         });
     }
 

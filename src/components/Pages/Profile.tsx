@@ -36,16 +36,17 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
 
     constructor(props: ProfileProps) {
         super(props);
+        const user: User = this.props.user ? this.props.user : this.props.thisUser;
         this.state = {
-            displayName: props.user.displayName,
-            firstName: props.user.firstName,
-            lastName: props.user.lastName,
-            imageUrl: props.user.imageUrl,
+            displayName: user.displayName,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            imageUrl: user.imageUrl,
             snackTimeout: null,
             snackOpen: false,
             snackMessage: "",
-            faveDriver: props.user.faveDriver,
-            faveTeam: props.user.faveTeam
+            faveDriver: user.faveDriver,
+            faveTeam: user.faveTeam
         };
         this.handleDisplayNameChange = this.handleDisplayNameChange.bind(this);
         this.handleFirstNameChange = this.handleFirstNameChange.bind(this);
@@ -57,7 +58,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
     }
 
     save() {
-        const user = this.props.user;
+        const user: User = this.props.user ? this.props.user : this.props.thisUser;
         user.displayName = this.state.displayName;
         user.firstName = this.state.firstName;
         user.lastName = this.state.lastName;
@@ -112,8 +113,8 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
     render() {
         let disabled: boolean = true;
         let showEmail: boolean = false;
-
-        if (this.props.thisUser.key === this.props.user.key) {
+        const user: User = this.props.user ? this.props.user : this.props.thisUser;
+        if (this.props.thisUser.key === user.key) {
             disabled = false;
             showEmail = true;
         }
@@ -196,7 +197,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                     hintText={"Email"}
                                     floatingLabelText={"Email"}
                                     disabled={true}
-                                    value={this.props.user.email}>
+                                    value={user.email}>
                                 </TextField>}
                                 <br />
                                 <Divider style={styles.divider} />

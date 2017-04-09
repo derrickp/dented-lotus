@@ -56,6 +56,8 @@ export class User {
             if (dentedLotusUser.role === UserRoles.ADMIN) {
                 this.isAdmin = true;
             }
+            this.firstName = dentedLotusUser.firstName;
+            this.lastName = dentedLotusUser.lastName;
             this.imageUrl = dentedLotusUser.imageUrl;
             this.faveDriver = dentedLotusUser.faveDriver;
             this.faveTeam = dentedLotusUser.faveTeam;
@@ -109,11 +111,9 @@ export class GoogleUser extends User {
     constructor(googleUser: gapi.auth2.GoogleUser, dentedLotusUser: UserResponse, id_token: string, context: UserContext) {
         super(dentedLotusUser, id_token, context);
         const profile = googleUser.getBasicProfile();
-        this.email = dentedLotusUser.email || profile.getEmail();
-        this.firstName = dentedLotusUser.firstName || profile.getGivenName();
-        this.lastName = dentedLotusUser.lastName || profile.getFamilyName();
-        // this.imageUrl = dentedLotusUser.imageUrl || profile.getImageUrl();
-        this.imageUrl = dentedLotusUser.imageUrl;
+        this.email = this.email || profile.getEmail();
+        this.firstName = this.firstName || profile.getGivenName();
+        this.lastName = this.lastName || profile.getFamilyName();
         this._loggedIn = true;
 
         if (!this.imageUrl) {

@@ -307,6 +307,29 @@ export function getAllPublicUsers(): Promise<PublicUser[]> {
     });
 }
 
+export function getUser(key: string, id_token: string): Promise<UserResponse> {
+    return new Promise<UserResponse>((resolve, reject) => {
+        return fetch(`${baseUrl}/users/${key}`, {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + id_token
+            }
+        }).then(response => {
+            return response.json().then(json => {
+                if (response.ok) {
+                    const users: UserResponse[] = json;
+                    const user = users[0];
+                    user.imageUrl = user.imageUrl ? user.imageUrl : getRandomImage();
+                    resolve(user);
+                }
+                else {
+                    reject(new Error(json.message));
+                }
+            });
+        });
+    });
+}
+
 export function saveUserInfo(user: UserResponse, id_token: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
         return fetch(`${baseUrl}/users/${user.key}`, {
@@ -373,5 +396,5 @@ export function saveUserPicks(picks: UserPickPayload[], id_token: string): Promi
 function getRandomImage(): string {
     const num = getRandomInt(0, 2);
     const imageUrl = DEFAULT_IMAGES[num];
-    return imageUrl; 
+    return imageUrl;
 }

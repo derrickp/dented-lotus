@@ -21,6 +21,7 @@ export interface ScoreboardProps {
     user: User;
     drivers: DriverModel[];
     title: string;
+    clickItem?: (item: any) => void;
 }
 
 export interface CanShowOnScoreboard {
@@ -87,7 +88,7 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
     render() {
         switch (this.props.type) {
             case ScoreboardType.USERS:
-                return <UserScoreboard title={this.props.title} users={this.props.publicUsers}></UserScoreboard>;
+                return <UserScoreboard clickUser={this.props.clickItem} title={this.props.title} users={this.props.publicUsers}></UserScoreboard>;
             default:
                 return <Panel header={this.props.title}>
                     <Table striped bordered condensed responsive>
