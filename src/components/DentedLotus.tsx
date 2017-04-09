@@ -70,6 +70,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         };
 
         this.launchNextRacePicks = this.launchNextRacePicks.bind(this);
+        this.launchAllSeasonPicks = this.launchAllSeasonPicks.bind(this);
         this.changeRace = this.changeRace.bind(this);
         this.changePage = this.changePage.bind(this);
 
