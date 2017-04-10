@@ -126,6 +126,12 @@ export class StateManager {
         return Array.from(this._raceMap.values());
     }
 
+    userIsAdmin():boolean{
+        if (!this.user){
+            return false;
+        }
+        return this.user.isAdmin;
+    }
     refreshRaces(): Promise<void> {
         if (!this.isLoggedIn) return Promise.resolve();
         return this._getAllRaces().then(raceModels => {

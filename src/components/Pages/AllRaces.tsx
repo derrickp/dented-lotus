@@ -9,6 +9,8 @@ import { getDurationFromNow } from "../../../common/utils/date";
 export interface AllRacesProps {
     races: RaceModel[];
     raceClick: (race: RaceModel) => void;
+    scoreRace:(race:RaceModel) => void;
+    userIsAdmin:boolean;
     selectedRace?: RaceModel;
 }
 
@@ -48,11 +50,17 @@ export class AllRaces extends React.Component<AllRacesProps, AllRacesState> {
         const clickHandler = () => {
             this.props.raceClick(race);
         };
+        
+        const scoringHandler = ()=>{
+            this.props.scoreRace(race);
+        }
+        const scoreRaceButton = dFromNow.duration.seconds() <= 0  && this.props.userIsAdmin ? <Button onClick={scoringHandler} bsSize="large" bsStyle={buttonStyle}>Score It!</Button> : null;
 
         const panel = 
             <Panel eventKey={race.key} id={race.key} key={race.key} header={race.raceResponse.displayName} collapsible={true} defaultExpanded={expanded} expanded={expanded}>
                 <div>
                     <Button onClick={clickHandler} bsSize="large" bsStyle={buttonStyle}>{buttonText}</Button>
+                    {scoreRaceButton}
                 </div>
             </Panel>;
         return panel;

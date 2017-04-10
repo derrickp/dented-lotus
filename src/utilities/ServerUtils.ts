@@ -155,6 +155,40 @@ export function savePredictionChoices(raceKey: string, predictionChoices: Predic
     });
 }
 
+export interface FinalChoice {
+    /** Prediction key */
+    prediction:string;
+    /** Comma delineated list of driver/team keys */
+    final: string;
+}
+
+/**
+ * Save the outcome of a race
+ * @param raceKey 
+ * @param predictionChoices  
+ */
+export function savePredictionOutcomes(raceKey: string, outcomes: FinalChoice[],id_token:string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        return fetch(`${baseUrl}/admin/races/${raceKey}/predictions/finals`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + id_token
+            },
+            body: JSON.stringify(outcomes)
+        }).then(response => {
+            if (response.ok) {
+                resolve();
+            }
+            else {
+                return response.json().then(json => {
+                    reject(new Error(json.message));
+                });
+            }
+        });
+    });
+}
+
 export function getRace(season: number, key: string, id_token: string): Promise<RaceResponse> {
     return new Promise<RaceResponse>((resolve, reject) => {
         return fetch(`${baseUrl}/races/${season}/${key}`, {

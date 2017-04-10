@@ -5,7 +5,7 @@ import { Banner } from "./Banner";
 import { UserComponent } from "./User";
 import { StateManager } from "../StateManager";
 import { RaceCountdown } from "./widgets/RaceCountdown";
-import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, AllSeasonPicks, Blogs, Profile } from "./Pages";
+import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, AllSeasonPicks, Blogs, Profile, RaceAdmin } from "./Pages";
 import { RaceModel } from "../../common/models/Race";
 import { TeamModel } from "../../common/models/Team";
 import { DriverModel } from "../../common/models/Driver";
@@ -76,6 +76,8 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         this.changeRace = this.changeRace.bind(this);
         this.changePage = this.changePage.bind(this);
         this.clickUser = this.clickUser.bind(this);
+        this.returnHome = this.returnHome.bind(this);
+        this.scoreRace = this.scoreRace.bind(this);
 
         this.stateManager.watch("user", () => {
             this.setState({ user: this.stateManager.user });
@@ -190,16 +192,32 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         });
     }
 
+    returnHome() {
+        const parameters = this.state.parameters;
+        parameters.page = Pages.HOME;
+        this.setState({ parameters: parameters });
+    } 
+
+    scoreRace(race:RaceModel):void{
+        const parameters = this.state.parameters;
+        parameters.page = Pages.RACE_ADMIN;
+        this.stateManager.getRace(race.key).then(refreshedRace => {
+            this.setState({ parameters: parameters, race: refreshedRace });
+        });
+    }
+
     getCurrentView() {
         switch (this.state.parameters.page) {
             case Pages.RACE:
                 return <RacePage race={this.state.race} small={false} isAdmin={this.stateManager.user.isAdmin}></RacePage>;
+            case Pages.RACE_ADMIN:
+                return <RaceAdmin race={this.state.race} returnHome={this.returnHome} id_token={this.stateManager.user.id_token}></RaceAdmin>;
             case Pages.BLOGS:
                 return <Blogs numBlogs={-1} blogs={this.state.blogs} title="Blogs" fromHomePanel={false} saveNewBlog={this.stateManager.saveBlog} showAddButton={this.stateManager.isLoggedIn}></Blogs>
             case Pages.USER:
                 return <div>User!!!!</div>;
             case Pages.ALL_RACES:
-                return <AllRaces raceClick={this.changeRace} races={this.state.races} selectedRace={this.state.race} />;
+                return <AllRaces raceClick={this.changeRace} races={this.state.races} selectedRace={this.state.race}  userIsAdmin={this.stateManager.userIsAdmin()} scoreRace={this.scoreRace}/>;
             case Pages.TRACKS:
                 return <Tracks tracks={this.state.tracks} />;
             case Pages.DRIVERS:
