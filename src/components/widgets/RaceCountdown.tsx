@@ -1,9 +1,9 @@
 import * as React from "react";
 import { RaceModel } from "../../../common/models/Race";
-import { DATE_FORMAT, getDurationFromNow } from "../../../common/utils/date";
+import { DATE_FORMAT, getDurationFromNow } from "../../../common/utils/date"; 
 import * as moment from "moment";
 
-import { Jumbotron, Button, ButtonToolbar } from "react-bootstrap";
+import { Jumbotron, Button, ButtonToolbar, Row } from "react-bootstrap";
 
 export interface RaceCountdownProps {
     race: RaceModel;
@@ -44,7 +44,7 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
     }
     render() {
         const allSeasonDFromNow = getDurationFromNow("04/20/2017");
-        const jumbo =
+        const jumbo = <Row>
             <Jumbotron className="jumbotron">
                 <div className="container">
                     <h1>Next Race!</h1>
@@ -66,6 +66,7 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
                     }
                 </div>
             </Jumbotron>;
+            </Row>
         return jumbo;
     }
 

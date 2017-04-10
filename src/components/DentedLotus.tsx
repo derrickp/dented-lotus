@@ -238,8 +238,8 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     getHomePage() {
         return <div>
-            {this.stateManager.isLoggedIn && <RaceCountdown key={1} clickMakeAllSeasonPicks={this.launchAllSeasonPicks} clickMakeNextRacePicks={this.launchNextRacePicks} race={this.stateManager.nextRace} />}
             <Grid>
+            {this.stateManager.isLoggedIn && <RaceCountdown key={1} clickMakeAllSeasonPicks={this.launchAllSeasonPicks} clickMakeNextRacePicks={this.launchNextRacePicks} race={this.stateManager.nextRace} />}
                 <Row>
                     <Col xs={12} mdPush={8} md={4}><Scoreboard clickItem={this.clickUser} publicUsers={this.state.publicUsers} drivers={this.state.drivers} user={this.state.user} type="users" title="Standings" count={this.state.publicUsers.length} /></Col>
                     <Col xs={12} mdPull={4} md={8}><Blogs key={2} blogs={this.state.blogs} fromHomePanel={true} showAddButton={false} saveNewBlog={null} numBlogs={3} /></Col>
