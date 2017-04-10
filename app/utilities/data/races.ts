@@ -59,7 +59,7 @@ export function getFinalRacePredictions(raceKey): Promise<FinalPredictionPick[]>
 
 export function saveFinalRacePredictions(raceKey: string, finalPicks: FinalPredictionPick[]): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-        const insert = `INSERT INTO racepredictionsfinals
+        const insert = `INSERT OR REPLACE INTO racepredictionsfinals
         (prediction, race, final)
         VALUES (?1, ?2, ?3)`;
         try {
