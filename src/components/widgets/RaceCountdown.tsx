@@ -44,7 +44,7 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
     }
     render() {
         const allSeasonDFromNow = getDurationFromNow("04/20/2017");
-        const jumbo = 
+        const jumbo = (
             <Jumbotron className="jumbotron">  
                     <h1>Next Race!</h1>
                     {this.props.race ? <div>
@@ -64,6 +64,7 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
                     </div> : <span className="race-countdown">Loading race countdown...</span>
                     }  
             </Jumbotron>
+    )
         return jumbo;
     }
 
