@@ -8,7 +8,6 @@ bin
 **/*.js.map 
 APP_SECRETS.txt
 dist/**
-!webpack.config.js
 !gulpfile.js
 !.eslintrc.js
 _db_backups
