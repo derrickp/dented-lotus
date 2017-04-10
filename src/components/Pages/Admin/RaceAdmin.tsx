@@ -63,7 +63,7 @@ export class RaceAdminPage extends React.Component<RaceAdminProps, RaceAdminStat
         });
     }
 
-    returnHome() {
+    returnHome() {  
         this.props.returnHome();
     }
 
