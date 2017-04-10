@@ -70,7 +70,11 @@ export class Scoreboard extends React.Component<ScoreboardProps, any>{
                 break;
             case ScoreboardType.USERS:
                 entrants = props.publicUsers.sort((publicUser1, publicUser2) => {
-                    return publicUser2.points - publicUser1.points;
+                    let out =  publicUser2.points - publicUser1.points;
+                    if (!out){
+                        out = publicUser1.display.localeCompare(publicUser2.display);
+                    }
+                    return out;
                 }).slice(0, props.count).map((publicUser: PublicUser, index: number) => {
                     const entrant: CanShowOnScoreboard = {
                         key: UUID(),
