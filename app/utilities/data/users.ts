@@ -60,7 +60,7 @@ export function getUsersByKeys(keys: string[]): Promise<UserResponse[]> {
         let statement = userSelect;
         if (keys && keys.length) {
             const innerKeys = keys.join("','");
-            statement = statement + ` where key IN ('${innerKeys}')"`;
+            statement = statement + ` where key IN ('${innerKeys}')`;
         }
         db.all(statement, (err, rows: UserResponse[]) => {
             if (err) {

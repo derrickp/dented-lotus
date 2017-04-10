@@ -61,6 +61,10 @@ export class User {
             this.imageUrl = dentedLotusUser.imageUrl;
             this.faveDriver = dentedLotusUser.faveDriver;
             this.faveTeam = dentedLotusUser.faveTeam;
+            this._loggedIn = true;
+        }
+        else {
+            this._loggedIn = false;
         }
         this.id_token = id_token;
         this._context = context;

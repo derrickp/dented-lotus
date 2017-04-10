@@ -444,7 +444,7 @@ export class StateManager {
 
     signOut(): void {
         this.user.logOut().then(success => {
-            this.user = null;
+            this.user = new User(null, "", null);
         });
     }
 

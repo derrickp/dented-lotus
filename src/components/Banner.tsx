@@ -40,7 +40,7 @@ export class Banner extends React.Component<BannerProps, BannerState>{
         this.clickPredictionsAdmin = this.clickPredictionsAdmin.bind(this);
     }
 
-    clickHome() {
+    clickHome(event: React.MouseEvent<any>) {
         this.props.changePage(Pages.HOME);
         event.preventDefault();
     }
@@ -60,12 +60,12 @@ export class Banner extends React.Component<BannerProps, BannerState>{
         event.preventDefault();
     }
 
-    clickDrivers() {
+    clickDrivers(event: React.MouseEvent<NavItem>) {
         this.props.changePage(Pages.DRIVERS);
         event.preventDefault();
     }
 
-    clickTracks() {
+    clickTracks(event: React.MouseEvent<NavItem>) {
         this.props.changePage(Pages.TRACKS);
         event.preventDefault();
     }

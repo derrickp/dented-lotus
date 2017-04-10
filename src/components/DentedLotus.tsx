@@ -178,6 +178,9 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
                     this.setState({ parameters: parameters });
                 });
                 break;
+            case Pages.PROFILE:
+                this.setState({viewUser: null, parameters: parameters});
+                break;
             default:
                 this.setState({ parameters: parameters });
                 break;

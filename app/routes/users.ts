@@ -163,7 +163,6 @@ export const userRoutes: IRouteConfiguration[] = [
                 let credentials = req.auth.credentials;
                 let isAdmin = credentials.scope.indexOf('admin') >= 0;
                 const keys = req.params["key"] ? [req.params["key"]] : [];
-                console.log(keys);
                 // If the person is requesting their own info, then they can have it.
                 if (keys.length === 1 && keys[0] === credentials.key) {
                     try {
