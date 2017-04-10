@@ -139,7 +139,7 @@ export function updateUser(user: UserResponse): Promise<boolean> {
             updateFields.push("role = ?4");
             updateObject[4] = user.role;
         }
-        if (user.points) {
+        if (user.points != undefined) {
             updateFields.push("points = ?5");
             updateObject[5] = user.points;
         }

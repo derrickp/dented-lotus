@@ -9,14 +9,14 @@ import {
     DbRace,
     FinalPredictionPick,
     saveFinalRacePredictions,
-    getFinalRacePredictions
+    getFinalRacePredictions,
+    getRaceKeys
 } from "../utilities/data/races";
 import { getDriverResponses } from "../utilities/data/drivers";
 import { getTrackResponses } from "../utilities/data/tracks";
 import {
     getPredictionResponses,
     updateRacePredictions,
-
     deleteRacePredictions,
     savePredictionChoices,
     getPredictionsForRace,
@@ -188,45 +188,45 @@ export const raceRoutes: IRouteConfiguration[] = [
     },
     {
         method: "POST",
-        path: "/admin/races/{raceKey}/score",
+        path: "/admin/races/score",
         config: {
             cors: true,
             handler: async (request, reply) => {
                 try {
-                    const raceKey = request.params["raceKey"];
                     const users = await getFullUsers();
-                    const finalPicks = await getFinalRacePredictions(raceKey);
-                    const racePredictions = await getPredictionsForRace(raceKey);
-                    // For every user we will need to get their picks, and their points, and award them points if they were right
+                    const raceKeys = await getRaceKeys(2017);
+                    console.log(raceKeys);
                     for (const user of users) {
-                        const initPoints = user.points;
+                        let points = 0;
                         // 1. Get their picks
-                        const userPicks = await getUserPicks(user.key, [raceKey]);
-                        // 2. Loop through the race predictions
-                        for (const rp of racePredictions) {
-                            const finalPick = finalPicks.filter(fp => {
-                                return fp.prediction === rp.prediction;
-                            })[0];
-                            // If we don't have a final pick, then this prediction hasn't been finalized...
-                            if (!finalPick) {
-                                continue;
-                            }
-                            const userPick = userPicks.filter(up => up.prediction === rp.prediction)[0];
-                            // If user pick doesn't exist, the user didn't make a pick for this prediction. Continue
-                            if (!userPick) {
-                                continue;
-                            }
-                            // 3. Compare their pick choice to finals
-                            if (finalPick.final.includes(userPick.choice)) {
-                                // 4. Award points if correct
-                                const predictionPoints = rp.value * rp.modifier;
-                                console.log(`${rp.value} ${rp.modifier} ${predictionPoints}`)
-                                user.points += predictionPoints;
+                        const userPicks = await getUserPicks(user.key, raceKeys);
+                        for (const raceKey of raceKeys) {
+                            const finalPicks = await getFinalRacePredictions(raceKey);
+                            const racePredictions = await getPredictionsForRace(raceKey);
+                            // 2. Loop through the race predictions
+                            for (const rp of racePredictions) {
+                                const finalPick = finalPicks.filter(fp => {
+                                    return fp.prediction === rp.prediction;
+                                })[0];
+                                // If we don't have a final pick, then this prediction hasn't been finalized...
+                                if (!finalPick) {
+                                    continue;
+                                }
+                                const userPick = userPicks.filter(up => up.prediction === rp.prediction && up.race === raceKey)[0];
+                                // If user pick doesn't exist, the user didn't make a pick for this prediction. Continue
+                                if (!userPick) {
+                                    continue;
+                                }
+                                // 3. Compare their pick choice to finals
+                                if (finalPick.final.includes(userPick.choice)) {
+                                    // 4. Award points if correct
+                                    const predictionPoints = rp.value * rp.modifier;
+                                    points += predictionPoints;
+                                }
                             }
                         }
-                        console.log(`${user.email} ${user.points}`);
-                        if (user.points !== initPoints) {
-                            await updateUser({ key: user.key, points: user.points });
+                        if (points != user.points) {
+                            await updateUser({ key: user.key, points: points });
                         }
                     }
                     // Once we're here all user info has been saved

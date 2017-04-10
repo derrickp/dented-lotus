@@ -1,22 +1,22 @@
 [
     {
         "prediction": "fastest-lap",
-        "value": 50
+        "value": 100
     },
     {
         "prediction": "best-radio",
-        "value": 50
+        "value": 100
     },
     {
         "prediction": "top-3",
-        "value": 50
+        "value": 100
     },
     {
         "prediction": "most-exciting-driver",
-        "value": 50
+        "value": 100
     },
     {
         "prediction": "first-out",
-        "value": 50
+        "value": 100
     }
 ]

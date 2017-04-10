@@ -25,6 +25,23 @@ export interface FinalPredictionPick {
     final: string;
 }
 
+export function getRaceKeys(season: number): Promise<string[]> {
+    return new Promise<string[]>((resolve, reject) => {
+        let statement = `select key from races_vw where season = ${season}`;
+        db.all(statement, (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            const keys: string[] = [];
+            for (const row of rows) {
+                keys.push(row.key);
+            }
+            resolve(keys);
+        });
+    });
+}
+
 export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
     return new Promise<DbRace[]>((resolve, reject) => {
         let selectStatement = `${raceSelect} where season = ${season}`;
