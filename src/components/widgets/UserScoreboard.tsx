@@ -16,6 +16,9 @@ export interface UserScoreboardProps {
 export function UserScoreboard(props: UserScoreboardProps) {
     const disabled = !props.clickUser;
     const sorted = props.users.sort((user1, user2) => {
+        if (user2.points === user1.points) {
+            return user1.display.localeCompare(user2.display);
+        }
         return user2.points - user1.points;
     });
     const items: JSX.Element[] = [];

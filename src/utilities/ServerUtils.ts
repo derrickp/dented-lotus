@@ -17,6 +17,34 @@ if (baseUrl.indexOf(":8080") == -1) {
     baseUrl += ":8080";
 }
 
+/**
+ * 
+ * @param urlFragment the fragment of the url to send to (what follows the baseUrl)
+ * @param body JSON.stringified JSON data to send to the endpoint. Only works with POST
+ * @param id_token The id_token to send along on the request
+ */
+export function sendToEndpoint(urlFragment: string, body: string, id_token: string): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+        return fetch(`${baseUrl}${urlFragment}`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + id_token
+            },
+            body: body
+        }).then(response => {
+            return response.json().then(value => {
+                if (response.ok) {
+                    resolve(value);
+                }
+                else {
+                    reject(new Error(value.message));
+                }
+            });
+        }).catch(reject);
+    });
+}
+
 export function getBlogs(): Promise<BlogResponse[]> {
     return new Promise<BlogResponse[]>((resolve, reject) => {
         return fetch(`${baseUrl}/blogs`).then(response => {

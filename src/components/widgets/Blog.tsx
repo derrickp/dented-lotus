@@ -28,7 +28,7 @@ export function Blog(props: BlogProps) {
         <Panel header={header}> 
             <div style={bottomStyle}>
                 By: {props.blog.author.displayName}
-            </div> 
+            </div>
             <Editor editorState={editorState} toolbarHidden={true} readOnly={true}></Editor>
         </Panel>
     );

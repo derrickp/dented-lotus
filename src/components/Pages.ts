@@ -7,8 +7,9 @@ import { AllSeasonPicks } from "./Pages/AllSeasonPicks"
 import { Blogs } from "./Pages/Blogs";
 import { Profile } from "./Pages/Profile";
 import { RaceAdminPage as RaceAdmin } from "./Pages/Admin/RaceAdmin"
+import { GeneralAdmin } from "./Pages/Admin/GeneralAdmin";
 
-export { RacePage, AllRaces, TrackPage, Tracks, Drivers, AllSeasonPicks, Blogs, Profile, RaceAdmin };
+export { RacePage, AllRaces, TrackPage, Tracks, Drivers, AllSeasonPicks, Blogs, Profile, RaceAdmin, GeneralAdmin };
 
 export class Pages {
     static HOME = "home";
@@ -23,4 +24,5 @@ export class Pages {
     static PROFILE = "profile";
     static PREDICTIONS_ADMIN = "predictions-admin";
     static RACE_ADMIN = "race-admin";
+    static GENERAL_ADMIN = "general-admin";
 }

@@ -188,7 +188,7 @@ export const raceRoutes: IRouteConfiguration[] = [
     },
     {
         method: "POST",
-        path: "/admin/races/predictions/score",
+        path: "/admin/score",
         config: {
             cors: true,
             handler: async (request, reply) => {

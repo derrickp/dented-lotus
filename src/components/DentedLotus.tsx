@@ -5,7 +5,7 @@ import { Banner } from "./Banner";
 import { UserComponent } from "./User";
 import { StateManager } from "../StateManager";
 import { RaceCountdown } from "./widgets/RaceCountdown";
-import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, AllSeasonPicks, Blogs, Profile, RaceAdmin } from "./Pages";
+import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, AllSeasonPicks, Blogs, Profile, RaceAdmin, GeneralAdmin } from "./Pages";
 import { RaceModel } from "../../common/models/Race";
 import { TeamModel } from "../../common/models/Team";
 import { DriverModel } from "../../common/models/Driver";
@@ -216,7 +216,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             case Pages.RACE_ADMIN:
                 return <RaceAdmin race={this.state.race} returnHome={this.returnHome} id_token={this.stateManager.user.id_token}></RaceAdmin>;
             case Pages.BLOGS:
-                return <Blogs numBlogs={-1} blogs={this.state.blogs} title="Blogs" fromHomePanel={false} saveNewBlog={this.stateManager.saveBlog} showAddButton={this.stateManager.isLoggedIn}></Blogs>
+                return <Blogs numBlogs={-1} blogs={this.state.blogs} title="Blogs" fromHomePanel={false} saveNewBlog={this.stateManager.saveBlog} showAddButton={this.stateManager.isLoggedIn}></Blogs>;
             case Pages.USER:
                 return <div>User!!!!</div>;
             case Pages.ALL_RACES:
@@ -226,11 +226,13 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             case Pages.DRIVERS:
                 return <Drivers drivers={this.state.drivers} teams={this.state.teams} userIsAdmin={this.stateManager.user && this.stateManager.user.isAdmin} createDriver={this.stateManager.createDriver} createTeam={this.stateManager.createTeam} />
             case Pages.ALL_SEASON_PICKS:
-                return <AllSeasonPicks predictions={this.state.allSeasonPredictions} />
+                return <AllSeasonPicks predictions={this.state.allSeasonPredictions} />;
             case Pages.PROFILE:
-                return <Profile drivers={this.state.drivers} teams={this.state.teams} user={this.state.viewUser} thisUser={this.stateManager.user}></Profile>
+                return <Profile drivers={this.state.drivers} teams={this.state.teams} user={this.state.viewUser} thisUser={this.stateManager.user}></Profile>;
             case Pages.PREDICTIONS_ADMIN:
                 return <div>Predictions Admin</div>;
+            case Pages.GENERAL_ADMIN:
+                return <GeneralAdmin callEndpoint={this.stateManager.adminSendToEndpoint} races={this.state.races} drivers={this.state.drivers} teams={this.state.teams}></GeneralAdmin>;
             default:
                 return this.getHomePage();
         }

@@ -30,7 +30,8 @@ import {
     getUser as serverGetUser,
     saveUserInfo,
     savePredictionChoices as serverSavePredictionChoices,
-    saveRacePredictions as serverSaveRacePredictions
+    saveRacePredictions as serverSaveRacePredictions,
+    sendToEndpoint
 } from "./utilities/ServerUtils";
 
 
@@ -59,6 +60,8 @@ export class StateManager {
         this.saveTeam = this.saveTeam.bind(this);
         this.completeFacebookLogin = this.completeFacebookLogin.bind(this);
         this.saveBlog = this.saveBlog.bind(this);
+
+        this.adminSendToEndpoint = this.adminSendToEndpoint.bind(this);
 
         this.doFacebookLogin = this.doFacebookLogin.bind(this);
         this.doGoogleLogin = this.doGoogleLogin.bind(this);
@@ -613,6 +616,17 @@ export class StateManager {
         return authenticate(authPayload).then(authResponse => {
             const googleUser = new GoogleUser(response, authResponse.user, authResponse.id_token, this.userContext);
             this.user = googleUser;
+        });
+    }
+
+    adminSendToEndpoint(urlFragment: string, body: string): Promise<any> {
+        if (!this.user.isAdmin) {
+            return Promise.reject("Unauthorized");
+        }
+        return new Promise<any>((resolve, reject) => {
+            return sendToEndpoint(urlFragment, body, this.user.id_token).then(value => {
+                resolve(value);
+            }).catch(reject);
         });
     }
 }

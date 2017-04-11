@@ -37,7 +37,7 @@ export class Banner extends React.Component<BannerProps, BannerState>{
         this.clickLogout = this.clickLogout.bind(this);
         this.clickLogin = this.clickLogin.bind(this);
         this.onLogin = this.onLogin.bind(this);
-        this.clickPredictionsAdmin = this.clickPredictionsAdmin.bind(this);
+        this.clickGeneralAdmin = this.clickGeneralAdmin.bind(this);
     }
 
     clickHome(event: React.MouseEvent<any>) {
@@ -80,8 +80,8 @@ export class Banner extends React.Component<BannerProps, BannerState>{
         event.preventDefault();
     }
 
-    clickPredictionsAdmin(event: React.MouseEvent<NavItem>) {
-        this.props.changePage(Pages.PREDICTIONS_ADMIN);
+    clickGeneralAdmin(event: React.MouseEvent<NavItem>) {
+        this.props.changePage(Pages.GENERAL_ADMIN);
         event.preventDefault();
     }
 
@@ -101,7 +101,7 @@ export class Banner extends React.Component<BannerProps, BannerState>{
         if (this.props.loggedIn) {
             navItems.push(<NavItem key={"races"} eventKey={"races"} onClick={this.clickRaces} href="#races">Races</NavItem>);
             if (this.props.user.isAdmin) {
-                navItems.push(<NavItem key={"predictions-admin"} eventKey={"predictions-admin"} onClick={this.clickPredictionsAdmin}>Predictions</NavItem>)
+                navItems.push(<NavItem key={"general-admin"} eventKey={"general-admin"} onClick={this.clickGeneralAdmin}>Admin</NavItem>)
             }
             navRightItems.push(<NavDropdown key={"user-dropdown"} eventKey={"user-dropdown"} title={this.props.user.displayName} id="basic-nav-dropdown">
                 <MenuItem key={"profile"} eventKey={"profile"} onClick={this.clickProfile} >Profile</MenuItem>
