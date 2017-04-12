@@ -9,7 +9,6 @@ bin
 APP_SECRETS.txt
 dist/**
 bundle
-!gulpfile.js
 !.eslintrc.js
 _db_backups
 *.log
