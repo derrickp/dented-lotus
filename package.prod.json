@@ -1,0 +1,28 @@
+{
+  "name": "dented-lotus",
+  "private": true,
+  "version": "0.0.5",
+  "description": "",
+  "repository": "",
+  "license": "MIT",
+  "dependencies": {
+    "base64-url": "^1.2.2",
+    "bluebird": "^3.4.0",
+    "boom": "^3.2.1",
+    "cross-env": "^3.2.4",
+    "google-auth-library": "^0.10.0",
+    "hapi": "^13.4.1",
+    "hapi-auth-jwt": "^4.0.0",
+    "inert": "^4.1.0",
+    "joi": "^8.1.1",
+    "jsonwebtoken": "^7.0.0",
+    "node-fetch": "^1.6.3",
+    "sqlite3": "^3.1.4"
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "start": "cross-env DBNAME=\"production.dentedlotus.sqlite\" node app.js",
+    "test": "npm run build"
+  }
+}

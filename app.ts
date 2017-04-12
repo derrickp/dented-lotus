@@ -7,7 +7,6 @@
 'use strict';
 
 import { Server } from "hapi";
-import * as glob from "glob";
 import * as path from "path";
 import { key as secret } from "./app/config";
 import * as hapiAuthJwt from "hapi-auth-jwt";

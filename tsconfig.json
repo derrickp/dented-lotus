@@ -19,9 +19,9 @@
     "src",
     "app",
     "app.ts",
-    "webpack.config.ts"
+    "webpack.config.ts",
+    "gulpfile.ts"
   ],
   "exclude": [
-    "node_modules"
   ]
 }
