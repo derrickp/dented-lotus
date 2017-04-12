@@ -1,5 +1,7 @@
 export const DATE_FORMAT = "MM/DD/YYYY";
 
+export const FULL_FORMAT = "MM/DD/YYYY HH:mm"
+
 import * as moment from "moment";
 
 export function getDurationFromNow(date: string): DurationFromNow {
@@ -7,15 +9,15 @@ export function getDurationFromNow(date: string): DurationFromNow {
     const now = moment();
     const timeRemaining = cutoffTime.diff(now);
     const duration = moment.duration(timeRemaining, "milliseconds");
-    const days = Math.floor(duration.asDays());
-    const hours = Math.floor(duration.subtract(days, "days").asHours());
-    const minutes = Math.floor(duration.subtract(hours, "hours").asMinutes());
-    const seconds = Math.floor(duration.subtract(minutes, "minutes").asSeconds());
+    const days = duration.days();
+    const hours = duration.hours();
+    const minutes = duration.minutes();
+    const seconds = duration.seconds();
     const strHours = ("0" + hours.toString()).slice(-2);
     const strMinutes = ("0" + minutes.toString()).slice(-2);
     const strSeconds = ("0" + seconds.toString()).slice(-2);
     const dayString = days === 1 ? "day" : "days";
-    const output = `${days} ${dayString} : ${strMinutes} : ${strSeconds}`;
+    const output = `${days} ${dayString} : ${strHours} : ${strMinutes} : ${strSeconds}`;
     return {
         timeRemaining: timeRemaining,
         duration: duration,

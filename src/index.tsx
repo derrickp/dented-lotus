@@ -1,15 +1,32 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { Banner } from "./components/Banner";
-import { UserComponent } from "./components/User";
+import * as injectTapEventPlugin from 'react-tap-event-plugin';
+injectTapEventPlugin();
+
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+
 import { StateManager } from "./StateManager";
-import { BlogComponent } from "./components/BlogComponent"; 
-import { RaceCountdown } from "./components/widgets/RaceCountdown";
 import {DentedLotus} from "./components/DentedLotus";
+
+window.onerror = function(error) {
+    alert(error);
+};
+
+// Create our singleton little state manager. This will be the arbiter for data in the application.
+// It will be the single source for data. Allowing us to easily manage it all in one location.
 const stateManager = new StateManager();
 
+const dentedLotusElement = document.getElementById("dentedlotus");
+
+const App = () => (
+    <MuiThemeProvider>
+        <DentedLotus stateManager={stateManager}/>
+    </MuiThemeProvider>
+);
+
+// Render our react app. Inject the StateManager
 ReactDOM.render(
-    <DentedLotus stateManager={stateManager}/>,
-    document.getElementById("example")
+    <App />,
+    dentedLotusElement
 );

@@ -2,8 +2,7 @@ import * as sqlite3 from "sqlite3";
 
 import { BlogResponse } from "../../../common/models/Blog";
 import { getUsersByEmail } from "./users";
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
-
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 const blogSelect = "select * from blogs_vw";
 
 export async function getBlogResponses(): Promise<BlogResponse[]> {
@@ -21,7 +20,6 @@ export async function getBlogResponses(): Promise<BlogResponse[]> {
                 const blogs: BlogResponse[] = [];
                 for (const blogRow of blogRows) {
                     const user = basicUsers.filter(basicUser => { return basicUser.key === blogRow.author })[0];
-                    console.log(user);
                     if (!user) {
                         continue;
                     }
@@ -59,7 +57,6 @@ export function saveNewBlog(blog: BlogResponse): Promise<boolean> {
             db.run(insert, valuesObject);
             resolve(true);
         } catch (exception) {
-            console.log(exception);
             reject(exception);
         }
     });

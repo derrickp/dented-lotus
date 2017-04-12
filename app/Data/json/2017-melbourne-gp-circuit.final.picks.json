@@ -1,0 +1,22 @@
+[
+    {
+        "prediction": "top-3",
+        "final": "vettel,hamilton,bottas"
+    },
+    {
+        "prediction": "most-exciting-driver",
+        "final": "ocon"
+    },
+    {
+        "prediction": "first-out",
+        "final": "grosjean"
+    },
+    {
+        "prediction": "best-radio",
+        "final": "none"
+    },
+    {
+        "prediction": "fastest-lap",
+        "final": "raikonnen"
+    }
+]

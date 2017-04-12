@@ -3,7 +3,7 @@
 import * as sqlite3 from "sqlite3";
 import { getDrivers } from "./data/drivers";
 
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 const blogQuery = "select blogs.message, blogs.title, blogs.userkey as userKey, blogs.postdate as postDate from blogs";
 const topMessage = "select * from messageoftherace order by created_date DESC LIMIT 1 ";
 const addRadioMessage = "INSERT OR REPLACE INTO messageoftherace (image_url, message, created_by, created_date, season_id, race_id)";
@@ -40,7 +40,7 @@ export function addNewRadioMessage(newMessage): Promise<boolean> {
             });
         }
         catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }

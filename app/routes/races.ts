@@ -3,17 +3,27 @@
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 import { Credentials } from "../../common/models/Authentication";
-import { getRaces, saveRaces, DbRace } from "../utilities/data/races";
+import {
+    getRaces,
+    saveRaces,
+    DbRace,
+    FinalPredictionPick,
+    saveFinalRacePredictions,
+    getFinalRacePredictions,
+    getRaceKeys
+} from "../utilities/data/races";
 import { getDriverResponses } from "../utilities/data/drivers";
 import { getTrackResponses } from "../utilities/data/tracks";
 import {
     getPredictionResponses,
     updateRacePredictions,
-    DbRacePrediction,
     deleteRacePredictions,
-    savePredictionChoices
+    savePredictionChoices,
+    getPredictionsForRace,
+    getUserPicks
 } from "../utilities/data/predictions";
-import { RaceResponse } from "../../common/models/Race";
+import { getFullUsers, updateUser } from "../utilities/data/users";
+import { RacePrediction, RaceResponse, PredictionChoices } from "../../common/models/Race";
 import { TrackResponse } from "../../common/models/Track";
 import { DriverResponse } from "../../common/models/Driver";
 import { PredictionResponse } from "../../common/models/Prediction";
@@ -28,6 +38,7 @@ export const raceRoutes: IRouteConfiguration[] = [
                 const season = Number.parseInt(request.params["season"]);
                 if (isNaN(season)) {
                     reply(Boom.badRequest("Invalid season"));
+                    return;
                 }
                 try {
                     const credentials: Credentials = request.auth.credentials;
@@ -73,7 +84,6 @@ export const raceRoutes: IRouteConfiguration[] = [
             cors: true,
             handler: async (request, reply) => {
                 const races: RaceResponse[] = request.payload;
-                console.log(request.payload);
                 const season: number = Number.parseInt(request.params["season"]);
                 if (isNaN(season)) {
                     reply(Boom.badRequest("Invalid season"));
@@ -81,7 +91,7 @@ export const raceRoutes: IRouteConfiguration[] = [
                 }
 
                 for (const race of races) {
-                    if (!race.key && (!race.track)) {
+                    if ((!race.track)) {
                         reply(Boom.badRequest("Need track to save new race"));
                         return;
                     }
@@ -89,7 +99,7 @@ export const raceRoutes: IRouteConfiguration[] = [
                 }
                 try {
                     const success = await saveRaces(season, races);
-                    reply("done").code(201);
+                    reply({ success: true }).code(201);
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
                 }
@@ -106,22 +116,21 @@ export const raceRoutes: IRouteConfiguration[] = [
         config: {
             cors: true,
             handler: async (request, reply) => {
-                const adds: PredictionResponse[] = [];
+                const adds: RacePrediction[] = request.payload;
                 const raceKey = request.params["raceKey"];
-                console.log(request.payload);
                 try {
-                    const dbAdds: DbRacePrediction[] = [];
+                    const dbAdds: RacePrediction[] = [];
                     for (const add of adds) {
-                        const dbAdd: DbRacePrediction = {
+                        const dbAdd: RacePrediction = {
                             race: raceKey,
-                            prediction: add.key,
+                            prediction: add.prediction,
                             value: add.value,
-                            modifier: add.modifier
+                            modifier: add.modifier ? add.modifier : 1.0
                         };
                         dbAdds.push(dbAdd);
                     }
                     await updateRacePredictions(raceKey, dbAdds);
-                    reply("done").code(201);
+                    reply({ success: true }).code(201);
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
                 }
@@ -134,16 +143,17 @@ export const raceRoutes: IRouteConfiguration[] = [
     },
     {
         method: "POST",
-        path: "/admin/races/{raceKey}/predictions/{predictionKey}/choices",
+        path: "/admin/races/{raceKey}/predictions/choices",
         config: {
             cors: true,
             handler: async (request, reply) => {
                 const raceKey = request.params["raceKey"];
-                const predictionKey = request.params["predictionKey"];
-                const choices: string[] = request.payload;
+                const predictionChoices: PredictionChoices[] = request.payload;
                 try {
-                    await savePredictionChoices(predictionKey, raceKey, choices);
-                    reply("done");
+                    for (const predictionChoice of predictionChoices) {
+                        await savePredictionChoices(predictionChoice.prediction, raceKey, predictionChoice.choices);
+                    }
+                    reply({ success: true });
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
                 }
@@ -151,6 +161,84 @@ export const raceRoutes: IRouteConfiguration[] = [
             auth: {
                 strategies: ['jwt'],
                 scope: ['admin']
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "/admin/races/{raceKey}/predictions/finals",
+        config: {
+            cors: true,
+            handler: async (request, reply) => {
+                const raceKey = request.params["raceKey"];
+                const finalPredictionPicks: FinalPredictionPick[] = request.payload;
+                try {
+                    await saveFinalRacePredictions(raceKey, finalPredictionPicks);
+                    reply({ success: true });
+                }
+                catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
+            },
+            auth: {
+                strategies: ["jwt"],
+                scope: ["admin"]
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "/admin/score",
+        config: {
+            cors: true,
+            handler: async (request, reply) => {
+                try {
+                    const users = await getFullUsers();
+                    const raceKeys = await getRaceKeys(2017);
+                    console.log(raceKeys);
+                    for (const user of users) {
+                        let points = 0;
+                        // 1. Get their picks
+                        const userPicks = await getUserPicks(user.key, raceKeys);
+                        for (const raceKey of raceKeys) {
+                            const finalPicks = await getFinalRacePredictions(raceKey);
+                            const racePredictions = await getPredictionsForRace(raceKey);
+                            // 2. Loop through the race predictions
+                            for (const rp of racePredictions) {
+                                const finalPick = finalPicks.filter(fp => {
+                                    return fp.prediction === rp.prediction;
+                                })[0];
+                                // If we don't have a final pick, then this prediction hasn't been finalized...
+                                if (!finalPick) {
+                                    continue;
+                                }
+                                const userPick = userPicks.filter(up => up.prediction === rp.prediction && up.race === raceKey)[0];
+                                // If user pick doesn't exist, the user didn't make a pick for this prediction. Continue
+                                if (!userPick) {
+                                    continue;
+                                }
+                                // 3. Compare their pick choice to finals
+                                if (finalPick.final.includes(userPick.choice)) {
+                                    // 4. Award points if correct
+                                    const predictionPoints = rp.value * rp.modifier;
+                                    points += predictionPoints;
+                                }
+                            }
+                        }
+                        if (points != user.points) {
+                            await updateUser({ key: user.key, points: points });
+                        }
+                    }
+                    // Once we're here all user info has been saved
+                    reply({ success: true });
+                }
+                catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
+            },
+            auth: {
+                strategies: ["jwt"],
+                scope: ["admin"]
             }
         }
     },
@@ -193,7 +281,8 @@ function getRaceResponse(season: number, raceRow: DbRace): RaceResponse {
         trivia: raceRow.trivia ? JSON.parse(raceRow.trivia) : [],
         predictions: [],
         winner: undefined,
-        imageUrl:""
+        imageUrl: "",
+        info: raceRow.info
     };
     return race;
 }

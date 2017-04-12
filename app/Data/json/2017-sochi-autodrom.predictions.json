@@ -1,0 +1,22 @@
+[
+    {
+        "prediction": "top-3",
+        "value": 50
+    },
+    {
+        "prediction": "best-radio",
+        "value": 100
+    },
+    {
+        "prediction": "first-out",
+        "value": 150
+    },
+    {
+        "prediction": "worst-luck-team",
+        "value": 150
+    },
+    {
+        "prediction": "most-points",
+        "value": 100
+    }
+]

@@ -1,7 +1,8 @@
-import * as sqlite3 from "sqlite3";
+import * as sqlite3 from "sqlite3"; 
 import { RaceResponse } from "../../../common/models/Race";
 
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
+
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const raceSelect = "select * from races_vw";
 
@@ -16,6 +17,29 @@ export interface DbRace {
     trivia?: string;
     cutoff?: string;
     winner?: string;
+    info?: string;
+}
+
+export interface FinalPredictionPick {
+    prediction: string;
+    final: string;
+}
+
+export function getRaceKeys(season: number): Promise<string[]> {
+    return new Promise<string[]>((resolve, reject) => {
+        let statement = `select key from races_vw where season = ${season}`;
+        db.all(statement, (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            const keys: string[] = [];
+            for (const row of rows) {
+                keys.push(row.key);
+            }
+            resolve(keys);
+        });
+    });
 }
 
 export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
@@ -26,7 +50,6 @@ export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
             const innerKeys = keys.join("','");
             whereStatement = " and key IN ('" + innerKeys + "')";
         }
-        console.log(`${selectStatement} ${whereStatement}`);
         db.all(`${selectStatement} ${whereStatement}`, (err, rows) => {
             if (err) {
                 reject(err);
@@ -34,6 +57,58 @@ export function getRaces(season: number, keys?: string[]): Promise<DbRace[]> {
             }
             resolve(rows);
         });
+    });
+}
+
+export function getFinalRacePredictions(raceKey): Promise<FinalPredictionPick[]> {
+    return new Promise<FinalPredictionPick[]>((resolve, reject) => {
+        const select = `select * from racepredictionsfinals where race = '${raceKey}'`;
+        db.all(select, (err, rows: FinalPredictionPick[]) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
+export function saveFinalRacePredictions(raceKey: string, finalPicks: FinalPredictionPick[]): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        const insert = `INSERT OR REPLACE INTO racepredictionsfinals 
+        (prediction, race, final)
+        VALUES (?1, ?2, ?3)`;
+        try {
+            db.serialize(() => {
+                db.exec("BEGIN;", (beginError: Error) => {
+                    if (beginError) {
+                        reject(beginError);
+                        return;
+                    }
+                    for (const finalPick of finalPicks) {
+                        const values = {
+                            1: finalPick.prediction,
+                            2: raceKey,
+                            3: finalPick.final
+                        };
+                        db.run(insert, values);
+                    }
+                    db.exec("COMMIT;", (err: Error) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                        resolve();
+                    });
+                });
+            });
+        }
+        catch (exception) {
+            console.error(exception);
+            db.exec("ROLLBACK;");
+            reject(exception);
+        }
     });
 }
 
@@ -60,7 +135,7 @@ export async function saveRaces(season, newRaces: RaceResponse[]): Promise<boole
                         };
                         // track
                         if (race.track) {
-                            values[2] = race.track.key;
+                            values[2] = race.track;
                         }
                         else {
                             values[2] = existingRace ? existingRace.track : null;
@@ -128,7 +203,7 @@ export async function saveRaces(season, newRaces: RaceResponse[]): Promise<boole
                 });
             });
         } catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }

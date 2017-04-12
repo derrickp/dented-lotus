@@ -1,21 +1,23 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-
+import { Grid, Row, Col } from "react-bootstrap";
 import { Banner } from "./Banner";
 import { UserComponent } from "./User";
 import { StateManager } from "../StateManager";
-import { BlogComponent } from "./BlogComponent";
 import { RaceCountdown } from "./widgets/RaceCountdown";
-import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, Signup } from "./Pages";
+import { RacePage, AllRaces, TrackPage, Tracks, Drivers, Pages, AllSeasonPicks, Blogs, Profile, RaceAdmin, GeneralAdmin } from "./Pages";
 import { RaceModel } from "../../common/models/Race";
-import { PropsBase } from "../utilities/ComponentUtilities";
+import { TeamModel } from "../../common/models/Team";
+import { DriverModel } from "../../common/models/Driver";
+import { TrackResponse, TrackModel } from "../../common/models/Track";
+import { BlogResponse } from "../../common/models/Blog";
+import { PredictionModel } from "../../common/models/Prediction";
 import { getUrlParameters } from "../utilities/PageUtilities";
-import { User } from "../../common/models/User";
+import { User, PublicUser } from "../../common/models/User";
+import { Scoreboard } from "./widgets/Scoreboard";
 
-import { GoogleLoginResponse } from "../../common/models/GoogleLoginResponse";
-
-export interface DentedLotusProps extends PropsBase {
-
+export interface DentedLotusProps {
+    stateManager: StateManager;
 }
 
 interface Parameters {
@@ -25,60 +27,25 @@ interface Parameters {
 export interface DentedLotusState {
     parameters: Parameters;
     sidebarOpen: boolean;
-    race: Promise<RaceModel>;
     loggedIn: boolean;
     signUpMethod?: string;
+    teams: TeamModel[];
+    races: RaceModel[];
+    race: RaceModel;
+    drivers: DriverModel[];
+    blogs: BlogResponse[];
+    tracks: TrackResponse[];
+    allSeasonPredictions: PredictionModel[];
+    publicUsers: PublicUser[];
+    user: User;
+    haveGoogleApi: boolean;
+    haveFacebookApi: boolean;
+    viewUser: User;
 }
 
 export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusState>{
-    sidebarStyle = {
-        root: {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            overflow: 'hidden',
-        },
-        sidebar: {
-            zIndex: 2,
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            transition: 'transform .3s ease-out',
-            WebkitTransition: '-webkit-transform .3s ease-out',
-            willChange: 'transform',
-            overflowY: 'auto',
-        },
-        content: {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            overflow: 'auto',
-            transition: 'left .3s ease-out, right .3s ease-out',
-        },
-        overlay: {
-            zIndex: 1,
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            opacity: 0,
-            visibility: 'hidden',
-            transition: 'opacity .3s ease-out',
-            backgroundColor: 'rgba(0,0,0,.3)',
-        },
-        dragHandle: {
-            zIndex: 1,
-            position: 'fixed',
-            top: 0,
-            bottom: 0,
-        },
-    }
     stateManager: StateManager;
+    private _mounted: boolean = false;
     /**
      *
      */
@@ -86,17 +53,74 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         super(props);
         const parameters = getUrlParameters();
         this.stateManager = props.stateManager;
-        this.state = { loggedIn: false, race: Promise.resolve(null), parameters: parameters, sidebarOpen: false };
-        this.launchRacePicks = this.launchRacePicks.bind(this);
-        this.signUp = this.signUp.bind(this);
-        this.onPageChange = this.onPageChange.bind(this);
+        this.state = {
+            loggedIn: false,
+            race: null,
+            parameters: parameters,
+            sidebarOpen: false,
+            drivers: [],
+            races: [],
+            teams: [],
+            blogs: [],
+            tracks: [],
+            publicUsers: [],
+            allSeasonPredictions: [],
+            user: null,
+            haveGoogleApi: this.stateManager.googleLoaded,
+            haveFacebookApi: this.stateManager.fbLoaded,
+            viewUser: null
+        };
+
+        this.launchNextRacePicks = this.launchNextRacePicks.bind(this);
+        this.launchAllSeasonPicks = this.launchAllSeasonPicks.bind(this);
         this.changeRace = this.changeRace.bind(this);
-        this.stateManager.watch("user", (user: User) => {
+        this.changePage = this.changePage.bind(this);
+        this.clickUser = this.clickUser.bind(this);
+        this.returnHome = this.returnHome.bind(this);
+        this.scoreRace = this.scoreRace.bind(this);
+
+        this.stateManager.watch("user", () => {
+            this.setState({ user: this.stateManager.user });
             this.onUserChange();
         });
+
+        this.stateManager.watch("races", () => {
+            this.setState({ races: this.stateManager.races });
+        });
+
+        this.stateManager.watch("teams", () => {
+            this.setState({ teams: this.stateManager.teams });
+        });
+
+        this.stateManager.watch("drivers", () => {
+            this.setState({ drivers: this.stateManager.drivers });
+        });
+
+        this.stateManager.watch("tracks", () => {
+            this.setState({ tracks: this.stateManager.tracks });
+        });
+
+        this.stateManager.watch("googleLogin", () => {
+            if (this._mounted) this.setState({ haveGoogleApi: true });
+        });
+
+        this.stateManager.watch("facebookLogin", () => {
+            if (this._mounted) this.setState({ haveFacebookApi: true });
+        });
+
+        this.stateManager.watch("blogs", () => {
+            this.setState({ blogs: this.stateManager.blogs });
+        });
+
+        this.stateManager.watch("publicUsers", () => {
+            this.setState({ publicUsers: this.stateManager.publicUsers });
+        });
+
+        this.stateManager.initialize();
     }
 
     componentDidMount() {
+        this._mounted = true;
         this.onUserChange();
     }
 
@@ -107,75 +131,134 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             parameters.page = Pages.HOME;
             this.setState({ loggedIn: loggedIn, parameters: parameters });
         } else {
+            this.stateManager.refreshRaces();
             this.setState({ loggedIn: loggedIn });
         }
     }
 
-    launchRacePicks() {
-        let parameters = this.state.parameters;
-        parameters.page = Pages.RACE;
-        this.setState({ parameters: parameters, race: this.stateManager.nextRace });
+    clickUser(publicUser: PublicUser) {
+        const parameters = this.state.parameters;
+        parameters.page = Pages.PROFILE;
+        this.stateManager.getUser(publicUser.key).then(user => {
+            this.setState({ viewUser: user, parameters: parameters });
+        }).catch((error: Error) => {
+            alert(error.message);
+        });
     }
 
-    onPageChange(page: string) {
+    launchNextRacePicks() {
+        let parameters = this.state.parameters;
+        parameters.page = Pages.RACE;
+        this.stateManager.getRace(this.stateManager.nextRace.key).then(raceModel => {
+            this.setState({ parameters: parameters, race: raceModel });
+        });
+    }
+
+    launchAllSeasonPicks() {
+        const parameters = this.state.parameters;
+        parameters.page = Pages.ALL_SEASON_PICKS;
+        this.setState({ parameters: parameters });
+        this.stateManager.allSeasonPredictions.then(allSeasonPredictions => {
+            this.setState({ allSeasonPredictions: allSeasonPredictions });
+        });
+    }
+
+    changePage(page: string) {
         const parameters = this.state.parameters;
         parameters.page = page;
-        this.setState({ parameters: parameters });
+
+        switch (page) {
+            case Pages.BLOGS:
+                this.stateManager.refreshBlogs().then(() => {
+                    this.setState({ parameters: parameters });
+                });
+                break;
+            case Pages.PREDICTIONS_ADMIN:
+                this.stateManager.refreshRaces().then(() => {
+                    this.setState({ parameters: parameters });
+                });
+                break;
+            case Pages.PROFILE:
+                this.setState({viewUser: null, parameters: parameters});
+                break;
+            default:
+                this.setState({ parameters: parameters });
+                break;
+        }
     }
 
     changeRace(race: RaceModel) {
         const parameters = this.state.parameters;
         parameters.page = Pages.RACE;
-        this.setState({ parameters: parameters, race: Promise.resolve(race) })
+        this.stateManager.getRace(race.key).then(refreshedRace => {
+            this.setState({ parameters: parameters, race: refreshedRace });
+        });
+    }
+
+    returnHome() {
+        const parameters = this.state.parameters;
+        parameters.page = Pages.HOME;
+        this.setState({ parameters: parameters });
+    } 
+
+    scoreRace(race:RaceModel):void{
+        const parameters = this.state.parameters;
+        parameters.page = Pages.RACE_ADMIN;
+        this.stateManager.getRace(race.key).then(refreshedRace => {
+            this.setState({ parameters: parameters, race: refreshedRace });
+        });
     }
 
     getCurrentView() {
         switch (this.state.parameters.page) {
             case Pages.RACE:
-                return <RacePage race={this.state.race} small={false} ></RacePage>;
-                // return <div></div>;
+                return <RacePage race={this.state.race} small={false} isAdmin={this.stateManager.user.isAdmin}></RacePage>;
+            case Pages.RACE_ADMIN:
+                return <RaceAdmin race={this.state.race} returnHome={this.returnHome} id_token={this.stateManager.user.id_token}></RaceAdmin>;
+            case Pages.BLOGS:
+                return <Blogs numBlogs={-1} blogs={this.state.blogs} title="Blogs" fromHomePanel={false} saveNewBlog={this.stateManager.saveBlog} showAddButton={this.stateManager.isLoggedIn}></Blogs>;
             case Pages.USER:
                 return <div>User!!!!</div>;
             case Pages.ALL_RACES:
-                return <AllRaces raceClick={this.changeRace} races={this.stateManager.races} selectedRace={this.state.race} />;
+                return <AllRaces raceClick={this.changeRace} races={this.state.races} selectedRace={this.state.race}  userIsAdmin={this.stateManager.userIsAdmin()} scoreRace={this.scoreRace}/>;
             case Pages.TRACKS:
-                return <Tracks tracks={this.stateManager.tracks} />;
+                return <Tracks tracks={this.state.tracks} />;
             case Pages.DRIVERS:
-                return <Drivers drivers={this.stateManager.drivers} allTeams={this.stateManager.teams} userIsAdmin={true} onDriverAdded={this.stateManager.saveDriver.bind(this.stateManager)} onTeamAdded={this.stateManager.saveTeam.bind(this.stateManager)} />
-            case Pages.SIGN_UP:
-                return <Signup onSubmit={this.stateManager.signup} type={this.state.signUpMethod} />
+                return <Drivers drivers={this.state.drivers} teams={this.state.teams} userIsAdmin={this.stateManager.user && this.stateManager.user.isAdmin} createDriver={this.stateManager.createDriver} createTeam={this.stateManager.createTeam} />
+            case Pages.ALL_SEASON_PICKS:
+                return <AllSeasonPicks predictions={this.state.allSeasonPredictions} />;
+            case Pages.PROFILE:
+                return <Profile drivers={this.state.drivers} teams={this.state.teams} user={this.state.viewUser} thisUser={this.stateManager.user}></Profile>;
+            case Pages.PREDICTIONS_ADMIN:
+                return <div>Predictions Admin</div>;
+            case Pages.GENERAL_ADMIN:
+                return <GeneralAdmin callEndpoint={this.stateManager.adminSendToEndpoint} races={this.state.races} drivers={this.state.drivers} teams={this.state.teams}></GeneralAdmin>;
             default:
                 return this.getHomePage();
         }
     }
 
-    getHomePage() {
-        const components: any[] = [];
-
-        if (this.stateManager.isLoggedIn) {
-            components.push(<RaceCountdown onclick={this.launchRacePicks} stateManager={this.stateManager} race={this.stateManager.nextRace} />);
-        }
-        components.push(<BlogComponent stateManager={this.stateManager} />);
-        return <div>{components}</div>
-    }
-
-    signUp(type: string) {
-        let parameters = this.state.parameters;
-        parameters.page = Pages.SIGN_UP;
-        this.setState({ parameters: parameters, signUpMethod: type });
+    getHomePage() { 
+            return <Grid>
+                {this.stateManager.isLoggedIn && <RaceCountdown key={1} clickMakeAllSeasonPicks={this.launchAllSeasonPicks} clickMakeNextRacePicks={this.launchNextRacePicks} race={this.stateManager.nextRace} />}
+                <Row>
+                    <Col xs={12} mdPush={8} md={4}><Scoreboard clickItem={this.clickUser} publicUsers={this.state.publicUsers} drivers={this.state.drivers} user={this.state.user} type="users" title="Standings" count={this.state.publicUsers.length} /></Col>
+                    <Col xs={12} mdPull={4} md={8}><Blogs key={2} blogs={this.state.blogs} fromHomePanel={true} showAddButton={false} saveNewBlog={null} numBlogs={3} /></Col>
+                </Row>
+            </Grid> 
     }
 
     render() {
         let mainContent: JSX.Element[] = [];
         if (this.state.parameters.page === Pages.HOME) {
-            mainContent.push(<div className="header-section"></div>);
+            mainContent.push(<div key={"header"} className="header-section"></div>);
         }
-        mainContent.push(<div className="wrapper">{this.getCurrentView()}</div>);
-
+        mainContent.push(<div key={"wrapper"} className="wrapper">{this.getCurrentView()}</div>);
+        const googleLogin = this.stateManager.googleLoaded ? this.stateManager.doGoogleLogin : null;
+        const fbLogin = this.stateManager.fbLoaded ? this.stateManager.doFacebookLogin : null;
         return <div>
-            <Banner signUp={this.signUp} logout={this.stateManager.signOut} loggedIn={this.state.loggedIn} completeGoogleLogin={this.stateManager.completeGoogleLogin} onPageChange={this.onPageChange} stateManager={this.stateManager} title="Project Dented Lotus" />
+            <Banner key={"banner"} doFacebookLogin={fbLogin} user={this.stateManager.user} logout={this.stateManager.signOut} loggedIn={this.state.loggedIn} doGoogleLogin={googleLogin} changePage={this.changePage} title="Project Dented Lotus" />
             {mainContent}
         </div>;
-
     }
 }

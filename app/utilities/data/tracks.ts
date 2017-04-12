@@ -1,7 +1,7 @@
 import * as sqlite3 from "sqlite3";
 import { TrackResponse } from "../../../common/models/Track";
 
-const db = new sqlite3.Database('app/Data/formulawednesday.sqlite');
+const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 
 const trackSelect = "SELECT * from tracks_vw";
 
@@ -17,7 +17,9 @@ export async function getTrackResponses(keys?: string[]): Promise<TrackResponse[
             country: trackRow.country,
             trivia: trackRow.trivia ? JSON.parse(trackRow.trivia) : [],
             length: trackRow.length,
-            title: trackRow.title
+            title: trackRow.title,
+            info:trackRow.info,
+            image:trackRow.image
         };
         tracks.push(track);
     }
@@ -27,7 +29,7 @@ export async function getTrackResponses(keys?: string[]): Promise<TrackResponse[
 export function saveTracks(tracks: TrackResponse[]): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         try {
-            const insert = "INSERT OR REPLACE INTO tracks (key, name, country, title, latitude, longitude, trivia, tracklength, description) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)";
+            const insert = "INSERT OR REPLACE INTO tracks (key, name, country, title, latitude, longitude, trivia, tracklength, description, info) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)";
             db.serialize(() => {
                 db.exec("BEGIN;", (beginError: Error) => {
                     if (beginError) {
@@ -44,7 +46,8 @@ export function saveTracks(tracks: TrackResponse[]): Promise<boolean> {
                             6: track.longitude,
                             7: track.trivia ? JSON.stringify(track.trivia) : "",
                             8: track.length,
-                            9: track.description
+                            9: track.description,
+                            10:track.info
                         };
                         db.run(insert, valuesObject);
                     });
@@ -58,7 +61,7 @@ export function saveTracks(tracks: TrackResponse[]): Promise<boolean> {
                 });
             });
         } catch (exception) {
-            console.log(exception);
+            console.error(exception);
             db.exec("ROLLBACK;");
             reject(exception);
         }
@@ -73,7 +76,6 @@ export function getTracks(keys?: string[]): Promise<DbTrack[]> {
             const innerKeys = keys.join("','");
             statement = statement + ` where key IN ('${innerKeys}')`
         }
-        console.log(statement);
         db.all(statement, (err, rows: DbTrack[]) => {
             if (err) {
                 reject(err);
@@ -94,4 +96,6 @@ export interface DbTrack {
     description?: string;
     latitude?: number;
     longitude?: number;
+    info?:string;
+    image?:string;
 }

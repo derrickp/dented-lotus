@@ -3,15 +3,21 @@
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 import { UserResponse } from "../../common/models/User";
-import { SignupInfo } from "../../common/models/Signup";
 import { Credentials } from "../../common/models/Authentication";
 import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";
 import { createToken, checkAndDecodeToken } from "../utilities/token";
-import { getFullUsers, updateUser, saveUser, getUsersByEmail, getUsersByKeys, saveRequestedUser } from "../utilities/data/users";
-
-const base64url = require('base64-url');
+import {
+    getFullUsers,
+    updateUser,
+    saveUser,
+    getUsersByEmail,
+    getUsersByKeys,
+    getAllPublicUsers,
+    deleteUser
+} from "../utilities/data/users";
+const base64url = require("base64-url");
 
 export const userRoutes: IRouteConfiguration[] = [
     {
@@ -19,7 +25,7 @@ export const userRoutes: IRouteConfiguration[] = [
         path: '/users/{key}',
         config: {
             cors: true,
-            handler: (req, res) => {
+            handler: async (req, res) => {
                 let credentials: Credentials = req.auth.credentials;
                 let isAdmin = credentials.scope.indexOf('admin') >= 0;
                 const key = req.params["key"];
@@ -28,60 +34,37 @@ export const userRoutes: IRouteConfiguration[] = [
                     res(Boom.badRequest("cannot save values for a different user"));
                     return;
                 }
+                try {
+                    const userPayload: UserResponse = req.payload;
 
-                let newUser: UserResponse = {
-                    displayName: req.payload.displayName,
-                    firstName: req.payload.firstName,
-                    lastName: req.payload.lastName,
-                    key: key
-                };
-
-                if (isAdmin) {
-                    newUser.role = req.payload.role;
-                    newUser.points = req.payload.points;
-                }
-
-                // Get the existing user out of the database.
-                getFullUsers([key]).then(users => {
-                    let existingUser = users[0];
+                    const fullUsers = await getFullUsers([key]);
+                    let existingUser = fullUsers[0];
                     if (!existingUser) {
                         res(Boom.badRequest("user key provided was not found"));
                         return;
                     }
-
-
-
-                    updateUser(newUser).then(updatedUser => {
-                        res(updatedUser);
-                        return;
-                    }).catch(error => {
-                        console.log(error);
-                        res(Boom.badRequest(error));
-                    });
-                });
+                    const newUser: UserResponse = {
+                        key: key,
+                        displayName: userPayload.displayName ? userPayload.displayName : existingUser.displayName,
+                        firstName: userPayload.firstName ? userPayload.firstName : existingUser.firstName,
+                        lastName: userPayload.lastName ? userPayload.lastName : existingUser.lastName,
+                        imageUrl: userPayload.imageUrl ? userPayload.imageUrl : existingUser.imageUrl,
+                        faveDriver: userPayload.faveDriver ? userPayload.faveDriver : existingUser.faveDriver,
+                        faveTeam: userPayload.faveTeam ? userPayload.faveTeam : existingUser.faveTeam
+                    };
+                    newUser.role = userPayload.role && isAdmin ? userPayload.role : existingUser.role;
+                    newUser.points = userPayload.points && isAdmin ? userPayload.points : existingUser.points;
+                    await updateUser(newUser);
+                    res({ success: true });
+                }
+                catch (exception) {
+                    console.error(exception);
+                    res(Boom.badRequest(exception));
+                }
             },
             auth: {
                 strategies: ['jwt'],
                 scope: ['user']
-            }
-        }
-    },
-    {
-        method: 'POST',
-        path: '/signup',
-        config: {
-            pre: [
-                { method: verifyUniqueUser, assign: 'user' }
-            ],
-            cors: true,
-            handler: async (request, reply) => {
-                try {
-                    const info: SignupInfo = request.payload;
-                    await saveRequestedUser(info);
-                    reply({ status: "success" });
-                } catch (exception) {
-                    reply(Boom.badRequest(exception));
-                }
             }
         }
     },
@@ -135,7 +118,7 @@ export const userRoutes: IRouteConfiguration[] = [
             cors: true,
             handler: (req, res) => {
                 // If we get here with a user, then we are good to go. Let's issue that token
-                // If not, then the error bubbles up from the verify step
+                // If not, then the error bubbles up from the verify step 
                 res({
                     id_token: createToken(req.pre["user"]),
                     user: req.pre["user"]
@@ -151,13 +134,19 @@ export const userRoutes: IRouteConfiguration[] = [
         path: '/users/{key}',
         config: {
             cors: true,
-            handler: (req, res) => {
+            handler: async (req, res) => {
                 let credentials = req.auth.credentials;
                 if (req.params["key"] === credentials.key) {
                     res(Boom.badRequest("cannot delete own user"));
                     return;
                 }
-
+                try {
+                    await deleteUser(req.params["key"]);
+                    res({ success: true });
+                }
+                catch (exception) {
+                    res(Boom.badRequest(exception));
+                }
             },
             auth: {
                 strategies: ['jwt'],
@@ -170,55 +159,58 @@ export const userRoutes: IRouteConfiguration[] = [
         path: '/users/{key?}',
         config: {
             cors: true,
-            handler: (req, res) => {
+            handler: async (req, res) => {
                 let credentials = req.auth.credentials;
                 let isAdmin = credentials.scope.indexOf('admin') >= 0;
-                const key = req.params["key"];
+                const keys = req.params["key"] ? [req.params["key"]] : [];
                 // If the person is requesting their own info, then they can have it.
-                if (key === credentials.key) {
-                    getFullUsers(credentials.key).then(users => {
-                        if (!users) {
-                            throw Boom.badRequest("user information could not be found");
-                        }
-                        var user = users[0];
-                        if (!user) {
-                            throw Boom.badRequest("user information could not be found");
-                        }
-                        res(user);
-                    });
+                if (keys.length === 1 && keys[0] === credentials.key) {
+                    try {
+                        const users = await getFullUsers(keys);
+                        res(users);
+                    }
+                    catch (exception) {
+                        res(Boom.badRequest(exception));
+                    }
                 }
                 // If the person requesting information is a 
                 else if (isAdmin) {
-                    getFullUsers([key]).then(users => {
-                        if (key) {
-                            let user = users[0];
-                            if (!user) {
-                                throw Boom.badRequest("user key provided was not found");
-                            }
-                            res(user);
-                            return;
-                        }
+                    try {
+                        const users = await getFullUsers(keys);
                         res(users);
-                    });
+                    }
+                    catch (exception) {
+                        res(Boom.badRequest(exception));
+                    }
                 }
                 // They have authenticated, so we'll get them the basic info
                 else {
-                    getUsersByKeys([key]).then(users => {
-                        if (key) {
-                            let user = users[0];
-                            if (!user) {
-                                throw Boom.badRequest("user key provided was not found");
-                            }
-                            res(user);
-                            return;
-                        }
+                    try {
+                        const users = await getUsersByKeys(keys);
                         res(users);
-                    });
+                    }
+                    catch (exception) {
+                        res(Boom.badRequest(exception));
+                    }
                 }
             },
             auth: {
                 strategies: ['jwt'],
                 scope: ['user']
+            }
+        }
+    },
+    {
+        method: 'GET',
+        path: '/allusers',
+        config: {
+            cors: true,
+            handler: async (req, res) => {
+                const users = await getUsersByKeys([]);
+                res(users);
+                // getAllPublicUsers().then(users => {
+                //     res(users);
+                // });
             }
         }
     }

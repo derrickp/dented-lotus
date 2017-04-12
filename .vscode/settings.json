@@ -11,6 +11,7 @@
         "node_modules": true,
         "config": true, 
         "**/*.js": true,
-        "**/*.js.map": true
+        "**/*.js.map": true,
+        "gulpfile.js": false
     }
 }

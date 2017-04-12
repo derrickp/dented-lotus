@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { PropsBase } from "../../utilities/ComponentUtilities";
 import { TrackResponse as TrackModel } from "../../../common/models/Track";
 import { TrackPage } from "./TrackPage";
 import { DriverModel, DriverResponse } from "../../../common/models/Driver";
@@ -8,93 +7,72 @@ import { DriverComponent } from "../widgets/DriverComponent";
 import { TeamComponent } from "../widgets/TeamComponent";
 import { Form, Input } from "formsy-react-components";
 import { TeamModel, TeamResponse } from "../../../common/models/Team";
+import { Panel, Button, PanelGroup, Grid } from "react-bootstrap";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
 
 export interface DriverProps {
-    drivers: Promise<DriverModel[]>;
-    userIsAdmin: boolean;
-    allTeams: Promise<TeamModel[]>;
-    onDriverAdded: (driver: DriverModel) => Promise<DriverModel[]>;
-    onTeamAdded: (team: TeamModel) => Promise<TeamModel[]>;
-}
-
-export interface DriverState {
     drivers: DriverModel[];
     userIsAdmin: boolean;
     teams: TeamModel[];
+    createDriver: (dr: DriverResponse) => Promise<boolean>;
+    createTeam: (tr: TeamResponse) => Promise<boolean>;
+}
+
+export interface DriverState {
+    userIsAdmin: boolean;
 }
 
 export class Drivers extends React.Component<DriverProps, DriverState> {
     constructor(props: DriverProps) {
         super(props);
         this.state = {
-            drivers: [],
-            userIsAdmin: props.userIsAdmin,
-            teams: null
+            userIsAdmin: props.userIsAdmin
         };
-        this.props.allTeams.then((teams) => {
-            this.setState({ teams: teams });
-
-        });
-        this.props.drivers.then(drivers => {
-            drivers.sort((driver1, driver2) => { return driver1.lastName.localeCompare(driver2.lastName);});
-            this.setState({ drivers: drivers });
-        });
     }
-
-    onDriverAdded(driver:DriverModel):Promise<boolean>{
-        return this.props.onDriverAdded(driver).then((drivers)=>{
-            this.setState({drivers:drivers});    
-            return true;       
-        });
-    }
-
-    onTeamAdded(team:TeamModel):Promise<boolean>{
-        return this.props.onTeamAdded(team).then((teams)=>{
-            this.setState({teams:teams});
-            return true
-        });
-    }
-
     render() {
-        if (!this.state.drivers.length) {
+        if (!this.props.drivers.length) {
             return <div>Loading...</div>;
         }
         let output = null;
-        let drivers = this.state.drivers.map(driver => {
-            return <li key={driver.key} className="dl-panel">
-                <DriverComponent userIsAdmin={this.state.userIsAdmin} allTeams={this.state.teams} key={driver.abbreviation} driver={driver} small={true} />
+        let drivers = this.props.drivers.sort((a, b) => {
+            let out = b.points - a.points;
+            if (!out) {
+                out = a.lastName.localeCompare(b.lastName);
+            }
+            return out;
+        }).map(driver => {
+            return <li key={driver.key} >
+                <DriverComponent userIsAdmin={this.state.userIsAdmin} allTeams={this.props.teams} key={driver.abbreviation} driver={driver} small={true} />
             </li>
         });
         if (this.props.userIsAdmin) {
-            drivers.push(<li key="admin"><DriverAdmin onDriverAdded={this.onDriverAdded.bind(this)}  teams={this.state.teams} /></li>);
+            drivers.push(<li key="admin"><DriverAdmin createDriver={this.props.createDriver} teams={this.props.teams} /></li>);
         }
 
-        let teams = this.state.teams.map((team) => {
-            return <li key={team.abbreviation} className="dl-panel">
-                <TeamComponent userIsAdmin={this.state.userIsAdmin} allTeams={this.state.teams} key={team.abbreviation} team={team} small={true} />
+        let teams = this.props.teams.map((team) => {
+            return <li key={team.key} className="dl-panel">
+                <TeamComponent userIsAdmin={this.state.userIsAdmin} allTeams={this.props.teams} key={team.abbreviation} team={team} small={true} />
             </li>
         });
 
         if (this.props.userIsAdmin) {
-            teams.push(<li key="admin"><TeamAdmin onTeamAdded={this.onTeamAdded.bind(this)} /></li>);
+            teams.push(<li key="admin"><TeamAdmin createTeam={this.props.createTeam} /></li>);
         }
-        return <div>
+        return <Grid>
             <h1>Drivers</h1>
-            <ul>{drivers}</ul>
+            <ul className="no-padding">{drivers}</ul>
             <h1>Teams</h1>
             <ul>{teams}</ul>
-        </div>
+        </Grid>
     }
 }
 
 export interface DriverAdminProps {
     teams: TeamModel[]
-    onDriverAdded: (driver: DriverModel) => Promise<boolean>;
+    createDriver: (dr: DriverResponse) => Promise<boolean>;
 }
 
 export class DriverAdmin extends React.Component<DriverAdminProps, any>{
-    onDriverAdded: (newDriver: DriverResponse) => Promise<void>;
     defaultDriver: DriverResponse = {
         abbreviation: "",
         active: false,
@@ -110,7 +88,7 @@ export class DriverAdmin extends React.Component<DriverAdminProps, any>{
         trivia: [""],
         wins: 0
     }
-    driver:DriverResponse;
+    driver: DriverResponse;
     constructor(props) {
         super(props);
         this.driver = this.defaultDriver;
@@ -126,15 +104,15 @@ export class DriverAdmin extends React.Component<DriverAdminProps, any>{
     }
 
     saveClicked() {
-        return this.props.onDriverAdded(new DriverModel(this.driver)).then(() => {
-            this.setState({ isAdding: false })
+        return this.props.createDriver(this.driver).then(() => {
+            this.setState({ isAdding: false });
             this.driver = this.defaultDriver;
         })
     }
     onValueChanged(name: string, value: any) {
         this.driver[name] = value;
     }
-    teamChanged(option:SelectOption) {
+    teamChanged(option: SelectOption) {
         this.driver.team = option.value.json;
     }
 
@@ -158,12 +136,12 @@ export class DriverAdmin extends React.Component<DriverAdminProps, any>{
         } else {
             output = <button onClick={this.addNewClicked.bind(this)}>Add new driver</button>;
         }
-        return <div className="dl-panel">{output}</div>;
+        return <Grid >{output}</Grid>;
     }
 }
 
 export interface TeamAdminProps {
-    onTeamAdded: (team: TeamResponse) => Promise<boolean>;
+    createTeam: (tr: TeamResponse) => Promise<boolean>;
 }
 
 export interface TeamAdminState {
@@ -192,7 +170,7 @@ export class TeamAdmin extends React.Component<TeamAdminProps, TeamAdminState>{
     }
 
     saveTeam() {
-        this.props.onTeamAdded(this.newTeam);
+        this.props.createTeam(this.newTeam);
     }
 
     onValueChanged(name: string, value: any) {
