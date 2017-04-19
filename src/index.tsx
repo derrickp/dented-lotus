@@ -5,10 +5,10 @@ import * as injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import LinearProgress from 'material-ui/LinearProgress';
 
 import { StateManager } from "./StateManager";
 import { DentedLotus } from "./components/DentedLotus";
+import { SplashScreen } from "./components/SplashScreen";
 
 window.onerror = function (error) {
     alert(error);
@@ -22,7 +22,7 @@ const dentedLotusElement = document.getElementById("dentedlotus");
 
 const Loading = () => (
     <MuiThemeProvider>
-        <LinearProgress mode="indeterminate"></LinearProgress>
+        <SplashScreen ></SplashScreen>
     </MuiThemeProvider>
 );
 
