@@ -21,6 +21,9 @@
   },
   "devDependencies": {
   },
+  "engines": {
+    "node": "6.9.4"
+  },
   "scripts": {
     "start": "cross-env DBNAME=\"production.dentedlotus.sqlite\" node app.js",
     "test": "npm run build"

@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { Well, Panel } from "react-bootstrap";
 
-import { BlogResponse } from "../../../common/models/Blog";
+import { BlogResponse } from "../../../common/responses/BlogResponse";
 import { FULL_FORMAT } from "../../../common/utils/date";
 
 import * as moment from "moment";

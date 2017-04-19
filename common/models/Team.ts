@@ -1,4 +1,5 @@
-import { DriverModel, DriverResponse } from "./Driver";
+import { DriverModel } from "./Driver";
+import { DriverResponse } from "../responses/DriverResponse";
 import { Selectable } from "./Selectable";
 
 export class TeamModel implements Selectable {

@@ -4,7 +4,7 @@ import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 
 import { saveDrivers, getDrivers, getDriverResponses } from "../utilities/data/drivers";
-import { DriverResponse } from "../../common/models/Driver";
+import { DriverResponse } from "../../common/responses/DriverResponse";
 import { TeamResponse } from "../../common/models/Team";
 
 export const driverRoutes: IRouteConfiguration[] = [

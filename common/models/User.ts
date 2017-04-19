@@ -1,21 +1,10 @@
 
+import { UserResponse } from "../responses/UserResponse";
 import { getRandomInt } from "../utils/numbers";
 import { DEFAULT_IMAGES } from "../utils/images"
 import { DriverModel } from "./Driver";
 import { TeamModel } from "./Team";
 
-export interface UserResponse {
-    key?: string;
-    displayName?: string;
-    firstName?: string;
-    lastName?: string;
-    role?: string;
-    points?: number;
-    email?: string;
-    imageUrl?: string;
-    faveDriver?: string;
-    faveTeam?: string;
-}
 export interface PublicUser {
     imageUrl: string;
     display: string;

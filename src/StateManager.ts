@@ -1,14 +1,19 @@
 import * as moment from "moment";
 
 import { FULL_FORMAT } from "../common/utils/date";
-import { BlogResponse } from "../common/models/Blog";
+import { BlogResponse } from "../common/responses/BlogResponse";
 import { User, PublicUser, GoogleUser, FacebookUser, UserContext } from "../common/models/User";
-import { RaceModel, RaceResponse, RaceModelContext, RacePrediction, PredictionChoices } from "../common/models/Race";
+import { RaceModel, RaceModelContext, RacePrediction, PredictionChoices } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
-import { DriverModel, DriverModelContext, DriverResponse } from "../common/models/Driver";
-import { PredictionResponse, PredictionModel, PredictionContext, UserPickPayload } from "../common/models/Prediction";
+import { DriverModel, DriverModelContext } from "../common/models/Driver";
+import { DriverResponse } from "../common/responses/DriverResponse";
+import { RaceResponse } from "../common/responses/RaceResponse";
+import { PredictionResponse } from "../common/responses/PredictionResponse";
+import { PredictionModel, PredictionContext } from "../common/models/Prediction";
 import { TeamModel, TeamResponse } from "../common/models/Team";
-import { AuthenticationPayload, AuthenticationTypes, AuthenticationResponse } from "../common/models/Authentication";
+import { AuthenticationTypes } from "../common/authentication";
+import { AuthResponse } from "../common/responses/AuthResponse";
+import { AuthPayload } from "../common/payloads/AuthPayload";
 import {
     getAllTracks,
     getBlogs,
@@ -34,6 +39,8 @@ import {
     sendToEndpoint
 } from "./utilities/ServerUtils";
 
+import { PredictionStore } from "./stores/PredictionStore";
+
 
 export class StateManager {
 
@@ -41,11 +48,18 @@ export class StateManager {
     fbLoaded: boolean;
     googleLoaded: boolean;
 
+    _initialized: Promise<boolean>;
+
     blogs: BlogResponse[] = [];
     publicUsers: PublicUser[] = [];
+    nextRace: RaceModel;
+
+    currentPredictions: PredictionModel[];
 
     private _watches: Map<string, Function[]> = new Map<string, Function[]>();
     private _user: User;
+
+    private readonly _predictionStore: PredictionStore;
 
     private _raceMap: Map<string, RaceModel> = new Map<string, RaceModel>();
     private _driverMap: Map<string, DriverModel> = new Map<string, DriverModel>();
@@ -65,24 +79,48 @@ export class StateManager {
 
         this.doFacebookLogin = this.doFacebookLogin.bind(this);
         this.doGoogleLogin = this.doGoogleLogin.bind(this);
+        this.getDriver = this.getDriver.bind(this);
+        this.getTeam = this.getTeam.bind(this);
+
+        this._predictionStore = new PredictionStore();
+        this._predictionStore.getDriver = this.getDriver;
+        this._predictionStore.getTeam = this.getTeam;
     }
 
-    initialize() {
-        this._initFacebook();
-        this._initGoogle();
-        this.refreshTeams().then(() => {
-            console.log("got teams");
+    initialize(): Promise<boolean> {
+        this._initialized = this._initialized ? this._initialized : new Promise<boolean>((resolve, reject) => {
+            const promises: Promise<void>[] = [];
+            this._initFacebook();
+            this._initGoogle();
+            promises.push(this.refreshTeams().then(() => {
+                console.log("got teams");
+            }));
+            promises.push(this.refreshDrivers().then(() => {
+                console.log("got drivers");
+            }));
+            promises.push(this.refreshBlogs());
+            promises.push(this.refreshTracks());
+            promises.push(this.refreshAllUsers());
+            promises.push(this.refreshRaces());
+            return Promise.all(promises).then(() => {
+                resolve(true);
+            }).catch(error => {
+                reject(error);
+            });
         });
-        this.refreshDrivers().then(() => {
-            console.log("got drivers");
-        });
-        this.refreshBlogs();
-        this.refreshTracks();
-        this.refreshAllUsers();
+        return this._initialized;
     }
 
     get teams(): TeamModel[] {
         return Array.from(this._teamMap.values());
+    }
+
+    getDriver(key: string) {
+        return this._driverMap.get(key);
+    }
+
+    getTeam(key: string) {
+        return this._teamMap.get(key);
     }
 
     refreshTeams(): Promise<void> {
@@ -101,9 +139,9 @@ export class StateManager {
 
     refreshDrivers(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            return getAllDrivers().then((driverResponses: DriverModel[]) => {
+            return getAllDrivers().then((driverResponses: DriverResponse[]) => {
                 const driverModels: DriverModel[] = driverResponses.map(dr => {
-                    return this._getDriver(dr);
+                    return this._getDriverModel(dr);
                 });
                 this._publishWatches("drivers");
                 resolve();
@@ -122,6 +160,7 @@ export class StateManager {
 
     set user(user: User) {
         this._user = user;
+        this._predictionStore.user = user;
         this._publishWatches("user");
     }
 
@@ -129,16 +168,27 @@ export class StateManager {
         return Array.from(this._raceMap.values());
     }
 
-    userIsAdmin():boolean{
-        if (!this.user){
+    get allSeasonPredictions() {
+        return this._predictionStore.allSeasonPredictions;
+    }
+
+    userIsAdmin(): boolean {
+        if (!this.user) {
             return false;
         }
         return this.user.isAdmin;
     }
+
     refreshRaces(): Promise<void> {
-        if (!this.isLoggedIn) return Promise.resolve();
         return this._getAllRaces().then(raceModels => {
             this._publishWatches("races");
+        });
+    }
+
+    refreshPredictions(raceModel: RaceModel): Promise<void> {
+        return this._predictionStore.getPredictions(raceModel.key).then(predictions => {
+            this.currentPredictions = predictions;
+            this._publishWatches("currentPredictions");
         });
     }
 
@@ -155,44 +205,44 @@ export class StateManager {
         });
     }
 
-    saveRacePredictions(model: RaceModel): Promise<void> {
-        if (!this.user.isLoggedIn || !this.user.isAdmin) return Promise.reject("Unauthorized");
-        return new Promise<void>((resolve, reject) => {
-            // First save the actual predictions
-            if (model.predictions && model.predictions.length > 0) {
-                const racePredictions = model.predictions.map(pm => {
-                    const racePrediction: RacePrediction = {
-                        race: model.key,
-                        prediction: pm.predictionResponse.key,
-                        value: pm.predictionResponse.value,
-                        modifier: pm.predictionResponse.modifier
-                    };
-                    return racePrediction;
-                });
-                // Save them to the server
-                return serverSaveRacePredictions(model.key, racePredictions, this.user.id_token);
-            }
-            return Promise.resolve();
-        }).then(() => {
-            // Then save the choices if there are any.
-            if (model.predictions && model.predictions.length > 0) {
-                const all: PredictionChoices[] = [];
-                for (const prediction of model.predictions) {
-                    if (prediction.choices && prediction.choices.length) {
-                        const predictionChoices: PredictionChoices = {
-                            race: model.key,
-                            prediction: prediction.predictionResponse.key,
-                            choices: prediction.choices.map(c => c.key).join(",")
-                        };
-                        all.push(predictionChoices);
-                    }
-                }
-                // Save to the server
-                return serverSavePredictionChoices(model.key, all, this.user.id_token);
-            }
-            return Promise.resolve();
-        });
-    }
+    // saveRacePredictions(model: RaceModel): Promise<void> {
+    //     if (!this.user.isLoggedIn || !this.user.isAdmin) return Promise.reject("Unauthorized");
+    //     return new Promise<void>((resolve, reject) => {
+    //         // First save the actual predictions
+    //         if (model.predictions && model.predictions.length > 0) {
+    //             const racePredictions = model.predictions.map(pm => {
+    //                 const racePrediction: RacePrediction = {
+    //                     race: model.key,
+    //                     prediction: pm.predictionResponse.key,
+    //                     value: pm.predictionResponse.value,
+    //                     modifier: pm.predictionResponse.modifier
+    //                 };
+    //                 return racePrediction;
+    //             });
+    //             // Save them to the server
+    //             return serverSaveRacePredictions(model.key, racePredictions, this.user.id_token);
+    //         }
+    //         return Promise.resolve();
+    //     }).then(() => {
+    //         // Then save the choices if there are any.
+    //         if (model.predictions && model.predictions.length > 0) {
+    //             const all: PredictionChoices[] = [];
+    //             for (const prediction of model.predictions) {
+    //                 if (prediction.choices && prediction.choices.length) {
+    //                     const predictionChoices: PredictionChoices = {
+    //                         race: model.key,
+    //                         prediction: prediction.predictionResponse.key,
+    //                         choices: prediction.choices.map(c => c.key).join(",")
+    //                     };
+    //                     all.push(predictionChoices);
+    //                 }
+    //             }
+    //             // Save to the server
+    //             return serverSavePredictionChoices(model.key, all, this.user.id_token);
+    //         }
+    //         return Promise.resolve();
+    //     });
+    // }
 
     get raceModelContext(): RaceModelContext {
         const context: RaceModelContext = {
@@ -202,17 +252,16 @@ export class StateManager {
             saveRace: (raceModel: RaceModel) => {
                 return this.saveRace(raceModel);
             },
-            getTrack: (response: TrackResponse): TrackModel => {
-                return new TrackModel(response);
+            getTrack: (key: string): TrackModel => {
+                if (this._trackMap.has(key)) {
+                    return new TrackModel(this._trackMap.get(key));
+                }
+                else {
+                    return null;
+                }
             },
-            getDriver: (response: DriverResponse): DriverModel => {
-                return this._getDriver(response);
-            },
-            getPrediction: (response: PredictionResponse): PredictionModel => {
-                return new PredictionModel(response, this.predictionContext);
-            },
-            saveRacePredictions: (model: RaceModel) => {
-                return this.saveRacePredictions(model);
+            getDriver: (key: string): DriverModel => {
+                return this._driverMap.get(key);
             }
         };
         return context;
@@ -221,42 +270,24 @@ export class StateManager {
     private _getAllRaces(): Promise<RaceModel[]> {
         return new Promise<RaceModel[]>((resolve, reject) => {
             this._raceMap.clear();
-            return getAllRaces(2017, this.user.id_token).then((raceResponses: RaceResponse[]) => {
+            this.nextRace = null;
+            return getAllRaces(2017).then((raceResponses: RaceResponse[]) => {
                 const raceModels: RaceModel[] = raceResponses.map(rr => {
                     return new RaceModel(rr, this.raceModelContext);
                 });
                 for (const raceModel of raceModels) {
                     this._raceMap.set(raceModel.key, raceModel);
+                    if (!this.nextRace && !raceModel.complete) {
+                        this.nextRace = raceModel;
+                    }
                 }
+
                 resolve(raceModels);
             });
         });
     }
 
-    get predictionContext(): PredictionContext {
-        return {
-            saveUserPicks: (model: PredictionModel) => {
-                if (!this.user.isLoggedIn) {
-                    return Promise.reject(new Error("Need to be logged in to save"));
-                }
-                const payload: UserPickPayload[] = [];
-                payload.push({
-                    race: model.predictionResponse.raceKey,
-                    prediction: model.predictionResponse.key,
-                    choice: model.predictionResponse.userPick
-                });
-                return saveUserPicks(payload, this.user.id_token);
-            },
-            getDriver: (response: DriverResponse) => {
-                return this._getDriver(response);
-            },
-            getTeam: (response: TeamResponse) => {
-                return new TeamModel(response);
-            }
-        }
-    }
-
-    private _getDriver(response: DriverResponse): DriverModel {
+    private _getDriverModel(response: DriverResponse): DriverModel {
         if (this._driverMap.has(response.key)) return this._driverMap.get(response.key);
         const driverModel = new DriverModel(response, this.driverContext);
         this._driverMap.set(response.key, driverModel);
@@ -269,8 +300,8 @@ export class StateManager {
             saveDriver: (driver: DriverModel) => {
                 return this.saveDriver(driver);
             },
-            getTeam: (response: TeamResponse) => {
-                return this._getTeam(response);
+            getTeam: (key: string) => {
+                return this._teamMap.get(key);
             }
         };
     }
@@ -323,19 +354,6 @@ export class StateManager {
                 this.blogs = blogResponses;
                 this._publishWatches("blogs");
                 resolve();
-            });
-        });
-    }
-
-    get allSeasonPredictions(): Promise<PredictionModel[]> {
-        return new Promise<PredictionModel[]>((resolve, reject) => {
-            return getAllSeasonPredictions(this.user.id_token).then(predictionResponses => {
-                const allSeasonPredictions: PredictionModel[] = [];
-                for (const predictionResponse of predictionResponses) {
-                    const pm = new PredictionModel(predictionResponse, this.predictionContext);
-                    allSeasonPredictions.push(pm);
-                }
-                resolve(allSeasonPredictions);
             });
         });
     }
@@ -431,20 +449,6 @@ export class StateManager {
         }
     }
 
-    get nextRace(): RaceModel {
-        if (!this.races.length) {
-            return null;
-        }
-        let nextRace: RaceModel;
-        for (const race of this.races) {
-            if (!race.complete) {
-                nextRace = race;
-                break;
-            }
-        }
-        return nextRace;
-    }
-
     signOut(): void {
         this.user.logOut().then(success => {
             this.user = new User(null, "", null);
@@ -456,14 +460,14 @@ export class StateManager {
             return Promise.reject(new Error("Unauthorized"));
         }
         return new Promise<DriverModel>((resolve, reject) => {
-            return saveDrivers([driverModel], this.user.id_token).then(newDriverResponses => {
+            return saveDrivers([driverModel.json], this.user.id_token).then(newDriverResponses => {
                 const newDriverModels: DriverModel[] = [];
                 if (newDriverResponses.length) {
                     for (const newDriverResponse of newDriverResponses) {
                         if (this._driverMap.has(newDriverResponse.key)) {
                             this._driverMap.delete(newDriverResponse.key);
                         }
-                        newDriverModels.push(this._getDriver(newDriverResponse));
+                        newDriverModels.push(this._getDriverModel(newDriverResponse));
                     }
                 }
                 resolve(newDriverModels[0]);
@@ -505,7 +509,7 @@ export class StateManager {
                     if (this._driverMap.has(newDriverResponse.key)) {
                         this._driverMap.delete(newDriverResponse.key);
                     }
-                    const newDriverModel = this._getDriver(newDriverResponse);
+                    const newDriverModel = this._getDriverModel(newDriverResponse);
                 }
                 resolve(true);
             });
@@ -522,7 +526,7 @@ export class StateManager {
                         if (this._driverMap.has(newDriverResponse.key)) {
                             this._driverMap.delete(newDriverResponse.key);
                         }
-                        newDriverModels.push(this._getDriver(newDriverResponse));
+                        newDriverModels.push(this._getDriverModel(newDriverResponse));
                     }
                 }
                 resolve(newDriverModels);
@@ -594,7 +598,7 @@ export class StateManager {
     }
 
     completeFacebookLogin(args: FB.LoginStatusResponse): Promise<void> {
-        const authPayload: AuthenticationPayload = {
+        const authPayload: AuthPayload = {
             auth_token: args.authResponse.accessToken,
             authType: AuthenticationTypes.FACEBOOK
         };
@@ -609,7 +613,7 @@ export class StateManager {
     }
 
     completeGoogleLogin(response: gapi.auth2.GoogleUser): Promise<void> {
-        const authPayload: AuthenticationPayload = {
+        const authPayload: AuthPayload = {
             auth_token: response.getAuthResponse().id_token,
             authType: AuthenticationTypes.GOOGLE
         };

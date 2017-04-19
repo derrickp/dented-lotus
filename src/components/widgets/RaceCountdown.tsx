@@ -9,6 +9,7 @@ export interface RaceCountdownProps {
     race: RaceModel;
     clickMakeNextRacePicks: () => void;
     clickMakeAllSeasonPicks: () => void;
+    isLoggedIn: boolean;
 }
 
 export interface RaceCountdownState {
@@ -56,13 +57,13 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
                         </div>
                         <div className="row">
                             <div className="col-md-4 col-sm-8">
-                                <Button block={true} onClick={this.props.clickMakeNextRacePicks} bsSize="large" bsStyle="primary" >Make Your Picks</Button></div>
+                                <Button disabled={!this.props.isLoggedIn} block={true} onClick={this.props.clickMakeNextRacePicks} bsSize="large" bsStyle="primary" >Make Your Picks</Button></div>
                             <div className="col-md-4 col-sm-8">
-                                {allSeasonDFromNow.timeRemaining > 0 && <Button block={true} bsSize="large" bsStyle="primary" onClick={this.props.clickMakeAllSeasonPicks}>Make All Season Picks</Button>}
+                                {allSeasonDFromNow.timeRemaining > 0 && <Button disabled={!this.props.isLoggedIn} block={true} bsSize="large" bsStyle="primary" onClick={this.props.clickMakeAllSeasonPicks}>Make All Season Picks</Button>}
                             </div>
                         </div>
                     </div> : <span className="race-countdown">Loading race countdown...</span>
-                    }  
+                    }
             </Jumbotron>
         )
         return jumbo;

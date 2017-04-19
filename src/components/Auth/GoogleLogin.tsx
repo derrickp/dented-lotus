@@ -1,7 +1,5 @@
 import * as React from "react";
 
-import { GoogleLoginResponse } from "../../../common/models/GoogleLoginResponse";
-
 export interface GoogleLoginProps {
     login: () => void;
     loggedIn: boolean;

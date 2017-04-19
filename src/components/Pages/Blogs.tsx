@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { Grid, Row, Col, Button, Jumbotron } from "react-bootstrap";
 
-import { BlogResponse } from "../../../common/models/Blog";
+import { BlogResponse } from "../../../common/responses/BlogResponse";
 import { Blog } from "../widgets/Blog";
 import { BlogEditor } from "../widgets/BlogEditor";
 

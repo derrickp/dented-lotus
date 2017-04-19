@@ -14,6 +14,7 @@ export interface RaceAdminProps {
     race: RaceModel;
     returnHome: () => any;
     id_token: string;
+    predictions: PredictionModel[];
 }
 
 export interface RaceAdminState {
@@ -53,7 +54,7 @@ export class RaceAdminPage extends React.Component<RaceAdminProps, RaceAdminStat
             }
             // Do the scorpioning.
             const raceKey = this.props.race.key;
-            const predictions = this.props.race.predictions;
+            const predictions = this.props.predictions;
             const finals = predictions.map((p) => { return { prediction: p.predictionResponse.key, final: p.predictionResponse.userPick }; })
             savePredictionOutcomes(raceKey, finals, this.props.id_token).then(() => {
                 this.returnHome();
@@ -76,7 +77,7 @@ export class RaceAdminPage extends React.Component<RaceAdminProps, RaceAdminStat
         const predictionsTitle = (
             <div><h4 className="pull-left">{this.props.race.raceResponse.displayName + ": Scoring"}</h4><div className="clearfix"></div></div>
         );
-        const predictions = race.predictions.map((p) => { return <PredictionComponent allowedPrediction={true} save={this.saveUserPicks} key={p.json.key} prediction={p} /> });
+        const predictions = this.props.predictions.map((p) => { return <PredictionComponent allowedPrediction={true} save={this.saveUserPicks} key={p.json.key} prediction={p} /> });
         const predictionsPanel = <Panel eventKey={ActiveKeys.PREDICTIONS} bsStyle={"primary"} header={predictionsTitle} expanded={true} defaultExpanded={true} collapsible={true}>
             {predictions}
             <Button onClick={this.saveFinal} bsSize="large" bsStyle={"primary"}>Save</Button>

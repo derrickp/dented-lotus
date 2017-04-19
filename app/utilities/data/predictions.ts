@@ -1,8 +1,7 @@
 
 import * as sqlite3 from "sqlite3";
 
-import { Credentials } from "../../../common/models/Authentication";
-import { PredictionResponse } from "../../../common/models/Prediction";
+import { PredictionResponse, PredictionTypes } from "../../../common/responses/PredictionResponse";
 import { RacePrediction } from "../../../common/models/Race";
 import { getDriverResponses } from "./drivers";
 import { getTeamResponses } from "./teams";
@@ -14,14 +13,14 @@ const racePredictionSelect = "select * from racepredictions_vw";
 const userPicksSelect = "select * from userpicks_vw";
 const racePredictionsChoicesSelect = "select choice from racepredictionchoices";
 
-export async function getPredictionResponses(raceKeys: string[], credentials: Credentials): Promise<PredictionResponse[]> {
+export async function getPredictionResponses(raceKeys: string[], userKey: string): Promise<PredictionResponse[]> {
     const predictionResponses: PredictionResponse[] = [];
     const racePredictionRows = await getRacePredictions(raceKeys);
     const predictionKeys = racePredictionRows.filter(rp => rp.prediction).map(rp => rp.prediction);
     const predictions = await getPredictions(predictionKeys);
     const drivers = await getDriverResponses(true, []);
     const teams = await getTeamResponses([]);
-    const userPicks = await getUserPicks(credentials.key, raceKeys);
+    const userPicks = await getUserPicks(userKey, raceKeys);
     for (const racePredictionRow of racePredictionRows) {
         const thisPrediction = predictions.filter(p => {
             return p.key === racePredictionRow.prediction;
@@ -55,25 +54,21 @@ export async function getPredictionResponses(raceKeys: string[], credentials: Cr
         const possibleChoices = await getPredictionChoices(prediction.key, racePredictionRow.race);
         // Use the previously retrieved values.
         switch (prediction.type) {
-            case "team":
+            case PredictionTypes.TEAM:
                 if (possibleChoices && possibleChoices.length) {
-                    prediction.choices = teams.filter(t => {
-                        return possibleChoices.indexOf(t.key) > -1;
-                    });
+                    prediction.choices = possibleChoices;
                 }
                 else {
-                    prediction.choices = teams;
+                    prediction.choices = teams.map(t => t.key);
                 }
                 break;
-            case "driver":
+            case PredictionTypes.DRIVER:
             default:
                 if (possibleChoices && possibleChoices.length) {
-                    prediction.choices = drivers.filter(d => {
-                        return possibleChoices.indexOf(d.key) > -1;
-                    });
+                    prediction.choices = possibleChoices;
                 }
                 else {
-                    prediction.choices = drivers;
+                    prediction.choices = drivers.map(d => d.key);
                 }
                 break;
         }

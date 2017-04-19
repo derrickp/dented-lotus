@@ -2,8 +2,8 @@
 
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
-import { UserResponse } from "../../common/models/User";
-import { Credentials } from "../../common/models/Authentication";
+import { UserResponse } from "../../common/responses/UserResponse";
+import { Credentials } from "../../common/authentication";
 import { createUserSchema } from "../utilities/createUser";
 import { verifyUniqueUser, verifyCredentials } from "../utilities/userFunctions";
 import { authenticateUserSchema } from "../utilities/authenticateUserSchema";

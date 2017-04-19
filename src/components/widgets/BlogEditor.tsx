@@ -6,7 +6,7 @@ import { EditorState, ContentState, convertToRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import { Editor } from 'react-draft-wysiwyg';
 
-import { BlogResponse } from "../../../common/models/Blog";
+import { BlogResponse } from "../../../common/responses/BlogResponse";
 
 export interface BlogEditorProps {
     saveBlog: (b: BlogResponse) => void;

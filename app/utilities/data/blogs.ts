@@ -1,6 +1,6 @@
 import * as sqlite3 from "sqlite3";
 
-import { BlogResponse } from "../../../common/models/Blog";
+import { BlogResponse } from "../../../common/responses/BlogResponse";
 import { getUsersByEmail } from "./users";
 const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 const blogSelect = "select * from blogs_vw";

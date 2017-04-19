@@ -20,6 +20,7 @@ import { blogRoutes } from "./app/routes/blogs";
 import { trackRoutes } from "./app/routes/tracks";
 import { teamRoutes } from "./app/routes/teams";
 import { pickRoutes } from "./app/routes/picks";
+import { scoreRoutes } from "./app/routes/scores";
 
 // Start the server
 const PORT = process.env.PORT || 8080;
@@ -53,6 +54,7 @@ server.route(blogRoutes);
 server.route(trackRoutes);
 server.route(teamRoutes);
 server.route(pickRoutes);
+server.route(scoreRoutes);
 
 server.route({
   method: 'GET',

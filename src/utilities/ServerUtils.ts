@@ -2,20 +2,22 @@
 import { getRandomInt } from "../../common/utils/numbers";
 import { DEFAULT_IMAGES } from "../../common/utils/images"
 import { TrackResponse } from "../../common/models/Track";
-import { DriverResponse } from "../../common/models/Driver";
-import { RaceResponse, RacePrediction, PredictionChoices } from "../../common/models/Race";
-import { UserPickPayload } from "../../common/models/Prediction";
+import { DriverResponse } from "../../common/responses/DriverResponse";
+import { RacePrediction, PredictionChoices } from "../../common/models/Race";
+import { UserPickPayload } from "../../common/payloads/UserPickPayload";
 import { TeamResponse } from "../../common/models/Team";
-import { UserResponse } from "../../common/models/User";
-import { BlogResponse } from "../../common/models/Blog";
+import { UserResponse } from "../../common/responses/UserResponse";
+import { RaceResponse } from "../../common/responses/RaceResponse";
+import { BlogResponse } from "../../common/responses/BlogResponse";
 import { PublicUser } from "../../common/models/User";
-import { PredictionResponse } from "../../common/models/Prediction";
-import { AuthenticationPayload, AuthenticationResponse } from "../../common/models/Authentication";
+import { PredictionResponse } from "../../common/responses/PredictionResponse";
+import { AuthPayload } from "../../common/payloads/AuthPayload";
+import { AuthResponse } from "../../common/responses/AuthResponse";
 
-let baseUrl = `${window.location.origin}`;
-if (baseUrl.indexOf(":8080") == -1) {
-    baseUrl += ":8080";
-}
+export let baseUrl = `${window.location.origin}`;
+// if (baseUrl.indexOf(":8080") == -1) {
+//     baseUrl += ":8080";
+// }
 
 /**
  * 
@@ -106,14 +108,9 @@ export function getTrack(key: string): Promise<TrackResponse> {
     });
 }
 
-export function getAllRaces(season: number, id_token: string): Promise<RaceResponse[]> {
+export function getAllRaces(season: number): Promise<RaceResponse[]> {
     return new Promise<RaceResponse[]>((resolve, reject) => {
-        return fetch(`${baseUrl}/races/${season}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + id_token
-            }
-        }).then(response => {
+        return fetch(`${baseUrl}/races/${season}`).then(response => {
             return response.json().then((races: RaceResponse[]) => {
                 resolve(races);
             });
@@ -415,7 +412,7 @@ export function saveUserInfo(user: UserResponse, id_token: string): Promise<void
     });
 }
 
-export function authenticate(authPayload: AuthenticationPayload): Promise<AuthenticationResponse> {
+export function authenticate(authPayload: AuthPayload): Promise<AuthResponse> {
     return new Promise<UserResponse>((resolve, reject) => {
         return fetch(`${baseUrl}/users/authenticate`, {
             method: 'POST',
@@ -424,7 +421,7 @@ export function authenticate(authPayload: AuthenticationPayload): Promise<Authen
             },
             body: JSON.stringify(authPayload)
         }).then(response => {
-            return response.json().then((authResponse: AuthenticationResponse) => {
+            return response.json().then((authResponse: AuthResponse) => {
                 resolve(authResponse);
             });
         });

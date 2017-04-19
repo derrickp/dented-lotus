@@ -2,9 +2,9 @@
 import * as Boom from "boom";
 import fetch from "node-fetch";
 import { getUsersByEmail, saveUser } from "./data/users";
-import { AuthenticationPayload } from "../../common/models/Authentication";
+import { AuthPayload } from "../../common/payloads/AuthPayload";
 import { GOOGLE_CLIENT_ID } from "../config";
-import { UserResponse } from "../../common/models/User";
+import { UserResponse } from "../../common/responses/UserResponse";
 
 import * as GoogleAuth from "google-auth-library";
 
@@ -74,7 +74,7 @@ function verifyGoogleId(token: string): Promise<GoogleAuthResponse> {
 }
 
 export async function verifyCredentials(req, res) {
-    const authPayload: AuthenticationPayload = req.payload;
+    const authPayload: AuthPayload = req.payload;
 
     try {
         let authResponse: CombinedAuth;

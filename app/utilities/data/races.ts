@@ -1,5 +1,5 @@
 import * as sqlite3 from "sqlite3"; 
-import { RaceResponse } from "../../../common/models/Race";
+import { RaceResponse } from "../../../common/responses/RaceResponse";
 
 
 const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
@@ -171,8 +171,8 @@ export async function saveRaces(season, newRaces: RaceResponse[]): Promise<boole
                             values[7] = existingRace ? existingRace.qualiDate : null;
                         }
                         // winner
-                        if (race.winner && race.winner.key) {
-                            values[8] = race.winner.key;
+                        if (race.winner) {
+                            values[8] = race.winner;
                         }
                         else {
                             values[8] = existingRace ? existingRace.winner : null;

@@ -3,7 +3,7 @@ import * as React from "react";
 import { RaceModel } from "../../../../common/models/Race";
 import { DriverModel } from "../../../../common/models/Driver";
 import { TeamModel } from "../../../../common/models/Team";
-import { PredictionResponse } from "../../../../common/models/Prediction";
+import { PredictionResponse } from "../../../../common/responses/PredictionResponse";
 
 import TextField from "material-ui/TextField";
 import RaisedButton from 'material-ui/RaisedButton';

@@ -2,8 +2,8 @@
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 
-import { BlogResponse } from "../../common/models/Blog";
-import { Credentials } from "../../common/models/Authentication";
+import { BlogResponse } from "../../common/responses/BlogResponse";
+import { Credentials } from "../../common/authentication";
 import { getBlogResponses, saveNewBlog } from "../utilities/data/blogs";
 
 export const blogRoutes: IRouteConfiguration[] = [

@@ -10,7 +10,7 @@ import { RaceModel } from "../../common/models/Race";
 import { TeamModel } from "../../common/models/Team";
 import { DriverModel } from "../../common/models/Driver";
 import { TrackResponse, TrackModel } from "../../common/models/Track";
-import { BlogResponse } from "../../common/models/Blog";
+import { BlogResponse } from "../../common/responses/BlogResponse";
 import { PredictionModel } from "../../common/models/Prediction";
 import { getUrlParameters } from "../utilities/PageUtilities";
 import { User, PublicUser } from "../../common/models/User";
@@ -40,6 +40,7 @@ export interface DentedLotusState {
     user: User;
     haveGoogleApi: boolean;
     haveFacebookApi: boolean;
+    currentPredictions: PredictionModel[];
     viewUser: User;
 }
 
@@ -54,20 +55,21 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         const parameters = getUrlParameters();
         this.stateManager = props.stateManager;
         this.state = {
-            loggedIn: false,
+            loggedIn: this.stateManager.isLoggedIn,
             race: null,
             parameters: parameters,
             sidebarOpen: false,
-            drivers: [],
-            races: [],
-            teams: [],
-            blogs: [],
-            tracks: [],
-            publicUsers: [],
+            drivers: this.stateManager.drivers,
+            races: this.stateManager.races,
+            teams: this.stateManager.teams,
+            blogs: this.stateManager.blogs,
+            tracks: this.stateManager.tracks,
+            publicUsers: this.stateManager.publicUsers,
             allSeasonPredictions: [],
-            user: null,
+            user: this.stateManager.user,
             haveGoogleApi: this.stateManager.googleLoaded,
             haveFacebookApi: this.stateManager.fbLoaded,
+            currentPredictions: this.stateManager.currentPredictions,
             viewUser: null
         };
 
@@ -82,6 +84,10 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         this.stateManager.watch("user", () => {
             this.setState({ user: this.stateManager.user });
             this.onUserChange();
+        });
+
+        this.stateManager.watch("currentPredictions", () => {
+            this.setState({ currentPredictions: this.stateManager.currentPredictions });
         });
 
         this.stateManager.watch("races", () => {
@@ -115,8 +121,6 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         this.stateManager.watch("publicUsers", () => {
             this.setState({ publicUsers: this.stateManager.publicUsers });
         });
-
-        this.stateManager.initialize();
     }
 
     componentDidMount() {
@@ -131,7 +135,6 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             parameters.page = Pages.HOME;
             this.setState({ loggedIn: loggedIn, parameters: parameters });
         } else {
-            this.stateManager.refreshRaces();
             this.setState({ loggedIn: loggedIn });
         }
     }
@@ -147,11 +150,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     }
 
     launchNextRacePicks() {
-        let parameters = this.state.parameters;
-        parameters.page = Pages.RACE;
-        this.stateManager.getRace(this.stateManager.nextRace.key).then(raceModel => {
-            this.setState({ parameters: parameters, race: raceModel });
-        });
+        this.changeRace(this.stateManager.nextRace);
     }
 
     launchAllSeasonPicks() {
@@ -190,9 +189,8 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     changeRace(race: RaceModel) {
         const parameters = this.state.parameters;
         parameters.page = Pages.RACE;
-        this.stateManager.getRace(race.key).then(refreshedRace => {
-            this.setState({ parameters: parameters, race: refreshedRace });
-        });
+        this.stateManager.refreshPredictions(race);
+        this.setState({ parameters: parameters, race: race });
     }
 
     returnHome() {
@@ -212,9 +210,9 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     getCurrentView() {
         switch (this.state.parameters.page) {
             case Pages.RACE:
-                return <RacePage race={this.state.race} small={false} isAdmin={this.stateManager.user.isAdmin}></RacePage>;
+                return <RacePage race={this.state.race} predictions={this.state.currentPredictions} small={false} isAdmin={this.stateManager.user.isAdmin}></RacePage>;
             case Pages.RACE_ADMIN:
-                return <RaceAdmin race={this.state.race} returnHome={this.returnHome} id_token={this.stateManager.user.id_token}></RaceAdmin>;
+                return <RaceAdmin race={this.state.race} predictions={this.state.currentPredictions} returnHome={this.returnHome} id_token={this.stateManager.user.id_token}></RaceAdmin>;
             case Pages.BLOGS:
                 return <Blogs numBlogs={-1} blogs={this.state.blogs} title="Blogs" fromHomePanel={false} saveNewBlog={this.stateManager.saveBlog} showAddButton={this.stateManager.isLoggedIn}></Blogs>;
             case Pages.USER:
@@ -240,7 +238,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     getHomePage() { 
             return <Grid>
-                {this.stateManager.isLoggedIn && <RaceCountdown key={1} clickMakeAllSeasonPicks={this.launchAllSeasonPicks} clickMakeNextRacePicks={this.launchNextRacePicks} race={this.stateManager.nextRace} />}
+                <RaceCountdown isLoggedIn={this.stateManager.isLoggedIn} key={1} clickMakeAllSeasonPicks={this.launchAllSeasonPicks} clickMakeNextRacePicks={this.launchNextRacePicks} race={this.stateManager.nextRace} />
                 <Row>
                     <Col xs={12} mdPush={8} md={4}><Scoreboard clickItem={this.clickUser} publicUsers={this.state.publicUsers} drivers={this.state.drivers} user={this.state.user} type="users" title="Standings" count={this.state.publicUsers.length} /></Col>
                     <Col xs={12} mdPull={4} md={8}><Blogs key={2} blogs={this.state.blogs} fromHomePanel={true} showAddButton={false} saveNewBlog={null} numBlogs={3} /></Col>

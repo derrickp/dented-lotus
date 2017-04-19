@@ -1,9 +1,11 @@
 import * as React from "react";
 import * as ReactDom from "react-dom";
-import { DriverModel, DriverResponse } from "../../../common/models/Driver";
+import { DriverModel } from "../../../common/models/Driver";
+import { DriverResponse } from "../../../common/responses/DriverResponse";
 import { TeamModel, TeamResponse } from "../../../common/models/Team";
 import { Selectable } from "../../../common/models/Selectable";
-import { PredictionModel, PredictionResponse } from "../../../common/models/Prediction";
+import { PredictionModel } from "../../../common/models/Prediction";
+import { PredictionResponse } from "../../../common/responses/PredictionResponse";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
 import { MenuItem, FormControl, Well, FormGroup } from "react-bootstrap";
 import SnackBar from "material-ui/Snackbar";

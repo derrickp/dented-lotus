@@ -5,11 +5,12 @@ import * as injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import LinearProgress from 'material-ui/LinearProgress';
 
 import { StateManager } from "./StateManager";
-import {DentedLotus} from "./components/DentedLotus";
+import { DentedLotus } from "./components/DentedLotus";
 
-window.onerror = function(error) {
+window.onerror = function (error) {
     alert(error);
 };
 
@@ -19,14 +20,28 @@ const stateManager = new StateManager();
 
 const dentedLotusElement = document.getElementById("dentedlotus");
 
+const Loading = () => (
+    <MuiThemeProvider>
+        <LinearProgress mode="indeterminate"></LinearProgress>
+    </MuiThemeProvider>
+);
+
 const App = () => (
     <MuiThemeProvider>
-        <DentedLotus stateManager={stateManager}/>
+        <DentedLotus stateManager={stateManager} />
     </MuiThemeProvider>
 );
 
 // Render our react app. Inject the StateManager
 ReactDOM.render(
-    <App />,
+    <Loading />,
     dentedLotusElement
 );
+
+stateManager.initialize().then(success => {
+    // Render our react app. Inject the StateManager
+    ReactDOM.render(
+        <App />,
+        dentedLotusElement
+    );
+});

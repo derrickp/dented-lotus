@@ -1,6 +1,6 @@
 import * as sqlite3 from "sqlite3";
 
-import { DriverResponse } from "../../../common/models/Driver";
+import { DriverResponse } from "../../../common/responses/DriverResponse";
 import { getTeamResponses } from "./teams";
 
 const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
@@ -23,7 +23,7 @@ export function saveDrivers(drivers: DriverResponse[]): Promise<boolean> {
                             2: driver.active ? 1 : 0,
                             3: driver.firstName ? driver.firstName : "",
                             4: driver.lastName,
-                            5: driver.team ? driver.team.key : "",
+                            5: driver.team ? driver.team : "",
                             6: driver.trivia ? JSON.stringify(driver.trivia) : "",
                             7: driver.nationality ? driver.nationality : "",
                             8: driver.flag ? driver.flag : "",
@@ -82,14 +82,10 @@ export async function getDriverResponses(active?: boolean, keys?: string[]): Pro
             flag: driverRow.flag,
             points: +driverRow.points,
             nationality: driverRow.nationality,
-            team: null,
+            team: driverRow.team,
             trivia: driverRow.trivia ? JSON.parse(driverRow.trivia) : [],
             key: driverRow.key
         };
-        const teams = await getTeamResponses([driverRow.team]);
-        if (teams && teams.length) {
-            driver.team = teams[0];
-        }
         drivers.push(driver);
     }
     return drivers;

@@ -11,6 +11,7 @@ export interface RaceProps {
     race: RaceModel;
     small: boolean;
     isAdmin:boolean;
+    predictions: PredictionModel[];
 }
 
 export interface RaceState {
@@ -70,7 +71,7 @@ export class RacePage extends React.Component<RaceProps, RaceState> {
         const timeRemaining = dFromNow.timeRemaining;
         const allowedPrediction = timeRemaining > 0;
         const predictionsStyle = allowedPrediction ? "primary" : "danger";
-        const predictions = race.predictions.map((p) => { return <PredictionComponent allowedPrediction={allowedPrediction} save={this.saveUserPicks} key={p.json.key} prediction={p} /> });
+        const predictions = this.props.predictions ? this.props.predictions.map((p) => { return <PredictionComponent allowedPrediction={allowedPrediction} save={this.saveUserPicks} key={p.json.key} prediction={p} /> }) : null;
         const predictionsPanel = <Panel eventKey={ActiveKeys.PREDICTIONS} bsStyle={predictionsStyle} header={predictionsTitle} expanded={true} defaultExpanded={true} collapsible={true}>
             {predictions}
         </Panel>;

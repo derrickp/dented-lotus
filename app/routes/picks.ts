@@ -2,8 +2,9 @@
 
 import * as Boom from "boom";
 import { IRouteConfiguration } from "hapi";
-import { Credentials } from "../../common/models/Authentication";
-import { PredictionResponse, UserPickPayload } from "../../common/models/Prediction";
+import { Credentials } from "../../common/authentication";
+import { PredictionResponse } from "../../common/responses/PredictionResponse";
+import { UserPickPayload } from "../../common/payloads/UserPickPayload";
 import {
     getUserPicks, 
     DbUserPick, 

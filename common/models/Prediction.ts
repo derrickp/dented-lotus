@@ -1,25 +1,13 @@
-import { DriverResponse, DriverModel } from "./Driver";
+import { DriverModel } from "./Driver";
+import { DriverResponse } from "../responses/DriverResponse";
+import { PredictionResponse, PredictionTypes } from "../responses/PredictionResponse";
 import { TeamResponse, TeamModel } from "./Team";
 import { Selectable } from "./Selectable";
 
-export interface PredictionResponse {
-    key: string;
-    description?: string;
-    title: string;
-    type: string;
-    allSeason: boolean;
-    choices?: DriverResponse[] | TeamResponse[];
-    value?: number;
-    modifier?: number;
-    outcome?: DriverResponse[] | TeamResponse[];
-    userPick?: string;
-    raceKey?: string;
-}
-
 export interface PredictionContext {
     saveUserPicks: (model: PredictionModel) => Promise<boolean>;
-    getDriver: (response: DriverResponse) => DriverModel;
-    getTeam: (response: TeamResponse) => TeamModel;
+    getDriver: (key: string) => DriverModel;
+    getTeam: (key: string) => TeamModel;
 }
 
 export class PredictionModel {
@@ -30,11 +18,11 @@ export class PredictionModel {
     constructor(response: PredictionResponse, context: PredictionContext) {
         this.predictionResponse = response;
         for (const choice of response.choices) {
-            if ((choice as DriverResponse).lastName) {
-                this.choices.push(context.getDriver(choice as DriverResponse));
+            if (response.type === PredictionTypes.DRIVER) {
+                this.choices.push(context.getDriver(choice));
             }
             else {
-                this.choices.push(context.getTeam(choice as TeamResponse));
+                this.choices.push(context.getTeam(choice));
             }
         }
         this._context = context;
@@ -47,10 +35,4 @@ export class PredictionModel {
     get json(): PredictionResponse {
         return this.predictionResponse;
     }
-}
-
-export interface UserPickPayload {
-    race: string;
-    prediction: string;
-    choice: string;
 }
