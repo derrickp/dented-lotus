@@ -248,7 +248,7 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     render() {
         let mainContent: JSX.Element[] = [];
-        if (this.state.parameters.page === Pages.HOME) {
+        if (!this.state.parameters.page || this.state.parameters.page === Pages.HOME) {
             mainContent.push(<div key={"header"} className="header-section"></div>);
         }
         mainContent.push(<div key={"wrapper"} className="wrapper">{this.getCurrentView()}</div>);
