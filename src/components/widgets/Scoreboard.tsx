@@ -2,7 +2,6 @@ import * as React from "react";
 import { Button, Glyphicon, Panel, Table } from "react-bootstrap";
 import { DriverModel } from "../../../common/models/Driver";
 import { User, PublicUser } from "../../../common/models/User";
-import { StateManager } from "../../StateManager";
 
 import { UserScoreboard } from "./UserScoreboard";
 

@@ -15,6 +15,7 @@ export class SplashScreen extends React.Component<SplashScreenProps, SplashScree
     render() {
         return <div key={"wrapper"} className="loading-wrapper">
             <img key={"image"} className="loading-image"></img>
+            <div className="loading-text">Getting things ready...</div>
             <LinearProgress mode="indeterminate"></LinearProgress>
         </div>;
     }

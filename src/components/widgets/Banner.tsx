@@ -1,8 +1,7 @@
 import * as React from "react";
-import { LoginLogout } from "./widgets/LoginLogout";
-import { Pages } from "./Pages";
-import { User } from "../../common/models/User";
-import { UserComponent } from "./User";
+import { LoginLogout } from "./LoginLogout";
+import { Paths } from "./../../Paths";
+import { User } from "../../../common/models/User";
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem, DropdownButton } from "react-bootstrap";
 
 export interface BannerProps {
@@ -41,32 +40,32 @@ export class Banner extends React.Component<BannerProps, BannerState>{
     }
 
     clickHome(event: React.MouseEvent<any>) {
-        this.props.changePage(Pages.HOME);
+        this.props.changePage(Paths.HOME);
         event.preventDefault();
     }
 
     clickBlogs(event: React.MouseEvent<NavItem>) {
-        this.props.changePage(Pages.BLOGS);
+        this.props.changePage(Paths.BLOGS);
         event.preventDefault();
     }
 
     clickRaces(event: React.MouseEvent<NavItem>) {
-        this.props.changePage(Pages.ALL_RACES);
+        this.props.changePage(Paths.ALL_RACES);
         event.preventDefault();
     }
 
     clickProfile(event: React.MouseEvent<NavItem>) {
-        this.props.changePage(Pages.PROFILE);
+        this.props.changePage(Paths.PROFILE);
         event.preventDefault();
     }
 
     clickDrivers(event: React.MouseEvent<NavItem>) {
-        this.props.changePage(Pages.DRIVERS);
+        this.props.changePage(Paths.DRIVERS);
         event.preventDefault();
     }
 
     clickTracks(event: React.MouseEvent<NavItem>) {
-        this.props.changePage(Pages.TRACKS);
+        this.props.changePage(Paths.TRACKS);
         event.preventDefault();
     }
 
@@ -81,7 +80,7 @@ export class Banner extends React.Component<BannerProps, BannerState>{
     }
 
     clickGeneralAdmin(event: React.MouseEvent<NavItem>) {
-        this.props.changePage(Pages.GENERAL_ADMIN);
+        this.props.changePage(Paths.GENERAL_ADMIN);
         event.preventDefault();
     }
 

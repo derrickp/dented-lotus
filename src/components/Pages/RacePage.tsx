@@ -5,7 +5,7 @@ import { PredictionModel } from "../../../common/models/Prediction";
 import { getDurationFromNow } from "../../../common/utils/date";
 import { PredictionComponent } from "../widgets/Prediction";
 import { Panel, Button, PanelGroup,Grid } from "react-bootstrap";
-import {RaceInfo} from "../RaceInfo";
+import {RaceInfo} from "../widgets/RaceInfo";
 
 export interface RaceProps {
     race: RaceModel;

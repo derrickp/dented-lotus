@@ -1,6 +1,5 @@
 
 import * as React from "react"; 
-import { Pages } from "../Pages";
 import { GoogleLogin } from "../Auth/GoogleLogin";
 import { FacebookLogin } from "../Auth/FacebookLogin";
 import { Modal, Button } from "react-bootstrap";

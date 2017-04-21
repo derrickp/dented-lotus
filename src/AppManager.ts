@@ -2,7 +2,7 @@ import * as moment from "moment";
 
 import { FULL_FORMAT } from "../common/utils/date";
 import { BlogResponse } from "../common/responses/BlogResponse";
-import { User, PublicUser, GoogleUser, FacebookUser, UserContext } from "../common/models/User";
+import { User, PublicUser } from "../common/models/User";
 import { RaceModel, RaceModelContext, RacePrediction, PredictionChoices } from "../common/models/Race";
 import { TrackResponse, TrackModel } from "../common/models/Track";
 import { DriverModel, DriverModelContext } from "../common/models/Driver";
@@ -10,44 +10,32 @@ import { DriverResponse } from "../common/responses/DriverResponse";
 import { RaceResponse } from "../common/responses/RaceResponse";
 import { PredictionResponse } from "../common/responses/PredictionResponse";
 import { PredictionModel, PredictionContext } from "../common/models/Prediction";
+import { getHash } from "./utilities/url";
 import { TeamModel, TeamResponse } from "../common/models/Team";
-import { AuthenticationTypes } from "../common/authentication";
-import { AuthResponse } from "../common/responses/AuthResponse";
-import { AuthPayload } from "../common/payloads/AuthPayload";
 import {
     getAllTracks,
     getBlogs,
     getAllDrivers,
-    authenticate,
     saveDrivers,
     saveBlog as serverSaveBlog,
     createDriver as serverCreateDriver,
     getAllRaces,
     saveRaces,
-    saveUserPicks,
     getAllTeams,
     getTrack,
     getDriver,
-    getRace,
+    getRace as serverGetRace,
     saveTeams,
-    getAllSeasonPredictions,
     getAllPublicUsers,
-    getUser as serverGetUser,
-    saveUserInfo,
-    savePredictionChoices as serverSavePredictionChoices,
-    saveRacePredictions as serverSaveRacePredictions,
     sendToEndpoint
 } from "./utilities/ServerUtils";
 
 import { PredictionStore } from "./stores/PredictionStore";
+import { UserStore } from "./stores/UserStore";
+import { Paths } from "./Paths";
 
 
-export class StateManager {
-
-    private _googleAuth: gapi.auth2.GoogleAuth;
-    fbLoaded: boolean;
-    googleLoaded: boolean;
-
+export class AppManager {
     _initialized: Promise<boolean>;
 
     blogs: BlogResponse[] = [];
@@ -57,41 +45,71 @@ export class StateManager {
     currentPredictions: PredictionModel[];
 
     private _watches: Map<string, Function[]> = new Map<string, Function[]>();
-    private _user: User;
 
     private readonly _predictionStore: PredictionStore;
+    private readonly _userStore: UserStore = new UserStore();
 
     private _raceMap: Map<string, RaceModel> = new Map<string, RaceModel>();
     private _driverMap: Map<string, DriverModel> = new Map<string, DriverModel>();
     private _teamMap: Map<string, TeamModel> = new Map<string, TeamModel>();
     private _trackMap: Map<string, TrackResponse> = new Map<string, TrackResponse>();
 
+    doGoogleLogin: () => Promise<void>;
+    doFacebookLogin: () => Promise<void>;
+    refreshUser: (key: string) => Promise<void>;
+
     constructor() {
         this.signOut = this.signOut.bind(this);
-        this.completeGoogleLogin = this.completeGoogleLogin.bind(this);
         this.saveDriver = this.saveDriver.bind(this);
         this.saveRace = this.saveRace.bind(this);
         this.saveTeam = this.saveTeam.bind(this);
-        this.completeFacebookLogin = this.completeFacebookLogin.bind(this);
+
         this.saveBlog = this.saveBlog.bind(this);
 
         this.adminSendToEndpoint = this.adminSendToEndpoint.bind(this);
-
-        this.doFacebookLogin = this.doFacebookLogin.bind(this);
-        this.doGoogleLogin = this.doGoogleLogin.bind(this);
+        this.getUser = this.getUser.bind(this);
         this.getDriver = this.getDriver.bind(this);
         this.getTeam = this.getTeam.bind(this);
 
         this._predictionStore = new PredictionStore();
         this._predictionStore.getDriver = this.getDriver;
         this._predictionStore.getTeam = this.getTeam;
+        this._setupUserStore();
+        this.doGoogleLogin = this._userStore.doGoogleLogin;
+        this.doFacebookLogin = this._userStore.doFacebookLogin;
+        this.refreshUser = this._userStore.refreshUser;
+    }
+
+    private _setupUserStore() {
+        this._userStore.getDriver = this.getDriver;
+        this._userStore.getTeam = this.getTeam;
+        this._userStore.fbLoaded = () => {
+            this._publishWatches("facebookLogin");
+        };
+        this._userStore.userChange = () => {
+            this._predictionStore.user = this._userStore.user;
+            this._publishWatches("user");
+        };
+        this._userStore.googleLoaded = () => {
+            this._publishWatches("googleLogin");
+        };
+    }
+
+    get fbLoaded() {
+        return this._userStore.haveFB;
+    }
+
+    get googleLoaded() {
+        return this._userStore.haveGoogle;
     }
 
     initialize(): Promise<boolean> {
         this._initialized = this._initialized ? this._initialized : new Promise<boolean>((resolve, reject) => {
+            // Initial batch of promises to go and do everything we need to start up.
+            // Initialize our user store (log user in if they already were)
+            // Get all of our "base" models - Some of this can probably be moved into "secondary init"
             const promises: Promise<void>[] = [];
-            this._initFacebook();
-            this._initGoogle();
+            promises.push(this._userStore.initialize());
             promises.push(this.refreshTeams().then(() => {
                 console.log("got teams");
             }));
@@ -103,7 +121,31 @@ export class StateManager {
             promises.push(this.refreshAllUsers());
             promises.push(this.refreshRaces());
             return Promise.all(promises).then(() => {
-                resolve(true);
+                // Ok, we've got all of our initial stuff done.
+                // Now we do a secondary initialization.
+                // This will mean we have to check where in the app the user is starting at,
+                // And then fetch what they need.
+                const hash = getHash();
+                // If it contains a : then it has an id of something
+                const parts = hash.split(":");
+                // Secondary promises. We've got all of our base models.
+                // So let's go fetch anything that the user is going to be looking at on app load. (specific race, user, predictions, etc)
+                promises.length = 0;
+                if (parts[1]) {
+                    switch (parts[0]) {
+                        case Paths.RACE:
+                            promises.push(this._predictionStore.getPredictions(parts[1]).then(predictions => {
+                                this.currentPredictions = predictions;
+                            }));
+                            break;
+                        case Paths.PROFILE:
+                            promises.push(this._userStore.refreshUser(parts[1]).then(() => { }));
+                            break;
+                    }
+                }
+                return Promise.all(promises).then(() => {
+                    resolve(true);
+                });
             }).catch(error => {
                 reject(error);
             });
@@ -155,13 +197,7 @@ export class StateManager {
     }
 
     get user(): User {
-        return this._user;
-    }
-
-    set user(user: User) {
-        this._user = user;
-        this._predictionStore.user = user;
-        this._publishWatches("user");
+        return this._userStore.user;
     }
 
     get races() {
@@ -185,16 +221,16 @@ export class StateManager {
         });
     }
 
-    refreshPredictions(raceModel: RaceModel): Promise<void> {
-        return this._predictionStore.getPredictions(raceModel.key).then(predictions => {
+    refreshPredictions(raceKey: string): Promise<void> {
+        return this._predictionStore.getPredictions(raceKey).then(predictions => {
             this.currentPredictions = predictions;
             this._publishWatches("currentPredictions");
         });
     }
 
-    getRace(key: string): Promise<RaceModel> {
+    refreshRace(key: string): Promise<RaceModel> {
         return new Promise<RaceModel>((resolve, reject) => {
-            return getRace(2017, key, this.user.id_token).then(raceResponse => {
+            return serverGetRace(2017, key, this.user.id_token).then(raceResponse => {
                 const model = new RaceModel(raceResponse, this.raceModelContext);
                 if (this._raceMap.has(model.key)) {
                     this._raceMap.delete(model.key);
@@ -205,49 +241,15 @@ export class StateManager {
         });
     }
 
-    // saveRacePredictions(model: RaceModel): Promise<void> {
-    //     if (!this.user.isLoggedIn || !this.user.isAdmin) return Promise.reject("Unauthorized");
-    //     return new Promise<void>((resolve, reject) => {
-    //         // First save the actual predictions
-    //         if (model.predictions && model.predictions.length > 0) {
-    //             const racePredictions = model.predictions.map(pm => {
-    //                 const racePrediction: RacePrediction = {
-    //                     race: model.key,
-    //                     prediction: pm.predictionResponse.key,
-    //                     value: pm.predictionResponse.value,
-    //                     modifier: pm.predictionResponse.modifier
-    //                 };
-    //                 return racePrediction;
-    //             });
-    //             // Save them to the server
-    //             return serverSaveRacePredictions(model.key, racePredictions, this.user.id_token);
-    //         }
-    //         return Promise.resolve();
-    //     }).then(() => {
-    //         // Then save the choices if there are any.
-    //         if (model.predictions && model.predictions.length > 0) {
-    //             const all: PredictionChoices[] = [];
-    //             for (const prediction of model.predictions) {
-    //                 if (prediction.choices && prediction.choices.length) {
-    //                     const predictionChoices: PredictionChoices = {
-    //                         race: model.key,
-    //                         prediction: prediction.predictionResponse.key,
-    //                         choices: prediction.choices.map(c => c.key).join(",")
-    //                     };
-    //                     all.push(predictionChoices);
-    //                 }
-    //             }
-    //             // Save to the server
-    //             return serverSavePredictionChoices(model.key, all, this.user.id_token);
-    //         }
-    //         return Promise.resolve();
-    //     });
-    // }
+    getRace(key: string): RaceModel {
+        if (this._raceMap.has(key)) return this._raceMap.get(key);
+        return null;
+    }
 
     get raceModelContext(): RaceModelContext {
         const context: RaceModelContext = {
             refresh: (race: RaceModel) => {
-                return this.getRace(race.key);
+                return this.refreshRace(race.key);
             },
             saveRace: (raceModel: RaceModel) => {
                 return this.saveRace(raceModel);
@@ -324,7 +326,7 @@ export class StateManager {
     }
 
     get isLoggedIn(): boolean {
-        return this.user != null && this.user.isLoggedIn;
+        return this._userStore.isLoggedIn;
     }
 
     refreshAllUsers(): Promise<void> {
@@ -337,12 +339,8 @@ export class StateManager {
         });
     }
 
-    getUser(key: string): Promise<User> {
-        return new Promise<User>((resolve, reject) => {
-            return serverGetUser(key, this.user.id_token).then(userResponse => {
-                resolve(new User(userResponse, "", this.userContext));
-            }).catch(reject);
-        });
+    getUser(key: string): User {
+        return this._userStore.getUser(key);
     }
 
     refreshBlogs(): Promise<void> {
@@ -356,79 +354,6 @@ export class StateManager {
                 resolve();
             });
         });
-    }
-
-    doFacebookLogin(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            FB.login((response) => {
-                // handle the response
-                return this.completeFacebookLogin(response).then(() => {
-                    resolve();
-                });
-            }, { scope: 'public_profile,email' });
-        });
-    }
-
-    private _initFacebook() {
-        if (window["FB"]) {
-            this.fbLoaded = true;
-            this._publishWatches("facebookLogin");
-            FB.getLoginStatus((response: FB.LoginStatusResponse) => {
-                // If we haven't been authorized yet, then we aren't going to use Facebook to login
-                if (response.status !== "connected") {
-                    return;
-                }
-                else {
-                    this.completeFacebookLogin(response);
-                }
-            }, true);
-        }
-        else {
-            const interval = setInterval(() => {
-                if (window["FB"]) {
-                    clearInterval(interval);
-                    this._initFacebook();
-                }
-            }, 100);
-        }
-    }
-
-    doGoogleLogin(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            this._googleAuth.signIn().then(() => {
-                const user = this._googleAuth.currentUser.get();
-                return this.completeGoogleLogin(user).then(resolve);
-            });
-        });
-
-    }
-
-    private _initGoogle() {
-        if (window["gapi"]) {
-            gapi.load("auth2", () => {
-                gapi.auth2.init({
-                    client_id: "1047134015899-kpabbgk5b6bk0arj4b1hecktier9nki7.apps.googleusercontent.com"
-                }).then(() => {
-                    this.googleLoaded = true;
-                    this._googleAuth = gapi.auth2.getAuthInstance();
-                    this._publishWatches("googleLogin");
-                    const loggedIn = this._googleAuth.isSignedIn.get();
-                    if (loggedIn) {
-                        const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
-                        this.completeGoogleLogin(user);
-                    }
-                }, (reason: string) => {
-                    console.error("component:GoogleLogin:" + reason);
-                });
-            });
-        } else {
-            const interval = setInterval(() => {
-                if (window["gapi"]) {
-                    clearInterval(interval);
-                    this._initGoogle();
-                }
-            }, 1000);
-        }
     }
 
     watch(path: string, callback: Function) {
@@ -449,10 +374,8 @@ export class StateManager {
         }
     }
 
-    signOut(): void {
-        this.user.logOut().then(success => {
-            this.user = new User(null, "", null);
-        });
+    signOut(): Promise<void> {
+        return this._userStore.signOut();
     }
 
     updateDriver(driverModel: DriverModel): Promise<DriverModel> {
@@ -576,51 +499,6 @@ export class StateManager {
         this._teamMap.set(teamResponse.key, model);
         this._publishWatches("teams");
         return model;
-    }
-
-    get userContext(): UserContext {
-        const context: UserContext = {
-            saveUser: (user: User) => {
-                return saveUserInfo(user.json, this.user.id_token).then(() => {
-                    this._publishWatches("user");
-                });
-            },
-            getDriver: (key: string) => {
-                if (this._driverMap.has(key)) return this._driverMap.get(key);
-                return null;
-            },
-            getTeam: (key: string) => {
-                if (this._teamMap.has(key)) return this._teamMap.get(key);
-                return null;
-            }
-        };
-        return context;
-    }
-
-    completeFacebookLogin(args: FB.LoginStatusResponse): Promise<void> {
-        const authPayload: AuthPayload = {
-            auth_token: args.authResponse.accessToken,
-            authType: AuthenticationTypes.FACEBOOK
-        };
-
-        return authenticate(authPayload).then(authResponse => {
-            const user = new FacebookUser(args, authResponse.user, authResponse.id_token, this.userContext);
-            this.user = user;
-        }).catch((error: Error) => {
-            console.error(error.message);
-            alert(error.message);
-        });
-    }
-
-    completeGoogleLogin(response: gapi.auth2.GoogleUser): Promise<void> {
-        const authPayload: AuthPayload = {
-            auth_token: response.getAuthResponse().id_token,
-            authType: AuthenticationTypes.GOOGLE
-        };
-        return authenticate(authPayload).then(authResponse => {
-            const googleUser = new GoogleUser(response, authResponse.user, authResponse.id_token, this.userContext);
-            this.user = googleUser;
-        });
     }
 
     adminSendToEndpoint(urlFragment: string, body: string): Promise<any> {

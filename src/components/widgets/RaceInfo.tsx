@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Button, Glyphicon, Panel } from "react-bootstrap";
-import { RaceModel } from "../../common/models/Race";
-import {TriviaComponent} from "./widgets/TriviaComponent";
+import { RaceModel } from "../../../common/models/Race";
+import {TriviaComponent} from "./TriviaComponent";
 
 
 export interface RaceInfoProps {

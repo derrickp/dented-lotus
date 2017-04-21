@@ -12,6 +12,10 @@ export class PredictionStore {
     getDriver: (key: string) => DriverModel;
     getTeam: (key: string) => TeamModel;
 
+    constructor() {
+        this.getPredictions = this.getPredictions.bind(this);
+    }
+
     getPredictions(raceKey: string): Promise<PredictionModel[]> {
         return new Promise<PredictionModel[]>((resolve, reject) => {
             return getPredictionResponses(raceKey, this.user.id_token).then(predictionResponses => {

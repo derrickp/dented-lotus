@@ -5,8 +5,9 @@ import * as injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import { HashRouter } from 'react-router-dom'
 
-import { StateManager } from "./StateManager";
+import { AppManager } from "./AppManager";
 import { DentedLotus } from "./components/DentedLotus";
 import { SplashScreen } from "./components/SplashScreen";
 
@@ -16,7 +17,7 @@ window.onerror = function (error) {
 
 // Create our singleton little state manager. This will be the arbiter for data in the application.
 // It will be the single source for data. Allowing us to easily manage it all in one location.
-const stateManager = new StateManager();
+const stateManager = new AppManager();
 
 const dentedLotusElement = document.getElementById("dentedlotus");
 
@@ -27,9 +28,11 @@ const Loading = () => (
 );
 
 const App = () => (
-    <MuiThemeProvider>
-        <DentedLotus stateManager={stateManager} />
-    </MuiThemeProvider>
+    <HashRouter>
+        <MuiThemeProvider>
+            <DentedLotus stateManager={stateManager} />
+        </MuiThemeProvider>
+    </HashRouter>
 );
 
 // Render our react app. Inject the StateManager
