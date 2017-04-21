@@ -1,0 +1,22 @@
+[
+    {
+        "prediction": "fastest-lap",
+        "final": "hamilton"
+    },
+    {
+        "prediction": "best-radio",
+        "final": "alonso"
+    },
+    {
+        "prediction": "most-positions-lost",
+        "final": "palmer"
+    },
+    {
+        "prediction": "most-exciting-driver",
+        "final": "perez"
+    },
+    {
+        "prediction": "most-positions-gained",
+        "final": "perez"
+    }
+]

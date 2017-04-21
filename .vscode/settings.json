@@ -12,6 +12,7 @@
         "config": true, 
         "**/*.js": true,
         "**/*.js.map": true,
-        "gulpfile.js": false
+        "gulpfile.js": false,
+        "_db_backups": true
     }
 }

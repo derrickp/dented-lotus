@@ -1,0 +1,22 @@
+[
+    {
+        "prediction": "fastest-lap",
+        "final": "hamilton"
+    },
+    {
+        "prediction": "best-radio",
+        "final": "alonso"
+    },
+    {
+        "prediction": "first-out",
+        "final": "stroll"
+    },
+    {
+        "prediction": "most-exciting-driver",
+        "final": "vettel"
+    },
+    {
+        "prediction": "fastest-pit",
+        "final": "massa"
+    }
+]
