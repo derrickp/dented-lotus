@@ -74,6 +74,8 @@ export class UserStore {
     refreshUser(key: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             return serverGetUser(key, this.user.id_token).then(userResponse => {
+                const user = new User(userResponse, "", this.userContext);
+                this._userMap.set(key, user);
                 resolve();
             }).catch(reject);
         });
