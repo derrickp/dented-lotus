@@ -7,7 +7,7 @@ import { Selectable } from "../../../common/models/Selectable";
 import { PredictionModel } from "../../../common/models/Prediction";
 import { PredictionResponse } from "../../../common/responses/PredictionResponse";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
-import { MenuItem, FormControl, Well, FormGroup } from "react-bootstrap";
+import { MenuItem, FormControl, Well, FormGroup, Row, Col } from "react-bootstrap";
 import SnackBar from "material-ui/Snackbar";
 
 export interface PredictionProps {
@@ -54,6 +54,7 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
     }
 
     getOption(selectable: Selectable): JSX.Element {
+        const display = selectable.display +  " - " + selectable.points + " x " + selectable.multiplier + " = " + selectable.multiplier * selectable.points;
         return <option key={selectable.key} value={selectable.key}>{selectable.display}</option>;
     }
 
@@ -70,6 +71,9 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
         for (const c of prediction.choices) {
             options.push(this.getOption(c));
         }
+        const totalScore = <div className="total-score">
+            2.00
+        </div>
         const formControl =
             <FormGroup key={prediction.json.key} validationState={this.state.validationState} bsSize="large">
                 <FormControl disabled={!this.props.allowedPrediction} defaultValue={userChoices} onChange={this.onChange} id={prediction.json.key} componentClass="select" placeholder="Make your pick">
@@ -81,12 +85,19 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
                 <Well bsSize="small">
                     <h3>{prediction.json.title}</h3>
                     <h4>{prediction.json.description}</h4>
-                    {formControl}
+                    <Row>
+                        <Col sm={10}>
+                            {formControl}
+                        </Col>
+                        <Col sm={2}>
+                            {totalScore}
+                        </Col>
+                    </Row>
                 </Well>
                 <SnackBar open={this.state.snackbarOpen}
-                message={this.state.snackbarText}
-                autoHideDuration={2000}
-                onRequestClose={this.handleRequestSnackbarClose}>
+                    message={this.state.snackbarText}
+                    autoHideDuration={2000}
+                    onRequestClose={this.handleRequestSnackbarClose}>
                 </SnackBar>
             </div>
         );

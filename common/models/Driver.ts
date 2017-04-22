@@ -46,6 +46,12 @@ export class DriverModel implements Selectable {
         this._context = context;
     } 
 
+    public getSelectable(prediction: Prediction): Promise<Selectable>{
+        const pred = prediction.key;
+        const driver = this.key;
+
+    }
+
     public update( ){
        return this._context.saveDriver(this);
     }
