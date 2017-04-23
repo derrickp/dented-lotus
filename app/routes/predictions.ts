@@ -5,8 +5,9 @@ import { IRouteConfiguration } from "hapi";
 import { Credentials } from "../../common/authentication";
 import { PredictionResponse, PredictionTypes } from "../../common/responses/PredictionResponse";
 import { UserPickPayload } from "../../common/payloads/UserPickPayload";
-import { DriverResponse } from "../../common/responses/DriverResponse";
-import { TeamResponse } from "../../common/responses/TeamResponse";
+import { DriverResponse } from "../../common/responses/DriverResponse"; 
+import { TeamResponse } from "../../common/responses/TeamResponse";  
+import { ModifierResponse } from "../../common/responses/PredictionResponse"; 
 import { getDriverResponses } from "../utilities/data/drivers";
 import { getTeamResponses } from "../utilities/data/teams";
 import {
@@ -17,10 +18,36 @@ import {
     saveUserPicks,
     getAllSeasonPredictions,
     getAllSeasonValues,
-    getPredictionResponses
+    getPredictionResponses,
+    getModifiers
 } from "../utilities/data/predictions";
 
 export const predictionsRoutes: IRouteConfiguration[] = [
+    // Get modifiers for race/prediction
+    {
+        method: "GET",
+        path: "/predictions/modifiers/{raceKey}/{predictionKey}",
+        config: {
+            cors: true,
+            handler: async (request, reply: (predictions: ModifierResponse[] | Boom.BoomError) => void) => {
+                const credentials: Credentials = request.auth.credentials;
+                const userKey = credentials.key;
+                const raceKey= request.params["raceKey"];
+                const predictionKey = request.params["predictionKey"];
+                try {
+                    const modifiers = await getModifiers(raceKey,predictionKey);
+                    reply(modifiers);
+                }
+                catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
+            },
+            auth: {
+                strategies: ['jwt'],
+                scope: ['user']
+            }
+        }
+    },
     {
         method: "GET",
         path: "/predictions/{raceKey}",
@@ -96,8 +123,7 @@ export const predictionsRoutes: IRouteConfiguration[] = [
                             return v.prediction === prediction.key;
                         })[0];
                         if (value) {
-                            prediction.value = value.value;
-                            prediction.modifier = value.modifier;
+                            prediction.value = value.value; 
                             prediction.raceKey = value.race;
                         }
                         prediction.allSeason = true;

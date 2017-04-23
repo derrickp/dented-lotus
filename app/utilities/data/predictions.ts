@@ -1,7 +1,7 @@
 
 import * as sqlite3 from "sqlite3";
 
-import { PredictionResponse, PredictionTypes } from "../../../common/responses/PredictionResponse";
+import { PredictionResponse, PredictionTypes,ModifierResponse } from "../../../common/responses/PredictionResponse";
 import { RacePrediction } from "../../../common/models/Race";
 import { getDriverResponses } from "./drivers";
 import { getTeamResponses } from "./teams";
@@ -11,6 +11,7 @@ const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 const predictionsSelect = "select * from predictions_vw";
 const racePredictionSelect = "select * from racepredictions_vw";
 const userPicksSelect = "select * from userpicks_vw";
+const modifierSelect = "select choice, modifier from modifiers"
 const racePredictionsChoicesSelect = "select choice from racepredictionchoices";
 
 export async function getPredictionResponses(raceKeys: string[], userKey: string): Promise<PredictionResponse[]> {
@@ -32,8 +33,7 @@ export async function getPredictionResponses(raceKeys: string[], userKey: string
         const prediction: PredictionResponse = {
             allSeason: thisPrediction.allSeason ? true : false,
             key: thisPrediction.key,
-            value: racePredictionRow.value,
-            modifier: racePredictionRow.modifier,
+            value: racePredictionRow.value, 
             description: thisPrediction.description,
             title: thisPrediction.title,
             type: thisPrediction.type,
@@ -78,6 +78,23 @@ export async function getPredictionResponses(raceKeys: string[], userKey: string
 
     return predictionResponses;
 }
+
+export async function getModifiers(raceKey: string, predictionKey:string): Promise<ModifierResponse[]> { 
+    const modifierResponses: ModifierResponse[] = [];
+    if (!raceKey || !predictionKey){
+        return modifierResponses;
+    } 
+    return new Promise<ModifierResponse[]>((resolve, reject) => {
+        let statement = modifierSelect + ` where race = '${raceKey}' AND prediction = '${predictionKey}' order by choice asc`; 
+        db.all(statement, (err, rows: ModifierResponse[]) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(rows);
+        });
+    });
+} 
 
 export function getPredictionChoices(prediction: string, race: string): Promise<string[]> {
     return new Promise<string[]>((resolve, reject) => {

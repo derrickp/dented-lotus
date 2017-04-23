@@ -5,11 +5,15 @@ export interface PredictionResponse {
     type: string;
     allSeason: boolean;
     choices?: string[];
-    value?: number;
-    modifier?: number;
+    value?: number; 
     outcome?: string[];
     userPick?: string;
     raceKey?: string;
+}
+
+export interface ModifierResponse{
+    choice:string;
+    modifier: number;
 }
 
 export namespace PredictionTypes {

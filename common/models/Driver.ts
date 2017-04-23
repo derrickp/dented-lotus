@@ -1,13 +1,19 @@
 
+<<<<<<< Updated upstream
 import { TeamModel } from "./Team";
 import { TeamResponse } from "../responses/TeamResponse";
+=======
+import { TeamModel, TeamResponse } from "./Team";
+import { PredictionModel } from "./Prediction";
+>>>>>>> Stashed changes
 import { TrackModel } from "./Track";
 import { RaceModel } from "./Race";
+import {DriverResponse } from "../responses/DriverResponse";
 import { Selectable } from "./Selectable";
 
 export interface DriverModelContext {
     saveDriver?: (model:DriverModel) => Promise<DriverModel[]>;
-    getTeam?: (response: TeamResponse) => TeamModel;
+    getTeam?: (response: string) => TeamModel;
 } 
 
 export class DriverModel implements Selectable {
@@ -16,7 +22,7 @@ export class DriverModel implements Selectable {
     active: boolean;
     firstName: string;
     lastName: string;
-    nationality: string;
+    nationality: string; 
     /**URL for flag image */
     flag: string;
     points: number;
@@ -44,13 +50,7 @@ export class DriverModel implements Selectable {
         this.points = driverResponse.points;
         this.team = driverResponse.team && context.getTeam(driverResponse.team);
         this._context = context;
-    } 
-
-    public getSelectable(prediction: Prediction): Promise<Selectable>{
-        const pred = prediction.key;
-        const driver = this.key;
-           
-    }
+    }  
 
     public update( ){
        return this._context.saveDriver(this);
@@ -82,7 +82,7 @@ export class DriverModel implements Selectable {
             birthdate: this.birthdate,
             points: +this.points,
             nationality: this.nationality,
-            team: this.team.json,
+            team: this.team.json.key,
             trivia: this.trivia,
             wins: this.wins
         };
@@ -90,19 +90,19 @@ export class DriverModel implements Selectable {
     }
 }
 
-export interface DriverResponse {
-    key: string;
-    trivia: string[];
-    firstName: string;
-    lastName: string;
-    nationality: string;
-    active?: boolean;
-    flag?: string;
-    points?: number;
-    birthdate?: string;
-    number?: number;
-    abbreviation?: string;
-    /**Abbreviation for the team */
-    team?: TeamResponse;
-    wins?: number;
-}
+// export interface DriverResponse {
+//     key: string;
+//     trivia: string[];
+//     firstName: string;
+//     lastName: string;
+//     nationality: string;
+//     active?: boolean;
+//     flag?: string;
+//     points?: number;
+//     birthdate?: string;
+//     number?: number;
+//     abbreviation?: string;
+//     /**Abbreviation for the team */
+//     team?: TeamResponse;
+//     wins?: number;
+// }

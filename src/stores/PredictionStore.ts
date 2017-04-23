@@ -20,7 +20,7 @@ export class PredictionStore {
         return new Promise<PredictionModel[]>((resolve, reject) => {
             return getPredictionResponses(raceKey, this.user.id_token).then(predictionResponses => {
                 const models = predictionResponses.map(pr => {
-                    return new PredictionModel(pr, this.predictionContext);
+                    return new PredictionModel(pr, this.predictionContext,this.user.id_token);
                 });
                 resolve(models);
             }).catch(error => {
@@ -34,7 +34,7 @@ export class PredictionStore {
             return getAllSeasonPredictions(this.user.id_token).then(predictionResponses => {
                 const allSeasonPredictions: PredictionModel[] = [];
                 for (const predictionResponse of predictionResponses) {
-                    const pm = new PredictionModel(predictionResponse, this.predictionContext);
+                    const pm = new PredictionModel(predictionResponse, this.predictionContext, this.user.id_token);
                     allSeasonPredictions.push(pm);
                 }
                 resolve(allSeasonPredictions);

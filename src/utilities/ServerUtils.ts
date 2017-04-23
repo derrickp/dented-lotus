@@ -9,7 +9,12 @@ import { TeamResponse } from "../../common/responses/TeamResponse";
 import { UserResponse } from "../../common/responses/UserResponse";
 import { RaceResponse } from "../../common/responses/RaceResponse";
 import { BlogResponse } from "../../common/responses/BlogResponse";
+<<<<<<< Updated upstream
 import { PublicUser } from "../../common/responses/PublicUser";
+=======
+import { ModifierResponse } from "../../common/responses/PredictionResponse";
+import { PublicUser } from "../../common/models/User";
+>>>>>>> Stashed changes
 import { PredictionResponse } from "../../common/responses/PredictionResponse";
 import { AuthPayload } from "../../common/payloads/AuthPayload";
 import { AuthResponse } from "../../common/responses/AuthResponse";
@@ -45,6 +50,29 @@ export function sendToEndpoint(urlFragment: string, body: string, id_token: stri
             });
         }).catch(reject);
     });
+}
+
+export function getModifiers(raceKey: string, predictionKey: string, id_token:string): Promise<ModifierResponse[]> {
+    return new Promise<ModifierResponse[]>((resolve, reject) => {
+        return fetch(`/predictions/modifiers/${raceKey}/${predictionKey}`,{
+            method:"GET",
+            headers:{
+                'Authorization':"Bearer " + id_token
+            }
+        }).then(response => {
+            return response.json().then((modifiers: ModifierResponse[]) => {
+                if (response.ok) {
+                    resolve(modifiers);
+                }
+                else {
+                    reject(new Error((modifiers as any).message));
+                }
+            });
+        }).catch(error => {
+            reject(error);
+        });
+    });
+
 }
 
 export function getBlogs(): Promise<BlogResponse[]> {
@@ -182,7 +210,7 @@ export function savePredictionChoices(raceKey: string, predictionChoices: Predic
 
 export interface FinalChoice {
     /** Prediction key */
-    prediction:string;
+    prediction: string;
     /** Comma delineated list of driver/team keys */
     final: string;
 }
@@ -192,7 +220,7 @@ export interface FinalChoice {
  * @param raceKey 
  * @param predictionChoices  
  */
-export function savePredictionOutcomes(raceKey: string, outcomes: FinalChoice[],id_token:string): Promise<void> {
+export function savePredictionOutcomes(raceKey: string, outcomes: FinalChoice[], id_token: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
         return fetch(`${baseUrl}/admin/races/${raceKey}/predictions/finals`, {
             method: "POST",

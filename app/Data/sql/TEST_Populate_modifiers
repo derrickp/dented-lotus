@@ -1,0 +1,27 @@
+-- SELECT INTO racepredictionchoices 
+-- r.key as race,
+-- p.key as prediction
+delete from modifiers;
+insert into modifiers select
+null,
+d.key,
+r.key,
+1.00,
+p.prediction
+from races r
+inner join racepredictions p on p. race = r.key
+inner join predictions pre on pre.key = p.prediction
+inner join teams d
+where pre.type = 'team';
+insert into modifiers select
+null,
+d.key,
+r.key,
+1.00,
+p.prediction
+from races r
+inner join racepredictions p on p. race = r.key
+inner join predictions pre on pre.key = p.prediction
+inner join drivers d
+where pre.type = 'driver';
+select choice, modifier from modifiers where race = '2017-bahrain-international-circuit' and prediction = 'best-radio' order by choice asc
