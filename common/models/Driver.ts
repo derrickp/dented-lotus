@@ -7,7 +7,7 @@ import {DriverResponse } from "../responses/DriverResponse";
 import { Selectable } from "./Selectable";
 
 export interface DriverModelContext {
-    saveDriver?: (model:DriverModel) => Promise<DriverModel[]>;
+    saveDriver?: (model:DriverModel) => Promise<boolean>;
     getTeam?: (response: string) => TeamModel;
 } 
 

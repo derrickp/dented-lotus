@@ -12,21 +12,33 @@ import {
 import { PredictionResponse, ModifierResponse } from "../../common/responses/PredictionResponse";
 
 export class PredictionStore {
-    user: User;
-
     getDriver: (key: string) => DriverModel;
     getTeam: (key: string) => TeamModel;
+    getToken: () => string;
 
-    constructor() {
+    constructor(getToken: () => string, getDriver: (key: string) => DriverModel, getTeam: (key: string) => TeamModel) {
         this.getPredictions = this.getPredictions.bind(this);
+        this.getToken = getToken;
+        this.getDriver = getDriver;
+        this.getTeam = getTeam;
+        this.initialize = this.initialize.bind(this);
+        // this.get = this.get.bind(this);
+        // this.getAll = this.getAll.bind(this);
+        // this.save = this.save.bind(this);
+        // this.create = this.create.bind(this);
+        // this.refresh = this.refresh.bind(this);
+    }
+
+    initialize(): Promise<void> {
+        return Promise.resolve();
     }
 
     getPredictions(raceKey: string): Promise<PredictionModel[]> {
         return new Promise<PredictionModel[]>((resolve, reject) => {
-            return getPredictionResponses(raceKey, this.user.id_token).then(predictionResponses => {
+            return getPredictionResponses(raceKey, this.getToken()).then(predictionResponses => {
                 const modifierPromises: Promise<ModifierResponse[]>[] = [];
                 for (const pr of predictionResponses) {
-                    modifierPromises.push(serverGetModifiers(pr.raceKey, pr.key, this.user.id_token));
+                    modifierPromises.push(serverGetModifiers(pr.raceKey, pr.key, this.getToken()));
                 }
                 return Promise.all(modifierPromises).then((allModifiers) => {
                     const models = predictionResponses.map((pr, index) => {
@@ -43,10 +55,10 @@ export class PredictionStore {
 
     get allSeasonPredictions(): Promise<PredictionModel[]> {
         return new Promise<PredictionModel[]>((resolve, reject) => {
-            return getAllSeasonPredictions(this.user.id_token).then(predictionResponses => {
+            return getAllSeasonPredictions(this.getToken()).then(predictionResponses => {
                 const modifierPromises: Promise<ModifierResponse[]>[] = [];
                 for (const pr of predictionResponses) {
-                    modifierPromises.push(serverGetModifiers(pr.raceKey, pr.key, this.user.id_token));
+                    modifierPromises.push(serverGetModifiers(pr.raceKey, pr.key, this.getToken()));
                 }
                 const allSeasonPredictions: PredictionModel[] = [];
                 return Promise.all(modifierPromises).then((allModifiers) => {
@@ -63,16 +75,13 @@ export class PredictionStore {
     get predictionContext(): PredictionContext {
         return {
             saveUserPicks: (model: PredictionModel) => {
-                if (!this.user.isLoggedIn) {
-                    return Promise.reject(new Error("Need to be logged in to save"));
-                }
                 const payload: UserPickPayload[] = [];
                 payload.push({
                     race: model.predictionResponse.raceKey,
                     prediction: model.predictionResponse.key,
                     choice: model.predictionResponse.userPick
                 });
-                return saveUserPicks(payload, this.user.id_token);
+                return saveUserPicks(payload, this.getToken());
             },
             getDriver: (key: string) => {
                 return this.getDriver(key);

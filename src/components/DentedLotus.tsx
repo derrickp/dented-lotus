@@ -201,7 +201,16 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             <Route exact={true} path={Paths.GENERAL_ADMIN} render={() => <GeneralAdmin callEndpoint={this.props.stateManager.adminSendToEndpoint} races={this.state.races} drivers={this.state.drivers} teams={this.state.teams}></GeneralAdmin>} />
             <Route exact={true} path={Paths.PROFILE + ":id"} render={(props: RouteComponentProps<any>) => {
                 const id = props.match.url.split(":")[1];
-                const user = this.props.stateManager.getUser(id);
+                let user: User;
+
+                // If the user is the current one, grab the full thing.
+                if (id === this.props.stateManager.user.key) {
+                    user = this.props.stateManager.user;
+                }
+                // Otherwise get it from the store
+                else {
+                    user = this.props.stateManager.getUser(id);
+                }
                 return <Profile drivers={this.state.drivers} teams={this.state.teams} user={user} thisUser={this.props.stateManager.user}></Profile>;
             }} />
             <Route exact={true} path={Paths.TRACKS} render={() => <Tracks tracks={this.state.tracks} />} />

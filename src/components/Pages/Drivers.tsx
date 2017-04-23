@@ -16,8 +16,8 @@ export interface DriverProps {
     drivers: DriverModel[];
     userIsAdmin: boolean;
     teams: TeamModel[];
-    createDriver: (dr: DriverResponse) => Promise<boolean>;
-    createTeam: (tr: TeamResponse) => Promise<boolean>;
+    createDriver: (dr: DriverResponse) => Promise<DriverModel>;
+    createTeam: (tr: TeamResponse) => Promise<TeamModel>;
 }
 
 export interface DriverState {
@@ -71,7 +71,7 @@ export class Drivers extends React.Component<DriverProps, DriverState> {
 
 export interface DriverAdminProps {
     teams: TeamModel[]
-    createDriver: (dr: DriverResponse) => Promise<boolean>;
+    createDriver: (dr: DriverResponse) => Promise<DriverModel>;
 }
 
 export class DriverAdmin extends React.Component<DriverAdminProps, any>{
@@ -143,7 +143,7 @@ export class DriverAdmin extends React.Component<DriverAdminProps, any>{
 }
 
 export interface TeamAdminProps {
-    createTeam: (tr: TeamResponse) => Promise<boolean>;
+    createTeam: (tr: TeamResponse) => Promise<TeamModel>;
 }
 
 export interface TeamAdminState {

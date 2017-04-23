@@ -1,19 +1,19 @@
 
 import { UserResponse } from "../responses/UserResponse";
+import { PublicUser } from "../responses/PublicUser";
 import { getRandomInt } from "../utils/numbers";
 import { DEFAULT_IMAGES } from "../utils/images"
 import { UserRoles } from "../roles";
-import { DriverModel } from "./Driver";
-import { TeamModel } from "./Team";
 
 export interface UserContext {
     saveUser: (user: User) => Promise<void>;
 }
 
-export class User {
+export class User implements PublicUser {
     protected _loggedIn: boolean = false;
     protected _context: UserContext;
     id_token: string;
+    display: string;
     displayName: string;
     firstName: string;
     lastName: string;
@@ -24,9 +24,25 @@ export class User {
     usingDefaultImage: boolean;
     faveDriver: string;
     faveTeam: string;
+    points: number;
+    numCorrectPicks: number;
 
-    constructor(dentedLotusUser: UserResponse, id_token: string, context: UserContext) {
-        if (dentedLotusUser) {
+    constructor(user: UserResponse | PublicUser, id_token: string, context: UserContext) {
+        if (!user) {
+            this._loggedIn = false;
+            return;
+        }
+        if ((user as any).display) {
+            const publicUser: PublicUser = <PublicUser>user;
+            this.key = publicUser.key;
+            this.display = publicUser.display;
+            this.numCorrectPicks = publicUser.numCorrectPicks;
+            this.points = publicUser.points;
+            this.imageUrl = publicUser.imageUrl;
+            this._loggedIn = false;
+        }
+        else {
+            const dentedLotusUser: UserResponse = <UserResponse>user;
             this.key = dentedLotusUser.key;
             this.displayName = dentedLotusUser.displayName;
             if (dentedLotusUser.role === UserRoles.ADMIN) {
@@ -37,10 +53,9 @@ export class User {
             this.imageUrl = dentedLotusUser.imageUrl;
             this.faveDriver = dentedLotusUser.faveDriver;
             this.faveTeam = dentedLotusUser.faveTeam;
+            this.numCorrectPicks = dentedLotusUser.numCorrectPicks;
+            this.display = dentedLotusUser.displayName;
             this._loggedIn = true;
-        }
-        else {
-            this._loggedIn = false;
         }
         this.id_token = id_token;
         this._context = context;

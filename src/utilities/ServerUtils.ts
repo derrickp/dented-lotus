@@ -2,7 +2,6 @@
 import { TrackResponse } from "../../common/responses/TrackResponse";
 import { DriverResponse } from "../../common/responses/DriverResponse";
 import { RacePrediction, PredictionChoices } from "../../common/models/Race";
-import { TeamResponse } from "../../common/responses/TeamResponse";
 import { RaceResponse } from "../../common/responses/RaceResponse";
 import { BlogResponse } from "../../common/responses/BlogResponse"; 
 
@@ -160,109 +159,6 @@ export function getRace(season: number, key: string, id_token: string): Promise<
         }).then(response => {
             return response.json().then((races: RaceResponse[]) => {
                 resolve(races[0]);
-            });
-        });
-    });
-}
-
-export function getAllDrivers(activeOnly: boolean = true): Promise<DriverResponse[]> {
-    return new Promise<DriverResponse[]>((resolve, reject) => {
-        let suffix = "/drivers";
-        if (activeOnly) {
-            suffix += "/active";
-        }
-        return fetch(`${baseUrl}/drivers`).then(response => {
-            return response.json().then((drivers: DriverResponse[]) => {
-                resolve(drivers);
-            });
-        });
-    });
-}
-
-export function getDriver(key: string): Promise<DriverResponse> {
-    return new Promise<DriverResponse>((resolve, reject) => {
-        return fetch(`${baseUrl}/drivers/${key}`).then(response => {
-            return response.json().then((drivers: DriverResponse[]) => {
-                if (drivers.length) {
-                    resolve(drivers[0]);
-                } else {
-                    resolve(null);
-                }
-            });
-        });
-    });
-}
-
-export function saveDrivers(driversPayload: DriverResponse[], id_token: string): Promise<DriverResponse[]> {
-    if (!id_token) return Promise.reject(new Error("Unauthorized"));
-    return new Promise<DriverResponse[]>((resolve, reject) => {
-        return fetch(`${baseUrl}/admin/drivers`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + id_token
-            },
-            body: JSON.stringify(driversPayload)
-        }).then(response => {
-            return response.json().then((driverResponse: DriverResponse[]) => {
-                resolve(driverResponse);
-            });
-        });
-    });
-}
-
-export function createDriver(driverPayload: DriverResponse, id_token: string): Promise<DriverResponse> {
-    if (!id_token) return Promise.reject(new Error("Unauthorized"));
-    return new Promise<DriverResponse>((resolve, reject) => {
-        return fetch(`${baseUrl}/admin/drivers`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + id_token
-            },
-            body: JSON.stringify(driverPayload)
-        }).then(response => {
-            return response.json().then((driverResponse: DriverResponse) => {
-                resolve(driverResponse);
-            });
-        });
-    });
-}
-
-export function saveTeams(teamPayload: TeamResponse[], id_token: string): Promise<TeamResponse[]> {
-    if (!id_token) return Promise.reject(new Error("Unauthorized"));
-    return new Promise<TeamResponse[]>((resolve, reject) => {
-        return fetch(`${baseUrl}/admin/teams`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + id_token
-            },
-            body: JSON.stringify(teamPayload)
-        }).then(response => {
-            return response.json().then((teams: TeamResponse[]) => {
-                resolve(teams);
-            });
-        });
-    });
-}
-
-export function getTeamByAbbreviation(abbreviation: string): Promise<TeamResponse> {
-    return new Promise<TeamResponse>((resolve, reject) => {
-        return fetch(`${baseUrl}/teams/${abbreviation}`).then(response => {
-            return response.json().then((team: TeamResponse) => {
-                resolve(team);
-            });
-        });
-    });
-}
-
-export function getAllTeams(): Promise<TeamResponse[]> {
-    return new Promise<TeamResponse[]>((resolve, reject) => {
-        return fetch(`${baseUrl}/teams/`).then(response => {
-            return response.json().then((teams: TeamResponse[]) => {
-                teams.sort((a, b) => { return a.name.localeCompare(b.name); });
-                resolve(teams);
             });
         });
     });
