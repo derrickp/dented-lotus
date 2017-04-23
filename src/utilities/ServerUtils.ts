@@ -374,11 +374,11 @@ export function getAllTeams(): Promise<TeamResponse[]> {
 export function getAllPublicUsers(): Promise<PublicUser[]> {
     return new Promise<PublicUser[]>((resolve, reject) => {
         return fetch(`${baseUrl}/allusers`).then(response => {
-            return response.json().then((userResponses: PublicUser[]) => {
+            return response.json().then((userResponses: UserResponse[]) => {
                 const users = userResponses.map(ur => {
                     const user: PublicUser = {
                         imageUrl: ur.imageUrl ? ur.imageUrl : getRandomImage(),
-                        display: ur.display,
+                        display: ur.displayName,
                         points: ur.points,
                         key: ur.key,
                         numCorrectPicks: ur.numCorrectPicks
