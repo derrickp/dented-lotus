@@ -1,15 +1,15 @@
 
 import { getRandomInt } from "../../common/utils/numbers";
 import { DEFAULT_IMAGES } from "../../common/utils/images"
-import { TrackResponse } from "../../common/models/Track";
+import { TrackResponse } from "../../common/responses/TrackResponse";
 import { DriverResponse } from "../../common/responses/DriverResponse";
 import { RacePrediction, PredictionChoices } from "../../common/models/Race";
 import { UserPickPayload } from "../../common/payloads/UserPickPayload";
-import { TeamResponse } from "../../common/models/Team";
+import { TeamResponse } from "../../common/responses/TeamResponse";
 import { UserResponse } from "../../common/responses/UserResponse";
 import { RaceResponse } from "../../common/responses/RaceResponse";
 import { BlogResponse } from "../../common/responses/BlogResponse";
-import { PublicUser } from "../../common/models/User";
+import { PublicUser } from "../../common/responses/PublicUser";
 import { PredictionResponse } from "../../common/responses/PredictionResponse";
 import { AuthPayload } from "../../common/payloads/AuthPayload";
 import { AuthResponse } from "../../common/responses/AuthResponse";
@@ -350,13 +350,14 @@ export function getAllTeams(): Promise<TeamResponse[]> {
 export function getAllPublicUsers(): Promise<PublicUser[]> {
     return new Promise<PublicUser[]>((resolve, reject) => {
         return fetch(`${baseUrl}/allusers`).then(response => {
-            return response.json().then((userResponses: UserResponse[]) => {
+            return response.json().then((userResponses: PublicUser[]) => {
                 const users = userResponses.map(ur => {
                     const user: PublicUser = {
                         imageUrl: ur.imageUrl ? ur.imageUrl : getRandomImage(),
-                        display: ur.displayName,
+                        display: ur.display,
                         points: ur.points,
-                        key: ur.key
+                        key: ur.key,
+                        numCorrectPicks: ur.numCorrectPicks
                     };
                     return user;
                 });
@@ -413,7 +414,7 @@ export function saveUserInfo(user: UserResponse, id_token: string): Promise<void
 }
 
 export function authenticate(authPayload: AuthPayload): Promise<AuthResponse> {
-    return new Promise<UserResponse>((resolve, reject) => {
+    return new Promise<AuthResponse>((resolve, reject) => {
         return fetch(`${baseUrl}/users/authenticate`, {
             method: 'POST',
             headers: {

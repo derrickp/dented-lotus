@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { TrackResponse as TrackModel } from "../../../common/models/Track";
+import { TrackModel } from "../../../common/models/Track";
 
 export interface TrackProps {
     track: TrackModel;
@@ -8,7 +8,6 @@ export interface TrackProps {
 }
 
 export interface TrackState {
-    track: TrackModel;
     small: boolean;
 }
 
@@ -18,7 +17,6 @@ export class TrackPage extends React.Component<TrackProps, TrackState> {
     constructor(props: TrackProps) {
         super(props);
         this.state = {
-            track: props.track,
             small: this.props.small
         };
     }
@@ -30,20 +28,20 @@ export class TrackPage extends React.Component<TrackProps, TrackState> {
 
     getSmall() {
         return <div onClick={this.toggleSize.bind(this)} className="dl-panel">
-            <div>{this.state.track.name} - SMALL</div>
-            <div>{this.state.track.country}</div>
+            <div>{this.props.track.trackResponse.name} - SMALL</div>
+            <div>{this.props.track.trackResponse.country}</div>
         </div>;
     }
 
     getFull() {
         return <div onClick={this.toggleSize.bind(this)} className="dl-panel">
-            <div>{this.state.track.name}</div>
-            <div>{this.state.track.country}</div>
+            <div>{this.props.track.trackResponse.name}</div>
+            <div>{this.props.track.trackResponse.country}</div>
         </div>;
     }
 
     render() {
-        if (!this.state.track) {
+        if (!this.props.track) {
             return <div>Loading... </div>
         } else {
             if (this.state.small) {

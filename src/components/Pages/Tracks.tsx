@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { TrackResponse as TrackModel } from "../../../common/models/Track";
+import { TrackModel } from "../../../common/models/Track";
 import { TrackPage } from "./TrackPage";
 
 export interface TracksProps {
@@ -15,7 +15,7 @@ export class Tracks extends React.Component<TracksProps, TracksState> {
         super(props);
 
         const tracks = this.props.tracks.sort((track1, track2) => {
-            return track1.name.localeCompare(track2.name);
+            return track1.trackResponse.name.localeCompare(track2.trackResponse.name);
         });
 
         this.state = { };
@@ -26,7 +26,7 @@ export class Tracks extends React.Component<TracksProps, TracksState> {
             return <div>Loading...</div>;
         }
         const entries = this.props.tracks.sort((track1, track2) => {
-            return track1.name.localeCompare(track2.name);
+            return track1.trackResponse.name.localeCompare(track2.trackResponse.name);
         }).map(track => {
             return <li key={track.key} className="dl-panel"><TrackPage key={track.key} track={track} small={true} /></li>
         });

@@ -1,5 +1,5 @@
 import * as sqlite3 from "sqlite3";
-import { TrackResponse } from "../../../common/models/Track";
+import { TrackResponse } from "../../../common/responses/TrackResponse";
 
 const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 

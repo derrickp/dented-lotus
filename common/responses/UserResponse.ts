@@ -1,5 +1,5 @@
 export interface UserResponse {
-    key?: string;
+    key: string;
     displayName?: string;
     firstName?: string;
     lastName?: string;
@@ -9,4 +9,5 @@ export interface UserResponse {
     imageUrl?: string;
     faveDriver?: string;
     faveTeam?: string;
+    numCorrectPicks?: number;
 }

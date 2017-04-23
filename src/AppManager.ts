@@ -2,16 +2,19 @@ import * as moment from "moment";
 
 import { FULL_FORMAT } from "../common/utils/date";
 import { BlogResponse } from "../common/responses/BlogResponse";
-import { User, PublicUser } from "../common/models/User";
+import { User } from "../common/models/User";
+import { PublicUser } from "../common/responses/PublicUser";
 import { RaceModel, RaceModelContext, RacePrediction, PredictionChoices } from "../common/models/Race";
-import { TrackResponse, TrackModel } from "../common/models/Track";
+import { TrackModel } from "../common/models/Track";
+import { TrackResponse } from "../common/responses/TrackResponse";
 import { DriverModel, DriverModelContext } from "../common/models/Driver";
 import { DriverResponse } from "../common/responses/DriverResponse";
 import { RaceResponse } from "../common/responses/RaceResponse";
 import { PredictionResponse } from "../common/responses/PredictionResponse";
 import { PredictionModel, PredictionContext } from "../common/models/Prediction";
 import { getHash } from "./utilities/url";
-import { TeamModel, TeamResponse } from "../common/models/Team";
+import { TeamModel } from "../common/models/Team";
+import { TeamResponse } from "../common/responses/TeamResponse";
 import {
     getAllTracks,
     getBlogs,
@@ -52,7 +55,7 @@ export class AppManager {
     private _raceMap: Map<string, RaceModel> = new Map<string, RaceModel>();
     private _driverMap: Map<string, DriverModel> = new Map<string, DriverModel>();
     private _teamMap: Map<string, TeamModel> = new Map<string, TeamModel>();
-    private _trackMap: Map<string, TrackResponse> = new Map<string, TrackResponse>();
+    private _trackMap: Map<string, TrackModel> = new Map<string, TrackModel>();
 
     doGoogleLogin: () => Promise<void>;
     doFacebookLogin: () => Promise<void>;
@@ -256,7 +259,7 @@ export class AppManager {
             },
             getTrack: (key: string): TrackModel => {
                 if (this._trackMap.has(key)) {
-                    return new TrackModel(this._trackMap.get(key));
+                    return this._trackMap.get(key);
                 }
                 else {
                     return null;
@@ -308,7 +311,7 @@ export class AppManager {
         };
     }
 
-    get tracks(): TrackResponse[] {
+    get tracks(): TrackModel[] {
         return Array.from(this._trackMap.values());
     }
 
@@ -317,7 +320,7 @@ export class AppManager {
             this._trackMap.clear();
             return getAllTracks().then(trackResponses => {
                 for (const trackResponse of trackResponses) {
-                    this._trackMap.set(trackResponse.key, trackResponse);
+                    this._trackMap.set(trackResponse.key, new TrackModel(trackResponse));
                 }
                 this._publishWatches("tracks");
                 resolve();

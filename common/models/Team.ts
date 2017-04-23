@@ -1,6 +1,7 @@
 import { DriverModel } from "./Driver";
 import { DriverResponse } from "../responses/DriverResponse";
 import { Selectable } from "./Selectable";
+import { TeamResponse } from "../responses/TeamResponse";
 
 export class TeamModel implements Selectable {
     name: string;
@@ -46,13 +47,4 @@ export class TeamModel implements Selectable {
     update(){
 
     }
-}
-
-export interface TeamResponse {
-    key: string;
-    name: string;
-    trivia?: string[];
-    abbreviation?: string;
-    headquartersCity?: string;
-    points?: number;
 }

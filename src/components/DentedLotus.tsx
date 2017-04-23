@@ -13,11 +13,12 @@ import { Paths } from "./../Paths";
 import { RaceModel } from "../../common/models/Race";
 import { TeamModel } from "../../common/models/Team";
 import { DriverModel } from "../../common/models/Driver";
-import { TrackResponse, TrackModel } from "../../common/models/Track";
+import { TrackModel } from "../../common/models/Track";
 import { BlogResponse } from "../../common/responses/BlogResponse";
 import { PredictionModel } from "../../common/models/Prediction";
-import { User, PublicUser } from "../../common/models/User";
-import { Scoreboard } from "./widgets/Scoreboard";
+import { User } from "../../common/models/User";
+import { PublicUser } from "../../common/responses/PublicUser";
+import { Scoreboard } from "./widgets/scoreboards/Scoreboard";
 
 export interface DentedLotusProps {
     stateManager: AppManager;
@@ -36,7 +37,7 @@ export interface DentedLotusState {
     race: RaceModel;
     drivers: DriverModel[];
     blogs: BlogResponse[];
-    tracks: TrackResponse[];
+    tracks: TrackModel[];
     allSeasonPredictions: PredictionModel[];
     publicUsers: PublicUser[];
     user: User;
@@ -230,7 +231,7 @@ export interface HomeProps {
 export const Home = (props: HomeProps) => (
     <div>
         <div key={"header"} className="header-section"></div>
-        <Grid>
+        <Grid fluid={true}>
             <RaceCountdown isLoggedIn={props.isLoggedIn} key={1} clickMakeAllSeasonPicks={props.launchAllSeasonPicks} clickMakeNextRacePicks={props.launchNextRacePicks} race={props.race} />
             <Row>
                 <Col xs={12} mdPush={8} md={4}><Scoreboard clickItem={props.clickUser} publicUsers={props.publicUsers} drivers={props.drivers} user={props.user} type="users" title="Standings" count={props.publicUsers.length} /></Col>

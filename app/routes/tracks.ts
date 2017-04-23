@@ -3,7 +3,7 @@
 import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 import { getTracks, saveTracks, getTrackResponses } from "../utilities/data/tracks";
-import { TrackResponse } from "../../common/models/Track";
+import { TrackResponse } from "../../common/responses/TrackResponse";
 
 export const trackRoutes: IRouteConfiguration[] = [
     {

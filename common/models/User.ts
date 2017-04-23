@@ -2,25 +2,12 @@
 import { UserResponse } from "../responses/UserResponse";
 import { getRandomInt } from "../utils/numbers";
 import { DEFAULT_IMAGES } from "../utils/images"
+import { UserRoles } from "../roles";
 import { DriverModel } from "./Driver";
 import { TeamModel } from "./Team";
 
-export interface PublicUser {
-    imageUrl: string;
-    display: string;
-    points: number;
-    key: string;
-}
-
-export namespace UserRoles {
-    export const ADMIN = "admin";
-    export const USER = "user";
-}
-
 export interface UserContext {
     saveUser: (user: User) => Promise<void>;
-    getDriver: (key: string) => DriverModel;
-    getTeam: (key: string) => TeamModel;
 }
 
 export class User {

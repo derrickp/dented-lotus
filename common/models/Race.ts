@@ -1,9 +1,6 @@
-import { TrackModel, TrackResponse } from "./Track";
+import { TrackModel } from "./Track";
 import { DriverModel } from "./Driver";
 import { RaceResponse } from "../responses/RaceResponse";
-import { DriverResponse } from "../responses/DriverResponse";
-import { PredictionResponse } from "../responses/PredictionResponse";
-import { PredictionModel } from "./Prediction";
 import { getDurationFromNow } from "../utils/date";
 
 export interface RaceModelContext {
@@ -65,24 +62,6 @@ export class RaceModel {
         }
         return this._context.saveRace(this);
     }
-
-    // addPrediction(predictionResponse: PredictionResponse) {
-    //     const predictionIndex = this.predictions.findIndex(p => p.predictionResponse.key === predictionResponse.key);
-    //     const prediction = this._context.getPrediction(predictionResponse)
-    //     if (predictionIndex) {
-    //         this.predictions.splice(predictionIndex, 1, prediction);
-    //     }
-    //     else {
-    //         this.predictions.push(prediction);
-    //     }
-    // }
-
-    // removePrediction(predictionResponse: PredictionResponse) {
-    //     const predictionIndex = this.predictions.findIndex(p => p.predictionResponse.key === predictionResponse.key);
-    //     if (predictionIndex >= 0) {
-    //         this.predictions.splice(predictionIndex, 1);
-    //     }
-    // }
 
     get json(): RaceResponse {
         const raceResponse: RaceResponse = {

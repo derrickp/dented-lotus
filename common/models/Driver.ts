@@ -1,5 +1,6 @@
 
-import { TeamModel, TeamResponse } from "./Team";
+import { TeamModel } from "./Team";
+import { TeamResponse } from "../responses/TeamResponse";
 import { TrackModel } from "./Track";
 import { RaceModel } from "./Race";
 import { Selectable } from "./Selectable";

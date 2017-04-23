@@ -1,9 +1,10 @@
 
-import { User, PublicUser, GoogleUser, FacebookUser, UserContext } from "../../common/models/User";
+import { User, GoogleUser, FacebookUser, UserContext } from "../../common/models/User";
 import { DriverModel } from "../../common/models/Driver";
 import { TeamModel } from "../../common/models/Team";
 import { AuthenticationTypes } from "../../common/authentication";
 import { AuthResponse } from "../../common/responses/AuthResponse";
+import { PublicUser } from "../../common/responses/PublicUser";
 import { AuthPayload } from "../../common/payloads/AuthPayload";
 
 import { authenticate, saveUserInfo, getUser as serverGetUser } from "../utilities/ServerUtils";
@@ -43,12 +44,6 @@ export class UserStore {
                 return saveUserInfo(user.json, this.user.id_token).then(() => {
                     this.userChange && this.userChange();
                 });
-            },
-            getDriver: (key: string) => {
-                return this.getDriver(key);
-            },
-            getTeam: (key: string) => {
-                return this.getTeam(key);
             }
         };
         return context;

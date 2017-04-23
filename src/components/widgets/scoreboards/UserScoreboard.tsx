@@ -5,7 +5,8 @@ import {List, ListItem} from 'material-ui/List';
 import Avatar from 'material-ui/Avatar';
 import Divider from 'material-ui/Divider';
 
-import { User, PublicUser } from "../../../common/models/User";
+import { User } from "../../../../common/models/User";
+import { PublicUser } from "../../../../common/responses/PublicUser";
 
 export interface UserScoreboardProps {
     users: PublicUser[];
@@ -27,7 +28,7 @@ export function UserScoreboard(props: UserScoreboardProps) {
         const user = sorted[i];
         items.push(<ListItem key={user.key}
             onClick={() => { props.clickUser && props.clickUser(user); }}
-            primaryText={`${i + 1}   ${user.display}`}
+            primaryText={`${user.display} (${user.numCorrectPicks} correct)`}
             leftAvatar={<Avatar src={user.imageUrl}></Avatar>}
             rightIcon={<div>{user.points}</div>}
             disabled={disabled}>

@@ -6,7 +6,7 @@ import { Credentials } from "../../common/authentication";
 import { PredictionResponse, PredictionTypes } from "../../common/responses/PredictionResponse";
 import { UserPickPayload } from "../../common/payloads/UserPickPayload";
 import { DriverResponse } from "../../common/responses/DriverResponse";
-import { TeamResponse } from "../../common/models/Team";
+import { TeamResponse } from "../../common/responses/TeamResponse";
 import { getDriverResponses } from "../utilities/data/drivers";
 import { getTeamResponses } from "../utilities/data/teams";
 import {

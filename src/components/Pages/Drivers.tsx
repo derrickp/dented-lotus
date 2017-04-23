@@ -1,13 +1,14 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { TrackResponse as TrackModel } from "../../../common/models/Track";
+import { TrackModel } from "../../../common/models/Track";
 import { TrackPage } from "./TrackPage";
 import { DriverModel } from "../../../common/models/Driver";
 import { DriverResponse } from "../../../common/responses/DriverResponse";
 import { DriverComponent } from "../widgets/DriverComponent";
 import { TeamComponent } from "../widgets/TeamComponent";
 import { Form, Input } from "formsy-react-components";
-import { TeamModel, TeamResponse } from "../../../common/models/Team";
+import { TeamModel } from "../../../common/models/Team";
+import { TeamResponse } from "../../../common/responses/TeamResponse";
 import { Panel, Button, PanelGroup, Grid } from "react-bootstrap";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
 

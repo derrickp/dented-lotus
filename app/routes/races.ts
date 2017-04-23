@@ -25,7 +25,7 @@ import {
 import { getFullUsers, updateUser } from "../utilities/data/users";
 import { RacePrediction, PredictionChoices } from "../../common/models/Race";
 import { RaceResponse } from "../../common/responses/RaceResponse";
-import { TrackResponse } from "../../common/models/Track";
+import { TrackResponse } from "../../common/responses/TrackResponse";
 import { DriverResponse } from "../../common/responses/DriverResponse";
 import { PredictionResponse } from "../../common/responses/PredictionResponse";
 

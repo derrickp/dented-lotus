@@ -1,7 +1,8 @@
 import { DriverModel } from "./Driver";
 import { DriverResponse } from "../responses/DriverResponse";
 import { PredictionResponse, PredictionTypes } from "../responses/PredictionResponse";
-import { TeamResponse, TeamModel } from "./Team";
+import { TeamResponse } from "../responses/TeamResponse";
+import { TeamModel } from "./Team";
 import { Selectable } from "./Selectable";
 
 export interface PredictionContext {
