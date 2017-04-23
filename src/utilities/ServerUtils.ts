@@ -8,13 +8,9 @@ import { UserPickPayload } from "../../common/payloads/UserPickPayload";
 import { TeamResponse } from "../../common/responses/TeamResponse";
 import { UserResponse } from "../../common/responses/UserResponse";
 import { RaceResponse } from "../../common/responses/RaceResponse";
-import { BlogResponse } from "../../common/responses/BlogResponse";
-<<<<<<< Updated upstream
-import { PublicUser } from "../../common/responses/PublicUser";
-=======
-import { ModifierResponse } from "../../common/responses/PredictionResponse";
-import { PublicUser } from "../../common/models/User";
->>>>>>> Stashed changes
+import { BlogResponse } from "../../common/responses/BlogResponse"; 
+import { PublicUser } from "../../common/responses/PublicUser"; 
+import { ModifierResponse } from "../../common/responses/PredictionResponse"; 
 import { PredictionResponse } from "../../common/responses/PredictionResponse";
 import { AuthPayload } from "../../common/payloads/AuthPayload";
 import { AuthResponse } from "../../common/responses/AuthResponse";

@@ -1,18 +1,12 @@
 import * as React from "react";
 import * as ReactDom from "react-dom";
-import { DriverModel } from "../../../common/models/Driver";
-<<<<<<< Updated upstream
+import { DriverModel } from "../../../common/models/Driver"; 
 import { DriverResponse } from "../../../common/responses/DriverResponse";
 import { TeamModel } from "../../../common/models/Team";
-import { TeamResponse } from "../../../common/responses/TeamResponse";
-import { Selectable } from "../../../common/models/Selectable";
-=======
-import { TeamModel, TeamResponse } from "../../../common/models/Team";
-import { Selectable, SelectableObject } from "../../../common/models/Selectable";
->>>>>>> Stashed changes
+import { TeamResponse } from "../../../common/responses/TeamResponse";   
+import { Selectable, SelectableObject } from "../../../common/models/Selectable"; 
 import { PredictionModel } from "../../../common/models/Prediction";
-import { PredictionResponse } from "../../../common/responses/PredictionResponse";
-import { DriverResponse } from "../../../common/responses/DriverResponse";
+import { PredictionResponse } from "../../../common/responses/PredictionResponse"; 
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
 import { FormControl, Well, FormGroup, Row, Col } from "react-bootstrap";
 import TextField from "material-ui/TextField";

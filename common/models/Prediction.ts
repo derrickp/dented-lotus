@@ -1,16 +1,10 @@
 import { DriverModel } from "./Driver";
-import { DriverResponse } from "../responses/DriverResponse";
-<<<<<<< Updated upstream
-import { PredictionResponse, PredictionTypes } from "../responses/PredictionResponse";
+import { DriverResponse } from "../responses/DriverResponse";  
 import { TeamResponse } from "../responses/TeamResponse";
-import { TeamModel } from "./Team";
-import { Selectable } from "./Selectable";
-=======
-import { PredictionResponse, PredictionTypes, ModifierResponse } from "../responses/PredictionResponse";
-import { TeamResponse, TeamModel } from "./Team";
+import { TeamModel } from "./Team"; 
+import { PredictionResponse, PredictionTypes, ModifierResponse } from "../responses/PredictionResponse";  
 import { Selectable, SelectableObject } from "./Selectable";
-import { getModifiers } from "../../src/utilities/ServerUtils";
->>>>>>> Stashed changes
+import { getModifiers } from "../../src/utilities/ServerUtils"; 
 
 export interface PredictionContext {
     saveUserPicks: (model: PredictionModel) => Promise<boolean>;

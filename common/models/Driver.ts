@@ -1,11 +1,6 @@
-
-<<<<<<< Updated upstream
 import { TeamModel } from "./Team";
-import { TeamResponse } from "../responses/TeamResponse";
-=======
-import { TeamModel, TeamResponse } from "./Team";
-import { PredictionModel } from "./Prediction";
->>>>>>> Stashed changes
+import { TeamResponse } from "../responses/TeamResponse";  
+import { PredictionModel } from "./Prediction"; 
 import { TrackModel } from "./Track";
 import { RaceModel } from "./Race";
 import {DriverResponse } from "../responses/DriverResponse";
