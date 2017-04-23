@@ -3,11 +3,10 @@ import { TeamModel, TeamResponse } from "./Team";
 import { TrackModel } from "./Track";
 import { RaceModel } from "./Race";
 import { Selectable } from "./Selectable";
-import { DriverResponse } from "../responses/DriverResponse";
 
 export interface DriverModelContext {
     saveDriver?: (model:DriverModel) => Promise<DriverModel[]>;
-    getTeam?: (key: string) => TeamModel;
+    getTeam?: (response: TeamResponse) => TeamModel;
 } 
 
 export class DriverModel implements Selectable {
@@ -49,7 +48,7 @@ export class DriverModel implements Selectable {
     public getSelectable(prediction: Prediction): Promise<Selectable>{
         const pred = prediction.key;
         const driver = this.key;
-
+           
     }
 
     public update( ){
@@ -82,10 +81,27 @@ export class DriverModel implements Selectable {
             birthdate: this.birthdate,
             points: +this.points,
             nationality: this.nationality,
-            team: this.team.key,
+            team: this.team.json,
             trivia: this.trivia,
             wins: this.wins
         };
         return driver;
     }
+}
+
+export interface DriverResponse {
+    key: string;
+    trivia: string[];
+    firstName: string;
+    lastName: string;
+    nationality: string;
+    active?: boolean;
+    flag?: string;
+    points?: number;
+    birthdate?: string;
+    number?: number;
+    abbreviation?: string;
+    /**Abbreviation for the team */
+    team?: TeamResponse;
+    wins?: number;
 }
