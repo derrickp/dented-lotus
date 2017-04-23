@@ -7,7 +7,7 @@ import { AuthResponse } from "../../common/responses/AuthResponse";
 import { PublicUser } from "../../common/responses/PublicUser";
 import { AuthPayload } from "../../common/payloads/AuthPayload";
 
-import { authenticate, saveUserInfo, getUser as serverGetUser } from "../utilities/ServerUtils";
+import { authenticate, saveUserInfo, getUser as serverGetUser, getAllPublicUsers } from "../utilities/server/users";
 
 export class UserStore {
     private _initializePromise: Promise<void>;
@@ -18,6 +18,7 @@ export class UserStore {
     user: User;
     haveFB: boolean;
     haveGoogle: boolean;
+    publicUsers: PublicUser[] = [];
 
     userChange: () => void;
     fbLoaded?: () => void;
@@ -54,6 +55,7 @@ export class UserStore {
             const promises: Promise<void>[] = [];
             promises.push(this._initFacebook());
             promises.push(this._initGoogle());
+            promises.push(this.refreshAllUsers());
             return Promise.all(promises).then(() => {
                 resolve();
             });
@@ -79,6 +81,15 @@ export class UserStore {
     signOut(): Promise<void> {
         return this.user.logOut().then(success => {
             this.user = new User(null, "", null);
+        });
+    }
+
+    refreshAllUsers(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            return getAllPublicUsers().then((users: PublicUser[]) => {
+                this.publicUsers = users;
+                resolve();
+            });
         });
     }
 

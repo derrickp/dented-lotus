@@ -1,7 +1,7 @@
 
 import * as sqlite3 from "sqlite3";
 
-import { PredictionResponse, PredictionTypes,ModifierResponse } from "../../../common/responses/PredictionResponse";
+import { PredictionResponse, PredictionTypes, ModifierResponse } from "../../../common/responses/PredictionResponse";
 import { RacePrediction } from "../../../common/models/Race";
 import { getDriverResponses } from "./drivers";
 import { getTeamResponses } from "./teams";
@@ -12,15 +12,12 @@ const predictionsSelect = "select * from predictions_vw";
 const racePredictionSelect = "select * from racepredictions_vw";
 const userPicksSelect = "select * from userpicks_vw";
 const modifierSelect = "select choice, modifier from modifiers"
-const racePredictionsChoicesSelect = "select choice from racepredictionchoices";
 
 export async function getPredictionResponses(raceKeys: string[], userKey: string): Promise<PredictionResponse[]> {
     const predictionResponses: PredictionResponse[] = [];
     const racePredictionRows = await getRacePredictions(raceKeys);
     const predictionKeys = racePredictionRows.filter(rp => rp.prediction).map(rp => rp.prediction);
     const predictions = await getPredictions(predictionKeys);
-    const drivers = await getDriverResponses(true, []);
-    const teams = await getTeamResponses([]);
     const userPicks = await getUserPicks(userKey, raceKeys);
     for (const racePredictionRow of racePredictionRows) {
         const thisPrediction = predictions.filter(p => {
@@ -33,13 +30,12 @@ export async function getPredictionResponses(raceKeys: string[], userKey: string
         const prediction: PredictionResponse = {
             allSeason: thisPrediction.allSeason ? true : false,
             key: thisPrediction.key,
-            value: racePredictionRow.value, 
+            value: racePredictionRow.value,
             description: thisPrediction.description,
             title: thisPrediction.title,
             type: thisPrediction.type,
             outcome: [],
             userPick: "",
-            choices: [],
             raceKey: racePredictionRow.race
         };
 
@@ -49,43 +45,19 @@ export async function getPredictionResponses(raceKeys: string[], userKey: string
         }).map(up => {
             return up.choice;
         })[0];
-
-        // Get the choices for this prediction.
-        const possibleChoices = await getPredictionChoices(prediction.key, racePredictionRow.race);
-        // Use the previously retrieved values.
-        switch (prediction.type) {
-            case PredictionTypes.TEAM:
-                if (possibleChoices && possibleChoices.length) {
-                    prediction.choices = possibleChoices;
-                }
-                else {
-                    prediction.choices = teams.map(t => t.key);
-                }
-                break;
-            case PredictionTypes.DRIVER:
-            default:
-                if (possibleChoices && possibleChoices.length) {
-                    prediction.choices = possibleChoices;
-                }
-                else {
-                    prediction.choices = drivers.map(d => d.key);
-                }
-                break;
-        }
-
         predictionResponses.push(prediction);
     }
 
     return predictionResponses;
 }
 
-export async function getModifiers(raceKey: string, predictionKey:string): Promise<ModifierResponse[]> { 
+export async function getModifiers(raceKey: string, predictionKey: string): Promise<ModifierResponse[]> {
     const modifierResponses: ModifierResponse[] = [];
-    if (!raceKey || !predictionKey){
+    if (!raceKey || !predictionKey) {
         return modifierResponses;
-    } 
+    }
     return new Promise<ModifierResponse[]>((resolve, reject) => {
-        let statement = modifierSelect + ` where race = '${raceKey}' AND prediction = '${predictionKey}' order by choice asc`; 
+        let statement = modifierSelect + ` where race = '${raceKey}' AND prediction = '${predictionKey}' order by choice asc`;
         db.all(statement, (err, rows: ModifierResponse[]) => {
             if (err) {
                 reject(err);
@@ -94,51 +66,39 @@ export async function getModifiers(raceKey: string, predictionKey:string): Promi
             resolve(rows);
         });
     });
-} 
-
-export function getPredictionChoices(prediction: string, race: string): Promise<string[]> {
-    return new Promise<string[]>((resolve, reject) => {
-        let statement = `${racePredictionsChoicesSelect} where prediction = '${prediction}' and race = '${race}'`;
-        db.all(statement, (err, rows: { choice: string }[]) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            if (rows) {
-                resolve(rows.map(row => row.choice));
-            }
-        });
-    });
 }
 
-export function savePredictionChoices(prediction: string, race: string, choice: string): Promise<boolean> {
+export function savePredictionModifiers(prediction: string, race: string, modifiers: ModifierResponse[]): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         if (!prediction || !race) {
             reject(new Error("need race key and prediction key"));
             return;
         }
-        const deleteStatement = `DELETE FROM racepredictionchoices where race == '${race}' AND prediction == '${prediction}'`
+        const deleteStatement = `DELETE FROM modifiers where race == '${race}' AND prediction == '${prediction}'`
         db.run(deleteStatement, (err) => {
             if (err) {
                 reject(err);
                 return;
             }
             try {
-                const insert = `INSERT OR REPLACE INTO racepredictionchoices
-            (race, prediction, choice)
-            VALUES (?1, ?2, ?3)`;
+                const insert = `INSERT OR REPLACE INTO modifiers
+            (race, prediction, choice, modifier)
+            VALUES (?1, ?2, ?3, ?4);`;
                 db.serialize(() => {
                     db.exec("BEGIN;", (beginError) => {
                         if (beginError) {
                             reject(beginError);
                             return;
                         }
-                        const valuesObject = {
-                            1: race,
-                            2: prediction,
-                            3: choice,
-                        };
-                        db.run(insert, valuesObject);
+                        for (const modifier of modifiers) {
+                            const valuesObject = {
+                                1: race,
+                                2: prediction,
+                                3: modifier.choice,
+                                4: modifier.modifier
+                            };
+                            db.run(insert, valuesObject);
+                        }
                         db.exec("COMMIT;", (commitError) => {
                             if (commitError) {
                                 reject(commitError);
@@ -351,8 +311,7 @@ export function updateRacePredictions(race: string, updates: RacePrediction[]): 
                         const valuesObject = {
                             1: racePrediction.prediction,
                             2: race,
-                            3: racePrediction.value,
-                            4: racePrediction.modifier
+                            3: racePrediction.value
                         };
                         db.run(insert, valuesObject);
                     }

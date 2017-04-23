@@ -8,6 +8,5 @@ export interface Selectable {
 export interface SelectableObject {
     key: string;
     display: string;
-    points: number;
-    multiplier: number;  
+    multiplier: number;
 }

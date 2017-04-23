@@ -19,7 +19,8 @@ import {
     getAllSeasonPredictions,
     getAllSeasonValues,
     getPredictionResponses,
-    getModifiers
+    getModifiers,
+    savePredictionModifiers
 } from "../utilities/data/predictions";
 
 export const predictionsRoutes: IRouteConfiguration[] = [
@@ -45,6 +46,28 @@ export const predictionsRoutes: IRouteConfiguration[] = [
             auth: {
                 strategies: ['jwt'],
                 scope: ['user']
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "/admin/predictions/modifiers/{raceKey}/{predictionKey}",
+        config: {
+            cors: true,
+            handler: async (request, reply) => {
+                const adds: ModifierResponse[] = request.payload;
+                const raceKey = request.params["raceKey"];
+                const predictionKey = request.params["predictionKey"];
+                try {
+                    await savePredictionModifiers(predictionKey, raceKey, adds);
+                    reply({ success: true }).code(201);
+                } catch (exception) {
+                    reply(Boom.badRequest(exception));
+                }
+            },
+            auth: {
+                strategies: ['jwt'],
+                scope: ['admin']
             }
         }
     },
@@ -127,12 +150,6 @@ export const predictionsRoutes: IRouteConfiguration[] = [
                             prediction.raceKey = value.race;
                         }
                         prediction.allSeason = true;
-                        if (prediction.type === PredictionTypes.DRIVER) {
-                            prediction.choices = drivers.map(d => d.key);
-                        }
-                        else {
-                            prediction.choices = teams.map(t => t.key);
-                        }
                         prediction.userPick = userPicks.filter(p => {
                             return p.prediction === prediction.key;
                         }).map(p => p.choice)[0];

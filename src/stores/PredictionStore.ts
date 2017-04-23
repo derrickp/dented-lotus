@@ -3,8 +3,13 @@ import { UserPickPayload } from "../../common/payloads/UserPickPayload";
 import { PredictionModel, PredictionContext } from "../../common/models/Prediction";
 import { DriverModel } from "../../common/models/Driver";
 import { TeamModel } from "../../common/models/Team";
-import { getPredictions as getPredictionResponses } from "../utilities/server/predictions";
-import { saveUserPicks, getAllSeasonPredictions } from "../utilities/ServerUtils";
+import {
+    getPredictions as getPredictionResponses,
+    getModifiers as serverGetModifiers,
+    getAllSeasonPredictions,
+    saveUserPicks
+} from "../utilities/server/predictions";
+import { PredictionResponse, ModifierResponse } from "../../common/responses/PredictionResponse";
 
 export class PredictionStore {
     user: User;
@@ -19,10 +24,17 @@ export class PredictionStore {
     getPredictions(raceKey: string): Promise<PredictionModel[]> {
         return new Promise<PredictionModel[]>((resolve, reject) => {
             return getPredictionResponses(raceKey, this.user.id_token).then(predictionResponses => {
-                const models = predictionResponses.map(pr => {
-                    return new PredictionModel(pr, this.predictionContext,this.user.id_token);
+                const modifierPromises: Promise<ModifierResponse[]>[] = [];
+                for (const pr of predictionResponses) {
+                    modifierPromises.push(serverGetModifiers(pr.raceKey, pr.key, this.user.id_token));
+                }
+                return Promise.all(modifierPromises).then((allModifiers) => {
+                    const models = predictionResponses.map((pr, index) => {
+                        const modifiers = allModifiers[index];
+                        return new PredictionModel(pr, modifiers, this.predictionContext);
+                    });
+                    resolve(models);
                 });
-                resolve(models);
             }).catch(error => {
                 reject(error);
             });
@@ -32,12 +44,18 @@ export class PredictionStore {
     get allSeasonPredictions(): Promise<PredictionModel[]> {
         return new Promise<PredictionModel[]>((resolve, reject) => {
             return getAllSeasonPredictions(this.user.id_token).then(predictionResponses => {
-                const allSeasonPredictions: PredictionModel[] = [];
-                for (const predictionResponse of predictionResponses) {
-                    const pm = new PredictionModel(predictionResponse, this.predictionContext, this.user.id_token);
-                    allSeasonPredictions.push(pm);
+                const modifierPromises: Promise<ModifierResponse[]>[] = [];
+                for (const pr of predictionResponses) {
+                    modifierPromises.push(serverGetModifiers(pr.raceKey, pr.key, this.user.id_token));
                 }
-                resolve(allSeasonPredictions);
+                const allSeasonPredictions: PredictionModel[] = [];
+                return Promise.all(modifierPromises).then((allModifiers) => {
+                    const models = predictionResponses.map((pr, index) => {
+                        const modifiers = allModifiers[index];
+                        return new PredictionModel(pr, modifiers, this.predictionContext);
+                    });
+                    resolve(models);
+                });
             });
         });
     }

@@ -4,15 +4,14 @@ export interface PredictionResponse {
     title: string;
     type: string;
     allSeason: boolean;
-    choices?: string[];
-    value?: number; 
+    value?: number;
     outcome?: string[];
     userPick?: string;
     raceKey?: string;
 }
 
-export interface ModifierResponse{
-    choice:string;
+export interface ModifierResponse {
+    choice: string;
     modifier: number;
 }
 

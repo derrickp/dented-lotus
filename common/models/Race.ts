@@ -84,7 +84,6 @@ export class RaceModel {
 export interface RacePrediction {
     race: string;
     prediction: string;
-    modifier: number;
     value: number;
 }
 

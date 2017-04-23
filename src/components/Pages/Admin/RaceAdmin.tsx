@@ -7,7 +7,7 @@ import { Accordion, Panel, PanelGroup, Button, Grid } from "react-bootstrap";
 import { getDurationFromNow } from "../../../../common/utils/date";
 import { PredictionComponent } from "../../../components/widgets/Prediction";
 import { confirmPromise } from "../../../utilities/UXUtilities";
-import { savePredictionOutcomes, FinalChoice } from "../../../utilities/ServerUtils";
+import { savePredictionOutcomes } from "../../../utilities/server/predictions";
 
 
 export interface RaceAdminProps {

@@ -1,6 +1,4 @@
--- SELECT INTO racepredictionchoices 
--- r.key as race,
--- p.key as prediction
+
 CREATE TABLE `modifiers` (
 	`id`	INTEGER PRIMARY KEY AUTOINCREMENT,
 	`choice`	INTEGER,

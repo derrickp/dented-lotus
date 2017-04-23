@@ -84,20 +84,3 @@ export class DriverModel implements Selectable {
         return driver;
     }
 }
-
-// export interface DriverResponse {
-//     key: string;
-//     trivia: string[];
-//     firstName: string;
-//     lastName: string;
-//     nationality: string;
-//     active?: boolean;
-//     flag?: string;
-//     points?: number;
-//     birthdate?: string;
-//     number?: number;
-//     abbreviation?: string;
-//     /**Abbreviation for the team */
-//     team?: TeamResponse;
-//     wins?: number;
-// }

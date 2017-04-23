@@ -1,19 +1,10 @@
 
-import { getRandomInt } from "../../common/utils/numbers";
-import { DEFAULT_IMAGES } from "../../common/utils/images"
 import { TrackResponse } from "../../common/responses/TrackResponse";
 import { DriverResponse } from "../../common/responses/DriverResponse";
 import { RacePrediction, PredictionChoices } from "../../common/models/Race";
-import { UserPickPayload } from "../../common/payloads/UserPickPayload";
 import { TeamResponse } from "../../common/responses/TeamResponse";
-import { UserResponse } from "../../common/responses/UserResponse";
 import { RaceResponse } from "../../common/responses/RaceResponse";
 import { BlogResponse } from "../../common/responses/BlogResponse"; 
-import { PublicUser } from "../../common/responses/PublicUser"; 
-import { ModifierResponse } from "../../common/responses/PredictionResponse"; 
-import { PredictionResponse } from "../../common/responses/PredictionResponse";
-import { AuthPayload } from "../../common/payloads/AuthPayload";
-import { AuthResponse } from "../../common/responses/AuthResponse";
 
 export let baseUrl = `${window.location.origin}`;
 // if (baseUrl.indexOf(":8080") == -1) {
@@ -46,29 +37,6 @@ export function sendToEndpoint(urlFragment: string, body: string, id_token: stri
             });
         }).catch(reject);
     });
-}
-
-export function getModifiers(raceKey: string, predictionKey: string, id_token:string): Promise<ModifierResponse[]> {
-    return new Promise<ModifierResponse[]>((resolve, reject) => {
-        return fetch(`/predictions/modifiers/${raceKey}/${predictionKey}`,{
-            method:"GET",
-            headers:{
-                'Authorization':"Bearer " + id_token
-            }
-        }).then(response => {
-            return response.json().then((modifiers: ModifierResponse[]) => {
-                if (response.ok) {
-                    resolve(modifiers);
-                }
-                else {
-                    reject(new Error((modifiers as any).message));
-                }
-            });
-        }).catch(error => {
-            reject(error);
-        });
-    });
-
 }
 
 export function getBlogs(): Promise<BlogResponse[]> {
@@ -169,62 +137,6 @@ export function saveRacePredictions(raceKey: string, racePredictions: RacePredic
                 'Authorization': 'Bearer ' + id_token
             },
             body: JSON.stringify(racePredictions)
-        }).then(response => {
-            if (response.ok) {
-                resolve();
-            }
-            else {
-                return response.json().then(json => {
-                    reject(new Error(json.message));
-                });
-            }
-        });
-    });
-}
-
-export function savePredictionChoices(raceKey: string, predictionChoices: PredictionChoices[], id_token: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-        return fetch(`${baseUrl}/admin/races/${raceKey}/predictions/choices`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + id_token
-            },
-            body: JSON.stringify(predictionChoices)
-        }).then(response => {
-            if (response.ok) {
-                resolve();
-            }
-            else {
-                return response.json().then(json => {
-                    reject(new Error(json.message));
-                });
-            }
-        });
-    });
-}
-
-export interface FinalChoice {
-    /** Prediction key */
-    prediction: string;
-    /** Comma delineated list of driver/team keys */
-    final: string;
-}
-
-/**
- * Save the outcome of a race
- * @param raceKey 
- * @param predictionChoices  
- */
-export function savePredictionOutcomes(raceKey: string, outcomes: FinalChoice[], id_token: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-        return fetch(`${baseUrl}/admin/races/${raceKey}/predictions/finals`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + id_token
-            },
-            body: JSON.stringify(outcomes)
         }).then(response => {
             if (response.ok) {
                 resolve();
@@ -345,21 +257,6 @@ export function getTeamByAbbreviation(abbreviation: string): Promise<TeamRespons
     });
 }
 
-export function getAllSeasonPredictions(id_token: string): Promise<PredictionResponse[]> {
-    return new Promise<PredictionResponse[]>((resolve, reject) => {
-        return fetch(`${baseUrl}/allseason/predictions`, {
-            method: "GET",
-            headers: {
-                "Authorization": "Bearer " + id_token
-            }
-        }).then(response => {
-            return response.json().then((predictions: PredictionResponse[]) => {
-                resolve(predictions);
-            });
-        });
-    });
-}
-
 export function getAllTeams(): Promise<TeamResponse[]> {
     return new Promise<TeamResponse[]>((resolve, reject) => {
         return fetch(`${baseUrl}/teams/`).then(response => {
@@ -369,116 +266,4 @@ export function getAllTeams(): Promise<TeamResponse[]> {
             });
         });
     });
-}
-
-export function getAllPublicUsers(): Promise<PublicUser[]> {
-    return new Promise<PublicUser[]>((resolve, reject) => {
-        return fetch(`${baseUrl}/allusers`).then(response => {
-            return response.json().then((userResponses: UserResponse[]) => {
-                const users = userResponses.map(ur => {
-                    const user: PublicUser = {
-                        imageUrl: ur.imageUrl ? ur.imageUrl : getRandomImage(),
-                        display: ur.displayName,
-                        points: ur.points,
-                        key: ur.key,
-                        numCorrectPicks: ur.numCorrectPicks
-                    };
-                    return user;
-                });
-                resolve(users);
-            });
-        });
-    });
-}
-
-export function getUser(key: string, id_token: string): Promise<UserResponse> {
-    return new Promise<UserResponse>((resolve, reject) => {
-        return fetch(`${baseUrl}/users/${key}`, {
-            method: "GET",
-            headers: {
-                "Authorization": "Bearer " + id_token
-            }
-        }).then(response => {
-            return response.json().then(json => {
-                if (response.ok) {
-                    const users: UserResponse[] = json;
-                    const user = users[0];
-                    user.imageUrl = user.imageUrl ? user.imageUrl : getRandomImage();
-                    resolve(user);
-                }
-                else {
-                    reject(new Error(json.message));
-                }
-            });
-        });
-    });
-}
-
-export function saveUserInfo(user: UserResponse, id_token: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-        return fetch(`${baseUrl}/users/${user.key}`, {
-            method: "PUT",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + id_token
-            },
-            body: JSON.stringify(user)
-        }).then(response => {
-            if (response.ok) {
-                resolve();
-                return;
-            }
-            else {
-                return response.json().then(json => {
-                    reject(new Error(json.message));
-                });
-            }
-        });
-    });
-}
-
-export function authenticate(authPayload: AuthPayload): Promise<AuthResponse> {
-    return new Promise<AuthResponse>((resolve, reject) => {
-        return fetch(`${baseUrl}/users/authenticate`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(authPayload)
-        }).then(response => {
-            return response.json().then((authResponse: AuthResponse) => {
-                resolve(authResponse);
-            });
-        });
-    });
-}
-
-export function saveUserPicks(picks: UserPickPayload[], id_token: string): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-        return fetch(`${baseUrl}/picks`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + id_token
-            },
-            body: JSON.stringify(picks)
-        }).then(response => {
-            return response.json().then(json => {
-                if (response.ok) {
-                    resolve(true);
-                }
-                else {
-                    reject(new Error(json.message));
-                }
-            });
-        }).catch(error => {
-            reject(error);
-        });
-    });
-}
-
-function getRandomImage(): string {
-    const num = getRandomInt(0, 2);
-    const imageUrl = DEFAULT_IMAGES[num];
-    return imageUrl;
 }

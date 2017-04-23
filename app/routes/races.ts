@@ -18,7 +18,6 @@ import {
     getPredictionResponses,
     updateRacePredictions,
     deleteRacePredictions,
-    savePredictionChoices,
     getPredictionsForRace,
     getUserPicks
 } from "../utilities/data/predictions";
@@ -103,36 +102,12 @@ export const raceRoutes: IRouteConfiguration[] = [
                         const dbAdd: RacePrediction = {
                             race: raceKey,
                             prediction: add.prediction,
-                            value: add.value,
-                            modifier: add.modifier ? add.modifier : 1.0
+                            value: add.value
                         };
                         dbAdds.push(dbAdd);
                     }
                     await updateRacePredictions(raceKey, dbAdds);
                     reply({ success: true }).code(201);
-                } catch (exception) {
-                    reply(Boom.badRequest(exception));
-                }
-            },
-            auth: {
-                strategies: ['jwt'],
-                scope: ['admin']
-            }
-        }
-    },
-    {
-        method: "POST",
-        path: "/admin/races/{raceKey}/predictions/choices",
-        config: {
-            cors: true,
-            handler: async (request, reply) => {
-                const raceKey = request.params["raceKey"];
-                const predictionChoices: PredictionChoices[] = request.payload;
-                try {
-                    for (const predictionChoice of predictionChoices) {
-                        await savePredictionChoices(predictionChoice.prediction, raceKey, predictionChoice.choices);
-                    }
-                    reply({ success: true });
                 } catch (exception) {
                     reply(Boom.badRequest(exception));
                 }

@@ -29,7 +29,6 @@ import {
     getDriver,
     getRace as serverGetRace,
     saveTeams,
-    getAllPublicUsers,
     sendToEndpoint
 } from "./utilities/ServerUtils";
 
@@ -42,7 +41,6 @@ export class AppManager {
     _initialized: Promise<boolean>;
 
     blogs: BlogResponse[] = [];
-    publicUsers: PublicUser[] = [];
     nextRace: RaceModel;
 
     currentPredictions: PredictionModel[];
@@ -121,7 +119,6 @@ export class AppManager {
             }));
             promises.push(this.refreshBlogs());
             promises.push(this.refreshTracks());
-            promises.push(this.refreshAllUsers());
             promises.push(this.refreshRaces());
             return Promise.all(promises).then(() => {
                 // Ok, we've got all of our initial stuff done.
@@ -332,14 +329,8 @@ export class AppManager {
         return this._userStore.isLoggedIn;
     }
 
-    refreshAllUsers(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            return getAllPublicUsers().then((users: PublicUser[]) => {
-                this.publicUsers = users;
-                this._publishWatches("publicUsers");
-                resolve();
-            });
-        });
+    get publicUsers() {
+        return this._userStore.publicUsers;
     }
 
     getUser(key: string): User {

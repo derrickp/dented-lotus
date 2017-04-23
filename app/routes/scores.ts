@@ -9,7 +9,8 @@ import {
 } from "../utilities/data/races";
 import {
     getPredictionsForRace,
-    getUserPicks
+    getUserPicks,
+    getModifiers
 } from "../utilities/data/predictions";
 import { getFullUsers, updateUser } from "../utilities/data/users";
 
@@ -37,6 +38,7 @@ export const scoreRoutes: IRouteConfiguration[] = [
                                 const finalPick = finalPicks.filter(fp => {
                                     return fp.prediction === rp.prediction;
                                 })[0];
+                                const modifiers = await getModifiers(rp.race, rp.prediction);
                                 // If we don't have a final pick, then this prediction hasn't been finalized...
                                 if (!finalPick) {
                                     continue;
@@ -49,7 +51,12 @@ export const scoreRoutes: IRouteConfiguration[] = [
                                 // 3. Compare their pick choice to finals
                                 if (finalPick.final.includes(userPick.choice)) {
                                     // 4. Award points if correct
-                                    const predictionPoints = rp.value * rp.modifier;
+                                    const modifierIndex = modifiers.findIndex(m => m.choice === finalPick.final);
+                                    let modifier: number = 1.0;
+                                    if (modifierIndex >= 0) {
+                                        modifier = modifiers[modifierIndex].modifier;
+                                    }
+                                    const predictionPoints = Math.round(rp.value * modifier);
                                     points += predictionPoints;
                                     numCorrect += 1;
                                 }

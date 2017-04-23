@@ -29,7 +29,6 @@ export interface PredictionState {
     validationState: "success" | "warning" | "error";
     snackbarOpen: boolean;
     snackbarText: string;
-    selectableObjects: SelectableObject[];
     points: number;
     selected: string;
 }
@@ -42,34 +41,29 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
         super(props);
         this.onChange = this.onChange.bind(this);
         this.handleRequestSnackbarClose = this.handleRequestSnackbarClose.bind(this);
+        let points: number = this.props.prediction.predictionResponse.value;
+        if (this.props.prediction.predictionResponse.userPick) {
+            const picked = this.props.prediction.choices.filter(c => c.key === this.props.prediction.predictionResponse.userPick)[0];
+            if (picked) {
+                points = points * picked.multiplier;
+            }
+        }
         this.state = {
             validationState: null,
             snackbarOpen: false,
             snackbarText: "",
-            selectableObjects: [],
-            points: 0,
+            points: points,
             selected: this.props.prediction.json.userPick || "not-app"
         };
-        this.props.prediction.getSelectable().then((sel) => {
-            const current = sel.filter((f) => { return f.key == this.props.prediction.json.userPick; })[0];
-            let points = 0;
-            if (current) {
-                points = current.points * current.multiplier;
-            }
-            this.setState({
-                selectableObjects: sel,
-                points: points
-            });
-        });
     }
 
     onChange(event: React.ChangeEvent<any>, index, value) {
         //const value = event.target.value !== "not-app" ? event.target.value : null;
         this.props.prediction.predictionResponse.userPick = value;
-        const selectedObject = this.state.selectableObjects.filter((s) => { return s.key == value; })[0];
+        const selectedObject = this.props.prediction.choices.filter((s) => { return s.key == value; })[0];
         let currentPoints = 0;
         if (selectedObject) {
-            currentPoints = selectedObject.points * selectedObject.multiplier;
+            currentPoints = this.props.prediction.predictionResponse.value * selectedObject.multiplier;
         }
         this.props.save(this.props.prediction).then(success => {
             this.setState({
@@ -122,7 +116,7 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
         const placeholder = <MenuItem key={"not-app"} value={"not-app"} primaryText="Make your pick" />;
         options.push(placeholder);
         const userChoices = prediction.predictionResponse.userPick;
-        for (const c of this.state.selectableObjects) {
+        for (const c of this.props.prediction.choices) {
             options.push(this.getOption(c));
         }
         const totalScore = <Well>
@@ -130,11 +124,6 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
             <div className="total-score" >{this.state.points}pts</div>
         </Well>
         const formControl = <SelectField autoWidth={true} key={this.props.prediction.json.key} onChange={this.onChange} value={this.state.selected} disabled={!this.props.allowedPrediction} style={styles.fields}  >{options}</SelectField>;
-        /*<FormGroup key={prediction.json.key} validationState={this.state.validationState} bsSize="large">
-            <FormControl disabled={!this.props.allowedPrediction} defaultValue={userChoices} onChange={this.onChange} id={prediction.json.key} componentClass="select" placeholder="Make your pick">
-                {options}
-            </FormControl>
-        </FormGroup>;*/
         return (
             <div>
                 <Well bsSize="small">
