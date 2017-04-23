@@ -1,12 +1,12 @@
 import * as React from "react";
 import * as ReactDom from "react-dom";
-import { DriverModel } from "../../../common/models/Driver"; 
+import { DriverModel } from "../../../common/models/Driver";
 import { DriverResponse } from "../../../common/responses/DriverResponse";
 import { TeamModel } from "../../../common/models/Team";
-import { TeamResponse } from "../../../common/responses/TeamResponse";   
-import { Selectable, SelectableObject } from "../../../common/models/Selectable"; 
+import { TeamResponse } from "../../../common/responses/TeamResponse";
+import { Selectable, SelectableObject } from "../../../common/models/Selectable";
 import { PredictionModel } from "../../../common/models/Prediction";
-import { PredictionResponse } from "../../../common/responses/PredictionResponse"; 
+import { PredictionResponse } from "../../../common/responses/PredictionResponse";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
 import { FormControl, Well, FormGroup, Row, Col } from "react-bootstrap";
 import TextField from "material-ui/TextField";
@@ -125,10 +125,11 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
         for (const c of this.state.selectableObjects) {
             options.push(this.getOption(c));
         }
-        const totalScore = <div className="total-score">
-            {this.state.points}
-        </div>
-        const formControl = <SelectField autoWidth={true} key={this.props.prediction.json.key} onChange={this.onChange} value={this.state.selected} disabled={!this.props.allowedPrediction} style={styles.fields} floatingLabelText={this.props.prediction.json.title} >{options}</SelectField>;
+        const totalScore = <Well>
+            <div className="centered full-width">Total</div>
+            <div className="total-score" >{this.state.points}pts</div>
+        </Well>
+        const formControl = <SelectField autoWidth={true} key={this.props.prediction.json.key} onChange={this.onChange} value={this.state.selected} disabled={!this.props.allowedPrediction} style={styles.fields}  >{options}</SelectField>;
         /*<FormGroup key={prediction.json.key} validationState={this.state.validationState} bsSize="large">
             <FormControl disabled={!this.props.allowedPrediction} defaultValue={userChoices} onChange={this.onChange} id={prediction.json.key} componentClass="select" placeholder="Make your pick">
                 {options}
@@ -137,7 +138,7 @@ export class PredictionComponent extends React.Component<PredictionProps, Predic
         return (
             <div>
                 <Well bsSize="small">
-                    <h3>{prediction.json.title} - {prediction.json.value}pts</h3>
+                    <h3>{prediction.json.title}</h3>
                     <h4>{prediction.json.description}</h4>
                     <Row>
                         <Col sm={10}>
