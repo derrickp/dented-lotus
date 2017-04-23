@@ -1,6 +1,6 @@
 import * as sqlite3 from "sqlite3";
 
-import { TeamResponse } from "../../../common/models/Team";
+import { TeamResponse } from "../../../common/responses/TeamResponse";
 
 const db = new sqlite3.Database('app/Data/' + process.env.DBNAME);
 

@@ -3,7 +3,7 @@ import { IRouteConfiguration } from "hapi";
 import * as Boom from "boom";
 
 import { getTeams, getTeamResponses, saveTeams } from "../utilities/data/teams";
-import { TeamResponse } from "../../common/models/Team";
+import { TeamResponse } from "../../common/responses/TeamResponse";
 
 export const teamRoutes: IRouteConfiguration[] = [
     {

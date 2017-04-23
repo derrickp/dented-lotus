@@ -5,7 +5,7 @@ import * as Boom from "boom";
 
 import { saveDrivers, getDrivers, getDriverResponses } from "../utilities/data/drivers";
 import { DriverResponse } from "../../common/responses/DriverResponse";
-import { TeamResponse } from "../../common/models/Team";
+import { TeamResponse } from "../../common/responses/TeamResponse";
 
 export const driverRoutes: IRouteConfiguration[] = [
     {

@@ -79,11 +79,12 @@ export const userRoutes: IRouteConfiguration[] = [
             ],
             cors: true,
             handler: (req, res) => {
-                let user: UserResponse = {};
+                let user: UserResponse = {
+                    key: base64url.encode(req.payload.email)
+                };
                 user.email = req.payload.email;
                 user.displayName = req.payload.displayName;
                 user.role = "user";
-                user.key = base64url.encode(user.email);
                 user.firstName = req.payload.firstName;
                 user.lastName = req.payload.lastName;
                 saveUser(user).then(success => {
@@ -206,7 +207,9 @@ export const userRoutes: IRouteConfiguration[] = [
         config: {
             cors: true,
             handler: async (req, res) => {
-                const users = await getUsersByKeys([]);
+                // const users = await getUsersByKeys([]);
+                // res(users);
+                const users = await getAllPublicUsers();
                 res(users);
                 // getAllPublicUsers().then(users => {
                 //     res(users);

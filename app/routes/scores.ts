@@ -26,6 +26,7 @@ export const scoreRoutes: IRouteConfiguration[] = [
                     console.log(raceKeys);
                     for (const user of users) {
                         let points = 0;
+                        let numCorrect = 0;
                         // 1. Get their picks
                         const userPicks = await getUserPicks(user.key, raceKeys);
                         for (const raceKey of raceKeys) {
@@ -50,11 +51,12 @@ export const scoreRoutes: IRouteConfiguration[] = [
                                     // 4. Award points if correct
                                     const predictionPoints = rp.value * rp.modifier;
                                     points += predictionPoints;
+                                    numCorrect += 1;
                                 }
                             }
                         }
-                        if (points != user.points) {
-                            await updateUser({ key: user.key, points: points });
+                        if (points != user.points || numCorrect != user.numCorrectPicks) {
+                            await updateUser({ key: user.key, points: points, numCorrectPicks: numCorrect });
                         }
                     }
                     // Once we're here all user info has been saved
