@@ -52,6 +52,8 @@ export class AppManager {
 
     private _raceMap: Map<string, RaceModel> = new Map<string, RaceModel>();
     private _trackMap: Map<string, TrackModel> = new Map<string, TrackModel>();
+    private _working: boolean = false;
+
 
     doGoogleLogin: () => Promise<void>;
     doFacebookLogin: () => Promise<void>;
@@ -111,6 +113,26 @@ export class AppManager {
 
     get googleLoaded() {
         return this._identityManager.haveGoogle;
+    }
+
+    /**
+     * showLoadingSpinner
+     */
+    public showLoadingSpinner() {
+        this._working = true;
+        this._publishWatches("working", true);
+    }
+
+    /**
+     * hideLoadingSpinner
+     */
+    public hideLoadingSpinner() {
+        this._working = false;
+        this._publishWatches("working", false);
+    }
+
+    isWorking(): boolean {
+        return this._working;
     }
 
     initialize(): Promise<boolean> {
@@ -303,11 +325,11 @@ export class AppManager {
         }
     }
 
-    private _publishWatches(path: string) {
+    private _publishWatches(path: string,callbackParams:any = null) {
         if (this._watches.has(path)) {
             const callbacks = this._watches.get(path);
             callbacks.forEach(callback => {
-                callback();
+                callback(callbackParams);
             });
 
         }
