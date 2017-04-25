@@ -96,7 +96,7 @@ export function saveUser(user: UserResponse): Promise<boolean> {
         let valuesObject = {
             1: user.key,
             2: user.email,
-            3: user.displayName ? user.displayName : "",
+            3: user.display ? user.display : "",
             4: user.firstName ? user.firstName : "",
             5: user.lastName ? user.lastName : "",
             6: user.role,
@@ -123,9 +123,9 @@ export function updateUser(user: UserResponse): Promise<boolean> {
         let updateStatement = "UPDATE users SET ";
         let updateFields = [];
         let updateObject = {};
-        if (user.displayName) {
+        if (user.display) {
             updateFields.push("displayname = ?1");
-            updateObject[1] = user.displayName;
+            updateObject[1] = user.display;
         }
         if (user.firstName) {
             updateFields.push("firstname = ?2");

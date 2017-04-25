@@ -45,7 +45,7 @@ export const userRoutes: IRouteConfiguration[] = [
                     }
                     const newUser: UserResponse = {
                         key: key,
-                        displayName: userPayload.displayName ? userPayload.displayName : existingUser.displayName,
+                        display: userPayload.display ? userPayload.display : existingUser.display,
                         firstName: userPayload.firstName ? userPayload.firstName : existingUser.firstName,
                         lastName: userPayload.lastName ? userPayload.lastName : existingUser.lastName,
                         imageUrl: userPayload.imageUrl ? userPayload.imageUrl : existingUser.imageUrl,
@@ -83,7 +83,7 @@ export const userRoutes: IRouteConfiguration[] = [
                     key: base64url.encode(req.payload.email)
                 };
                 user.email = req.payload.email;
-                user.displayName = req.payload.displayName;
+                user.display = req.payload.displayName;
                 user.role = "user";
                 user.firstName = req.payload.firstName;
                 user.lastName = req.payload.lastName;

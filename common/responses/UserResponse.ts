@@ -1,6 +1,6 @@
 export interface UserResponse {
     key: string;
-    displayName?: string;
+    display?: string;
     firstName?: string;
     lastName?: string;
     role?: string;

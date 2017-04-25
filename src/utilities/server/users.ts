@@ -76,7 +76,7 @@ export function getAllPublicUsers(): Promise<PublicUser[]> {
                 const users = userResponses.map(ur => {
                     const user: PublicUser = {
                         imageUrl: ur.imageUrl ? ur.imageUrl : getRandomImage(),
-                        display: ur.displayName,
+                        display: ur.display,
                         points: ur.points,
                         key: ur.key,
                         numCorrectPicks: ur.numCorrectPicks

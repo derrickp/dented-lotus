@@ -117,7 +117,7 @@ export async function verifyCredentials(req, res) {
             const user: UserResponse = {
                 key: key,
                 email: authResponse.email,
-                displayName: authResponse.name,
+                display: authResponse.name,
                 firstName: authResponse.first_name,
                 lastName: authResponse.last_name,
                 role: "user"

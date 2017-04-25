@@ -44,7 +44,7 @@ export class User implements PublicUser {
         else {
             const dentedLotusUser: UserResponse = <UserResponse>user;
             this.key = dentedLotusUser.key;
-            this.displayName = dentedLotusUser.displayName;
+            this.displayName = dentedLotusUser.display;
             if (dentedLotusUser.role === UserRoles.ADMIN) {
                 this.isAdmin = true;
             }
@@ -54,7 +54,7 @@ export class User implements PublicUser {
             this.faveDriver = dentedLotusUser.faveDriver;
             this.faveTeam = dentedLotusUser.faveTeam;
             this.numCorrectPicks = dentedLotusUser.numCorrectPicks;
-            this.display = dentedLotusUser.displayName;
+            this.display = dentedLotusUser.display;
             this._loggedIn = true;
         }
         this.id_token = id_token;
@@ -80,7 +80,7 @@ export class User implements PublicUser {
     get json(): UserResponse {
         return {
             key: this.key,
-            displayName: this.displayName,
+            display: this.displayName,
             lastName: this.lastName,
             email: this.email,
             firstName: this.firstName,
