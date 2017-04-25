@@ -28,38 +28,28 @@ export class User implements PublicUser {
     position: number;
     positionChange: number;
 
-    constructor(user: UserResponse | PublicUser, id_token: string, context: UserContext) {
-        if (!user) {
+    constructor(dentedLotusUser: UserResponse, id_token: string, context: UserContext) {
+        if (!dentedLotusUser) {
             this._loggedIn = false;
             return;
         }
-        if ((user as any).display) {
-            const publicUser: PublicUser = <PublicUser>user;
-            this.key = publicUser.key;
-            this.display = publicUser.display;
-            this.numCorrectPicks = publicUser.numCorrectPicks;
-            this.points = publicUser.points;
-            this.imageUrl = publicUser.imageUrl;
-            this._loggedIn = false;
-            this.position = publicUser.position;
-            this.positionChange = publicUser.positionChange;
+        this.key = dentedLotusUser.key;
+        this.display = dentedLotusUser.display;
+        if (dentedLotusUser.role === UserRoles.ADMIN) {
+            this.isAdmin = true;
         }
-        else {
-            const dentedLotusUser: UserResponse = <UserResponse>user;
-            this.key = dentedLotusUser.key;
-            this.display = dentedLotusUser.display;
-            if (dentedLotusUser.role === UserRoles.ADMIN) {
-                this.isAdmin = true;
-            }
-            this.firstName = dentedLotusUser.firstName;
-            this.lastName = dentedLotusUser.lastName;
-            this.imageUrl = dentedLotusUser.imageUrl;
-            this.faveDriver = dentedLotusUser.faveDriver;
-            this.faveTeam = dentedLotusUser.faveTeam;
-            this.numCorrectPicks = dentedLotusUser.numCorrectPicks;
-            this.display = dentedLotusUser.display;
-            this._loggedIn = true;
-        }
+        this.email = dentedLotusUser.email;
+        this.firstName = dentedLotusUser.firstName;
+        this.lastName = dentedLotusUser.lastName;
+        this.imageUrl = dentedLotusUser.imageUrl;
+        this.faveDriver = dentedLotusUser.faveDriver;
+        this.faveTeam = dentedLotusUser.faveTeam;
+        this.numCorrectPicks = dentedLotusUser.numCorrectPicks;
+        this.display = dentedLotusUser.display;
+        this.position = dentedLotusUser.position;
+        this.points = dentedLotusUser.points;
+        this.positionChange = dentedLotusUser.positionChange;
+        this._loggedIn = true;
         this.id_token = id_token;
         this._context = context;
     }

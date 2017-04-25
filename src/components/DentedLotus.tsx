@@ -141,8 +141,9 @@ export class DentedLotus extends DentedLotusComponentBase<DentedLotusProps, Dent
     }
 
     clickUser(publicUser: PublicUser) {
-        this.app.showLoadingSpinner();
+        // this.app.showLoadingSpinner();
         this.props.app.refreshUser(publicUser.key).then(() => {
+            // this.app.hideLoadingSpinner();
             this.context.router.history.push(`${Paths.PROFILE}:${publicUser.key}`);
         }).catch((error: Error) => {
             alert(error.message);
