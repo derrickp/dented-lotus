@@ -14,7 +14,6 @@ export class User implements PublicUser {
     protected _context: UserContext;
     id_token: string;
     display: string;
-    displayName: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -48,7 +47,7 @@ export class User implements PublicUser {
         else {
             const dentedLotusUser: UserResponse = <UserResponse>user;
             this.key = dentedLotusUser.key;
-            this.displayName = dentedLotusUser.display;
+            this.display = dentedLotusUser.display;
             if (dentedLotusUser.role === UserRoles.ADMIN) {
                 this.isAdmin = true;
             }
@@ -77,14 +76,14 @@ export class User implements PublicUser {
     }
 
     get name(): string {
-        if (this.displayName) return this.displayName;
+        if (this.display) return this.display;
         return this.firstName + " " + this.lastName.substr(0, 1) + ".";
     }
 
     get json(): UserResponse {
         return {
             key: this.key,
-            display: this.displayName,
+            display: this.display,
             lastName: this.lastName,
             email: this.email,
             firstName: this.firstName,

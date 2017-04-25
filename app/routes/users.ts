@@ -83,7 +83,7 @@ export const userRoutes: IRouteConfiguration[] = [
                     key: base64url.encode(req.payload.email)
                 };
                 user.email = req.payload.email;
-                user.display = req.payload.displayName;
+                user.display = req.payload.display;
                 user.role = "user";
                 user.firstName = req.payload.firstName;
                 user.lastName = req.payload.lastName;

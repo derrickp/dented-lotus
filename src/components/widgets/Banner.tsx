@@ -102,7 +102,7 @@ export class Banner extends React.Component<BannerProps, BannerState>{
             if (this.props.user.isAdmin) {
                 navItems.push(<NavItem key={"general-admin"} eventKey={"general-admin"} onClick={this.clickGeneralAdmin}>Admin</NavItem>)
             }
-            navRightItems.push(<NavDropdown key={"user-dropdown"} eventKey={"user-dropdown"} title={this.props.user.displayName} id="basic-nav-dropdown">
+            navRightItems.push(<NavDropdown key={"user-dropdown"} eventKey={"user-dropdown"} title={this.props.user.display} id="basic-nav-dropdown">
                 <MenuItem key={"profile"} eventKey={"profile"} onClick={this.clickProfile} >Profile</MenuItem>
                 <MenuItem key={"logout"} eventKey={"logout"} onClick={this.clickLogout}>Logout</MenuItem>
             </NavDropdown>);

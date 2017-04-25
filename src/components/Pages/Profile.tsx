@@ -20,7 +20,7 @@ export interface ProfileProps extends DentedLotusProps {
 }
 
 export interface ProfileState {
-    displayName: string;
+    display: string;
     firstName: string;
     lastName: string;
     imageUrl: string;
@@ -37,7 +37,7 @@ export class Profile extends DentedLotusComponentBase<ProfileProps, ProfileState
         super(props);
         const user: User = this.props.user ? this.props.user : this.props.thisUser;
         this.state = {
-            displayName: user.displayName,
+            display: user.display,
             firstName: user.firstName,
             lastName: user.lastName,
             imageUrl: user.imageUrl,
@@ -58,7 +58,7 @@ export class Profile extends DentedLotusComponentBase<ProfileProps, ProfileState
 
     save() {
         const user: User = this.props.user ? this.props.user : this.props.thisUser;
-        user.displayName = this.state.displayName;
+        user.display = this.state.display;
         user.firstName = this.state.firstName;
         user.lastName = this.state.lastName;
         if (user.imageUrl !== this.state.imageUrl) {
@@ -76,7 +76,7 @@ export class Profile extends DentedLotusComponentBase<ProfileProps, ProfileState
     }
 
     handleDisplayNameChange(event: React.ChangeEvent<any>) {
-        this.setState({ displayName: event.target.value });
+        this.setState({ display: event.target.value });
     }
 
     handleFirstNameChange(event: React.ChangeEvent<any>) {
@@ -169,7 +169,7 @@ export class Profile extends DentedLotusComponentBase<ProfileProps, ProfileState
                                     hintText={"Display Name"}
                                     floatingLabelText={"Display Name"}
                                     onChange={this.handleDisplayNameChange}
-                                    value={this.state.displayName}
+                                    value={this.state.display}
                                     disabled={disabled}>
                                 </TextField>
                                 <br />
