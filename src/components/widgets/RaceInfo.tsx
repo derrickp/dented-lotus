@@ -1,6 +1,6 @@
 import * as React from "react";
-import { Button, Glyphicon, Panel } from "react-bootstrap";
-import { RaceModel } from "../../../common/models/Race";
+import { Button, Glyphicon, Panel, Col, Row } from "react-bootstrap";
+import { RaceModel } from "../../../common/models/Race"; 
 import {TriviaComponent} from "./TriviaComponent";
 
 
@@ -35,20 +35,18 @@ export class RaceInfo extends React.Component<RaceInfoProps, any>{
     render() {
         const infoTitle = <div><h4 className="pull-left">{"Race Info"}</h4><div className="clearfix"></div></div>
         const race = this.props.race;
-        return <Panel eventKey={this.props.eventKey} bsStyle={"primary"} header={infoTitle} collapsible={true} defaultExpanded={false}>
-            <div className="container">
-                <div className="row">
-                    <div className="col-lg-3 col-md-3 col-sm-3 col-xs-12 ">
+        return <Panel eventKey={this.props.eventKey} bsStyle={"primary"} header={infoTitle} collapsible={true} defaultExpanded={false}> 
+                <Row>
+                    <Col lg={3} md={3} sm={3} xs={12}>
                         <img className="img-responsive" src={race.track.trackResponse.image || this.defaultTrackImage}/>
-                    </div>
-                    <div className="col-lg-9 col-md-9 col-sm-9 col-xs-12 ">
+                    </Col>
+                    <Col lg={9} md={9} sm={9} xs={12}>
                         {race.track.trackResponse && <h3>Track: {race.track.trackResponse.name}, {race.track.trackResponse.country}</h3>}
                         {race.winner && <p>Winner: {race.winner.name}</p>}
                         {race.track.trackResponse && <p>{race.track.trackResponse.info}</p>} 
                         <TriviaComponent trivia={race.track.trackResponse.trivia} canAddTrivia={this.props.canAddTrivia} onAddNewTrivia={this.onAddNewTrivia.bind(this)}/>
-                    </div>
-                </div>
-            </div>
+                    </Col>
+                </Row> 
         </Panel>;
 
 
