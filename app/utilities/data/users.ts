@@ -159,6 +159,14 @@ export function updateUser(user: UserResponse): Promise<boolean> {
             updateFields.push("numcorrectpicks = ?9");
             updateObject[9] = user.numCorrectPicks;
         }
+        if (user.position >= 0) {
+            updateFields.push("position = ?10");
+            updateObject[10] = user.position;
+        }
+        if (user.positionChange !== undefined || user.positionChange !== null) {
+            updateFields.push("positionchange = ?11");
+            updateObject[11] = user.positionChange;
+        }
         if (!updateFields.length) {
             reject("nothing to update");
             return;
@@ -166,8 +174,8 @@ export function updateUser(user: UserResponse): Promise<boolean> {
 
         let fieldStatement = updateFields.join(",");
         updateStatement += fieldStatement;
-        let where = " WHERE key = ?10";
-        updateObject[10] = user.key;
+        let where = " WHERE key = ?12";
+        updateObject[12] = user.key;
         updateStatement += where;
         db.run(updateStatement, updateObject, (err) => {
             if (err) {

@@ -10,4 +10,6 @@ export interface UserResponse {
     faveDriver?: string;
     faveTeam?: string;
     numCorrectPicks?: number;
+    position?: number;
+    positionChange?: number;
 }

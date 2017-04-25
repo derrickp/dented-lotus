@@ -4,4 +4,6 @@ export interface PublicUser {
     points: number;
     key: string;
     numCorrectPicks: number;
+    positionChange: number;
+    position: number;
 }

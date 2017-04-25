@@ -26,6 +26,8 @@ export class User implements PublicUser {
     faveTeam: string;
     points: number;
     numCorrectPicks: number;
+    position: number;
+    positionChange: number;
 
     constructor(user: UserResponse | PublicUser, id_token: string, context: UserContext) {
         if (!user) {
@@ -40,6 +42,8 @@ export class User implements PublicUser {
             this.points = publicUser.points;
             this.imageUrl = publicUser.imageUrl;
             this._loggedIn = false;
+            this.position = publicUser.position;
+            this.positionChange = publicUser.positionChange;
         }
         else {
             const dentedLotusUser: UserResponse = <UserResponse>user;

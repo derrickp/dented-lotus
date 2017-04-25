@@ -72,14 +72,16 @@ export function authenticate(authPayload: AuthPayload): Promise<AuthResponse> {
 export function getAllPublicUsers(): Promise<PublicUser[]> {
     return new Promise<PublicUser[]>((resolve, reject) => {
         return fetch(`${baseUrl}/allusers`).then(response => {
-            return response.json().then((userResponses: UserResponse[]) => {
-                const users = userResponses.map(ur => {
+            return response.json().then((publicUsers: PublicUser[]) => {
+                const users = publicUsers.map(ur => {
                     const user: PublicUser = {
                         imageUrl: ur.imageUrl ? ur.imageUrl : getRandomImage(),
                         display: ur.display,
                         points: ur.points,
                         key: ur.key,
-                        numCorrectPicks: ur.numCorrectPicks
+                        numCorrectPicks: ur.numCorrectPicks,
+                        position: ur.position,
+                        positionChange: ur.positionChange
                     };
                     return user;
                 });

@@ -63,9 +63,32 @@ export const scoreRoutes: IRouteConfiguration[] = [
                             }
                         }
                         if (points != user.points || numCorrect != user.numCorrectPicks) {
-                            await updateUser({ key: user.key, points: points, numCorrectPicks: numCorrect });
+                            user.points = points;
+                            user.numCorrectPicks = numCorrect;
+                            // await updateUser({ key: user.key, points: points, numCorrectPicks: numCorrect });
                         }
                     }
+
+                    // Sort the users by points and name
+                    const sorted = users.sort((user1, user2) => {
+                        if (user2.points === user1.points) {
+                            return user1.display.localeCompare(user2.display);
+                        }
+                        return user2.points - user1.points;
+                    });
+
+                    for (let i = 0; i < users.length; i++) {
+                        const user = users[i];
+                        const position = i + 1;
+                        const previousPosition = user.position;
+                        if (previousPosition) {
+                            const positionChange = position - previousPosition;
+                            user.positionChange = positionChange;
+                        }
+                        user.position = position;
+                        await updateUser(user);
+                    }
+
                     // Once we're here all user info has been saved
                     reply({ success: true });
                 }
