@@ -1,12 +1,10 @@
-import * as React from "react";
-
-import { Grid, Row, Col, Button, Jumbotron } from "react-bootstrap";
-
+import { Grid, Row, Col, Button, Jumbotron } from "react-bootstrap"; 
 import { BlogResponse } from "../../../common/responses/BlogResponse";
 import { Blog } from "../widgets/Blog";
-import { BlogEditor } from "../widgets/BlogEditor";
+import { BlogEditor } from "../widgets/BlogEditor"; 
+import {DentedLotusComponentBase, DentedLotusProps, React} from "../../DefaultImports"; 
 
-export interface BlogsProps {
+export interface BlogsProps extends DentedLotusProps {
     showAddButton: boolean;
     blogs: BlogResponse[];
     numBlogs: number;
@@ -20,7 +18,7 @@ export interface BlogsState {
     saving: boolean;
 }
 
-export class Blogs extends React.Component<BlogsProps, BlogsState> {
+export class Blogs extends DentedLotusComponentBase<BlogsProps, BlogsState> {
 
     constructor(props: BlogsProps) {
         super(props);

@@ -5,6 +5,7 @@ import { Grid, Row, Col } from "react-bootstrap";
 import { Route, RouteComponentProps } from "react-router-dom";
 import { RouterChildContext } from "react-router";
 
+import { DentedLotusComponentBase } from "../interfaces/DentedLotusComponentBase";
 import { Banner } from "./widgets/Banner";
 import { AppManager } from "../AppManager";
 import { RaceCountdown } from "./widgets/RaceCountdown";
@@ -22,7 +23,7 @@ import { Scoreboard } from "./widgets/scoreboards/Scoreboard";
 import { CircularProgress } from "material-ui";
 
 export interface DentedLotusProps {
-    stateManager: AppManager;
+    app: AppManager;
 }
 
 interface Parameters {
@@ -48,13 +49,8 @@ export interface DentedLotusState {
     working: Boolean;
 }
 
-export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusState>{
+export class DentedLotus extends DentedLotusComponentBase<DentedLotusProps, DentedLotusState>{
     private _mounted: boolean = false;
-    /**
-     *
-     */
-    app:AppManager;
-
     context: RouterChildContext<any>;
     static contextTypes: React.ValidationMap<any> = {
         router: React.PropTypes.object.isRequired
@@ -62,23 +58,23 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     constructor(props: DentedLotusProps, context: RouterChildContext<any>) {
         super(props);
-        this.app = this.props.stateManager;
+        this.app = this.props.app;
         this.context = context;
         this.state = {
-            loggedIn: this.props.stateManager.isLoggedIn,
+            loggedIn: this.props.app.isLoggedIn,
             race: null,
             sidebarOpen: false,
-            drivers: this.props.stateManager.drivers,
-            races: this.props.stateManager.races,
-            teams: this.props.stateManager.teams,
-            blogs: this.props.stateManager.blogs,
-            tracks: this.props.stateManager.tracks,
-            publicUsers: this.props.stateManager.publicUsers,
+            drivers: this.props.app.drivers,
+            races: this.props.app.races,
+            teams: this.props.app.teams,
+            blogs: this.props.app.blogs,
+            tracks: this.props.app.tracks,
+            publicUsers: this.props.app.publicUsers,
             allSeasonPredictions: [],
-            user: this.props.stateManager.user,
-            haveGoogleApi: this.props.stateManager.googleLoaded,
-            haveFacebookApi: this.props.stateManager.fbLoaded,
-            currentPredictions: this.props.stateManager.currentPredictions,
+            user: this.props.app.user,
+            haveGoogleApi: this.props.app.googleLoaded,
+            haveFacebookApi: this.props.app.fbLoaded,
+            currentPredictions: this.props.app.currentPredictions,
             working: false
         };
         this.launchNextRacePicks = this.launchNextRacePicks.bind(this);
@@ -88,49 +84,49 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
         this.clickUser = this.clickUser.bind(this);
         this.scoreRace = this.scoreRace.bind(this);
 
-        this.props.stateManager.watch("user", () => {
-            this.setState({ user: this.props.stateManager.user });
+        this.props.app.watch("user", () => {
+            this.setState({ user: this.props.app.user });
             this.onUserChange();
         });
 
-        this.props.stateManager.watch("working", (working: boolean) => {
+        this.props.app.watch("working", (working: boolean) => {
             this.setState({ working: working });
         })
 
-        this.props.stateManager.watch("currentPredictions", () => {
-            this.setState({ currentPredictions: this.props.stateManager.currentPredictions });
+        this.props.app.watch("currentPredictions", () => {
+            this.setState({ currentPredictions: this.props.app.currentPredictions });
         });
 
-        this.props.stateManager.watch("races", () => {
-            this.setState({ races: this.props.stateManager.races });
+        this.props.app.watch("races", () => {
+            this.setState({ races: this.props.app.races });
         });
 
-        this.props.stateManager.watch("teams", () => {
-            this.setState({ teams: this.props.stateManager.teams });
+        this.props.app.watch("teams", () => {
+            this.setState({ teams: this.props.app.teams });
         });
 
-        this.props.stateManager.watch("drivers", () => {
-            this.setState({ drivers: this.props.stateManager.drivers });
+        this.props.app.watch("drivers", () => {
+            this.setState({ drivers: this.props.app.drivers });
         });
 
-        this.props.stateManager.watch("tracks", () => {
-            this.setState({ tracks: this.props.stateManager.tracks });
+        this.props.app.watch("tracks", () => {
+            this.setState({ tracks: this.props.app.tracks });
         });
 
-        this.props.stateManager.watch("googleLogin", () => {
+        this.props.app.watch("googleLogin", () => {
             if (this._mounted) this.setState({ haveGoogleApi: true });
         });
 
-        this.props.stateManager.watch("facebookLogin", () => {
+        this.props.app.watch("facebookLogin", () => {
             if (this._mounted) this.setState({ haveFacebookApi: true });
         });
 
-        this.props.stateManager.watch("blogs", () => {
-            this.setState({ blogs: this.props.stateManager.blogs });
+        this.props.app.watch("blogs", () => {
+            this.setState({ blogs: this.props.app.blogs });
         });
 
-        this.props.stateManager.watch("publicUsers", () => {
-            this.setState({ publicUsers: this.props.stateManager.publicUsers });
+        this.props.app.watch("publicUsers", () => {
+            this.setState({ publicUsers: this.props.app.publicUsers });
         });
     }
 
@@ -140,12 +136,13 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     }
 
     onUserChange() {
-        const loggedIn = this.props.stateManager.isLoggedIn;
+        const loggedIn = this.props.app.isLoggedIn;
         this.setState({ loggedIn: loggedIn });
     }
 
     clickUser(publicUser: PublicUser) {
-        this.props.stateManager.refreshUser(publicUser.key).then(() => {
+        this.app.showLoadingSpinner();
+        this.props.app.refreshUser(publicUser.key).then(() => {
             this.context.router.history.push(`${Paths.PROFILE}:${publicUser.key}`);
         }).catch((error: Error) => {
             alert(error.message);
@@ -153,11 +150,11 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     }
 
     launchNextRacePicks() {
-        this.changeRace(this.props.stateManager.nextRace);
+        this.changeRace(this.props.app.nextRace);
     }
 
     launchAllSeasonPicks() {
-        this.props.stateManager.allSeasonPredictions.then(allSeasonPredictions => {
+        this.props.app.allSeasonPredictions.then(allSeasonPredictions => {
             this.setState({ allSeasonPredictions: allSeasonPredictions });
         });
     }
@@ -165,12 +162,12 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
     changePage(page: string) {
         switch (page) {
             case Paths.BLOGS:
-                this.props.stateManager.refreshBlogs().then(() => {
+                this.props.app.refreshBlogs().then(() => {
                     this.context.router.history.push(page);
                 });
                 break;
             case Paths.PREDICTIONS_ADMIN:
-                this.props.stateManager.refreshRaces().then(() => {
+                this.props.app.refreshRaces().then(() => {
                     this.context.router.history.push(page);
                 });
                 break;
@@ -185,15 +182,15 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
 
     changeRace(race: RaceModel) {
         const promises: Promise<any>[] = [];
-        promises.push(this.props.stateManager.refreshPredictions(race.key));
-        // promises.push(this.props.stateManager.refreshRace(race.key));
+        promises.push(this.props.app.refreshPredictions(race.key));
+        // promises.push(this.props.app.refreshRace(race.key));
         Promise.all(promises).then(() => {
             this.context.router.history.push(`/single-race:${race.key}`);
         });
     }
 
     scoreRace(race: RaceModel): void {
-        this.props.stateManager.refreshRace(race.key).then(refreshedRace => {
+        this.props.app.refreshRace(race.key).then(refreshedRace => {
             this.setState({ race: refreshedRace });
         });
     }
@@ -203,49 +200,52 @@ export class DentedLotus extends React.Component<DentedLotusProps, DentedLotusSt
             return null;
         }
         return <div className="spinner-modal-background">
-                <CircularProgress />
-            </div>
+            <CircularProgress style={{
+                display: 'block',
+                margin: '14% auto auto'
+            }} />
+        </div>
 
     }
 
     render() {
-        const googleLogin = this.props.stateManager.googleLoaded ? this.props.stateManager.doGoogleLogin : null;
-        const fbLogin = this.props.stateManager.fbLoaded ? this.props.stateManager.doFacebookLogin : null;
+        const googleLogin = this.props.app.googleLoaded ? this.props.app.doGoogleLogin : null;
+        const fbLogin = this.props.app.fbLoaded ? this.props.app.doFacebookLogin : null;
         const spinner = this.getSpinner();
         return <div>
             {spinner}
-            <Banner key={"banner"} doFacebookLogin={fbLogin} user={this.props.stateManager.user} logout={this.props.stateManager.signOut} loggedIn={this.state.loggedIn} doGoogleLogin={googleLogin} changePage={this.changePage} title="Project Dented Lotus" />
-            <Route exact={true} path={Paths.HOME} render={() => <Home app={this.app} race={this.props.stateManager.nextRace} publicUsers={this.state.publicUsers} blogs={this.state.blogs} drivers={this.state.drivers} isLoggedIn={this.props.stateManager.isLoggedIn} user={this.state.user} clickUser={this.clickUser} launchAllSeasonPicks={this.launchAllSeasonPicks} launchNextRacePicks={this.launchNextRacePicks} ></Home>} />
-            <Route exact={true} path={Paths.BLOGS} render={() => <Blogs numBlogs={-1} blogs={this.state.blogs} title="Blogs" fromHomePanel={false} saveNewBlog={this.props.stateManager.saveBlog} showAddButton={this.props.stateManager.isLoggedIn}></Blogs>} />
-            <Route exact={true} path={Paths.DRIVERS} render={() => <Drivers drivers={this.state.drivers} teams={this.state.teams} userIsAdmin={this.props.stateManager.user && this.props.stateManager.user.isAdmin} createDriver={this.props.stateManager.createDriver} createTeam={this.props.stateManager.createTeam} />} />
-            <Route exact={true} path={Paths.GENERAL_ADMIN} render={() => <GeneralAdmin callEndpoint={this.props.stateManager.adminSendToEndpoint} races={this.state.races} drivers={this.state.drivers} teams={this.state.teams}></GeneralAdmin>} />
+            <Banner key={"banner"} doFacebookLogin={fbLogin} user={this.props.app.user} logout={this.props.app.signOut} loggedIn={this.state.loggedIn} doGoogleLogin={googleLogin} changePage={this.changePage} title="Project Dented Lotus" />
+            <Route exact={true} path={Paths.HOME} render={() => <Home app={this.app} race={this.app.nextRace} publicUsers={this.state.publicUsers} blogs={this.state.blogs} drivers={this.state.drivers} isLoggedIn={this.app.isLoggedIn} user={this.state.user} clickUser={this.clickUser} launchAllSeasonPicks={this.launchAllSeasonPicks} launchNextRacePicks={this.launchNextRacePicks} ></Home>} />
+            <Route exact={true} path={Paths.BLOGS} render={() => <Blogs app={this.app} numBlogs={-1} blogs={this.state.blogs} title="Blogs" fromHomePanel={false} saveNewBlog={this.props.app.saveBlog} showAddButton={this.props.app.isLoggedIn}></Blogs>} />
+            <Route exact={true} path={Paths.DRIVERS} render={() => <Drivers app={this.app} drivers={this.state.drivers} teams={this.state.teams} userIsAdmin={this.props.app.user && this.props.app.user.isAdmin} createDriver={this.props.app.createDriver} createTeam={this.props.app.createTeam} />} />
+            <Route exact={true} path={Paths.GENERAL_ADMIN} render={() => <GeneralAdmin app={this.app} callEndpoint={this.props.app.adminSendToEndpoint} races={this.state.races} drivers={this.state.drivers} teams={this.state.teams}></GeneralAdmin>} />
             <Route exact={true} path={Paths.PROFILE + ":id"} render={(props: RouteComponentProps<any>) => {
                 const id = props.match.url.split(":")[1];
                 let user: User;
 
                 // If the user is the current one, grab the full thing.
-                if (id === this.props.stateManager.user.key) {
-                    user = this.props.stateManager.user;
+                if (id === this.props.app.user.key) {
+                    user = this.props.app.user;
                 }
                 // Otherwise get it from the store
                 else {
-                    user = this.props.stateManager.getUser(id);
+                    user = this.props.app.getUser(id);
                 }
-                return <Profile drivers={this.state.drivers} teams={this.state.teams} user={user} thisUser={this.props.stateManager.user}></Profile>;
+                return <Profile app={this.app} drivers={this.state.drivers} teams={this.state.teams} user={user} thisUser={this.props.app.user}></Profile>;
             }} />
-            <Route exact={true} path={Paths.TRACKS} render={() => <Tracks tracks={this.state.tracks} />} />
-            <Route exact={true} path={Paths.ALL_RACES} render={() => <AllRaces raceClick={this.changeRace} races={this.state.races} selectedRace={this.state.race} userIsAdmin={this.props.stateManager.userIsAdmin()} scoreRace={this.scoreRace} />} />
+            <Route exact={true} path={Paths.TRACKS} render={() => <Tracks app={this.app} tracks={this.state.tracks} />} />
+            <Route exact={true} path={Paths.ALL_RACES} render={() => <AllRaces app={this.app} raceClick={this.changeRace} races={this.state.races} selectedRace={this.state.race} userIsAdmin={this.props.app.userIsAdmin()} scoreRace={this.scoreRace} />} />
             <Route exact={true} path={Paths.RACE + ":id"} render={(props: RouteComponentProps<any>) => {
                 const id = props.match.url.split(":")[1];
-                const race = this.props.stateManager.getRace(id);
-                return <RacePage race={race} predictions={this.state.currentPredictions} small={false} isAdmin={this.props.stateManager.user.isAdmin}></RacePage>;
+                const race = this.props.app.getRace(id);
+                return <RacePage race={race} app={this.app} predictions={this.state.currentPredictions} small={false} isAdmin={this.props.app.user.isAdmin}></RacePage>;
             }} />
-            <Route exact={true} path={Paths.ALL_SEASON_PICKS} render={() => <AllSeasonPicks predictions={this.state.allSeasonPredictions} />} />
+            <Route exact={true} path={Paths.ALL_SEASON_PICKS} render={() => <AllSeasonPicks app={this.app} predictions={this.state.allSeasonPredictions} />} />
         </div>;
     }
 }
 
-export interface HomeProps {
+export interface HomeProps extends DentedLotusProps {
     isLoggedIn: boolean;
     blogs: BlogResponse[];
     user: User;
@@ -264,7 +264,7 @@ export const Home = (props: HomeProps) => (
             <RaceCountdown isLoggedIn={props.isLoggedIn} key={1} clickMakeAllSeasonPicks={props.launchAllSeasonPicks} clickMakeNextRacePicks={props.launchNextRacePicks} race={props.race} />
             <Row>
                 <Col xs={12} mdPush={8} md={4}><Scoreboard clickItem={props.clickUser} publicUsers={props.publicUsers} drivers={props.drivers} user={props.user} type="users" title="Standings" count={props.publicUsers.length} /></Col>
-                <Col xs={12} mdPull={4} md={8}><Blogs key={2} blogs={props.blogs} fromHomePanel={true} showAddButton={false} saveNewBlog={null} numBlogs={3} /></Col>
+                <Col xs={12} mdPull={4} md={8}><Blogs app={props.app} key={2} blogs={props.blogs} fromHomePanel={true} showAddButton={false} saveNewBlog={null} numBlogs={3} /></Col>
             </Row>
         </Grid>
     </div>

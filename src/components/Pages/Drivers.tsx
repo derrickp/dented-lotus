@@ -1,4 +1,3 @@
-import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { TrackModel } from "../../../common/models/Track";
 import { TrackPage } from "./TrackPage";
@@ -11,8 +10,9 @@ import { TeamModel } from "../../../common/models/Team";
 import { TeamResponse } from "../../../common/responses/TeamResponse";
 import { Panel, Button, PanelGroup, Grid } from "react-bootstrap";
 import { SelectBox, SelectOption } from "../../../react-select-component/SelectBox";
+import {DentedLotusComponentBase, DentedLotusProps, React} from "../../DefaultImports"; 
 
-export interface DriverProps {
+export interface DriverProps extends DentedLotusProps {
     drivers: DriverModel[];
     userIsAdmin: boolean;
     teams: TeamModel[];
@@ -24,7 +24,7 @@ export interface DriverState {
     userIsAdmin: boolean;
 }
 
-export class Drivers extends React.Component<DriverProps, DriverState> {
+export class Drivers extends DentedLotusComponentBase<DriverProps, DriverState> {
     constructor(props: DriverProps) {
         super(props);
         this.state = {

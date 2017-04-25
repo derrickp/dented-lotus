@@ -17,7 +17,7 @@ window.onerror = function (error) {
 
 // Create our singleton little state manager. This will be the arbiter for data in the application.
 // It will be the single source for data. Allowing us to easily manage it all in one location.
-const stateManager = new AppManager();
+const app = new AppManager();
 
 const dentedLotusElement = document.getElementById("dentedlotus");
 
@@ -30,7 +30,7 @@ const Loading = () => (
 const App = () => (
     <HashRouter>
         <MuiThemeProvider>
-            <DentedLotus stateManager={stateManager} />
+            <DentedLotus app={app} />
         </MuiThemeProvider>
     </HashRouter>
 );
@@ -41,7 +41,7 @@ ReactDOM.render(
     dentedLotusElement
 );
 
-stateManager.initialize().then(success => {
+app.initialize().then(success => {
     // Render our react app. Inject the StateManager
     ReactDOM.render(
         <App />,

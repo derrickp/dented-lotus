@@ -1,13 +1,12 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
 import { RaceModel } from "../../../common/models/Race";
 import { PredictionModel } from "../../../common/models/Prediction";
 import { getDurationFromNow } from "../../../common/utils/date";
 import { PredictionComponent } from "../widgets/Prediction";
 import { Panel, Button, PanelGroup,Grid } from "react-bootstrap";
 import {RaceInfo} from "../widgets/RaceInfo";
+import {DentedLotusComponentBase, DentedLotusProps, React,ReactDOM} from "../../DefaultImports"; 
 
-export interface RaceProps {
+export interface RaceProps extends DentedLotusProps {
     race: RaceModel;
     small: boolean;
     isAdmin:boolean;
@@ -24,7 +23,7 @@ namespace ActiveKeys {
     export const INFO = "info";
 }
 
-export class RacePage extends React.Component<RaceProps, RaceState> {
+export class RacePage extends DentedLotusComponentBase<RaceProps, RaceState> {
 
     constructor(props: RaceProps) {
         super(props);

@@ -1,12 +1,12 @@
-import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { RaceModel } from "../../../common/models/Race";
 import { PredictionModel } from "../../../common/models/Prediction";
 import { RacePage } from "../Pages";
 import { Accordion, Panel, Button,Grid } from "react-bootstrap";
 import { getDurationFromNow } from "../../../common/utils/date";
+import {DentedLotusComponentBase, DentedLotusProps, React} from "../../DefaultImports"; 
 
-export interface AllRacesProps {
+export interface AllRacesProps extends DentedLotusProps{
     races: RaceModel[];
     raceClick: (race: RaceModel) => void;
     scoreRace:(race:RaceModel) => void;
@@ -18,7 +18,7 @@ export interface AllRacesState {
     expandedRace: RaceModel;
 }
 
-export class AllRaces extends React.Component<AllRacesProps, AllRacesState> {
+export class AllRaces extends DentedLotusComponentBase<AllRacesProps, AllRacesState> {
 
     constructor(props: AllRacesProps) {
         super(props);

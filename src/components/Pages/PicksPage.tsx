@@ -1,12 +1,11 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
 import { RaceModel } from "../../../common/models/Race";
 import { PredictionModel } from "../../../common/models/Prediction";
 import { RacePage } from "../Pages";
 import { Accordion, Panel, Button } from "react-bootstrap";
 import { getDurationFromNow } from "../../../common/utils/date";
+import {DentedLotusComponentBase, DentedLotusProps, React,ReactDOM} from "../../DefaultImports"; 
 
-export interface PicksPageProps {
+export interface PicksPageProps extends DentedLotusProps {
     race: Promise<RaceModel>;
 }
 
@@ -14,7 +13,7 @@ export interface PicksPageState {
     race: RaceModel;
 }
 
-export class PicksPage extends React.Component<PicksPageProps, PicksPageState> {
+export class PicksPage extends DentedLotusComponentBase<PicksPageProps, PicksPageState> {
 
     constructor(props: PicksPageProps) {
         super(props);

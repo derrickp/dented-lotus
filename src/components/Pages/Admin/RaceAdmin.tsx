@@ -1,4 +1,3 @@
-import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { RaceModel } from "../../../../common/models/Race";
 import { PredictionModel } from "../../../../common/models/Prediction";
@@ -8,9 +7,10 @@ import { getDurationFromNow } from "../../../../common/utils/date";
 import { PredictionComponent } from "../../../components/widgets/Prediction";
 import { confirmPromise } from "../../../utilities/UXUtilities";
 import { savePredictionOutcomes } from "../../../utilities/server/predictions";
+import {DentedLotusComponentBase, DentedLotusProps, React} from "../../../DefaultImports"; 
 
 
-export interface RaceAdminProps {
+export interface RaceAdminProps extends DentedLotusProps{
     race: RaceModel;
     returnHome: () => any;
     id_token: string;
@@ -26,7 +26,7 @@ namespace ActiveKeys {
     export const INFO = "info";
 }
 
-export class RaceAdminPage extends React.Component<RaceAdminProps, RaceAdminState> {
+export class RaceAdminPage extends DentedLotusComponentBase<RaceAdminProps, RaceAdminState> {
 
     constructor(props: RaceAdminProps) {
         super(props);

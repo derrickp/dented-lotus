@@ -1,18 +1,18 @@
-import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { PredictionModel } from "../../../common/models/Prediction";
 import { getDurationFromNow } from "../../../common/utils/date";
 import { PredictionComponent } from "../widgets/Prediction";
+import {DentedLotusComponentBase, DentedLotusProps, React} from "../../DefaultImports"; 
 import { Panel, Button, PanelGroup } from "react-bootstrap";
 
-export interface AllSeasonPicksProps {
+export interface AllSeasonPicksProps extends DentedLotusProps {
     predictions: PredictionModel[];
 }
 
 export interface AllSeasonPicksState {
 }
 
-export class AllSeasonPicks extends React.Component<AllSeasonPicksProps, AllSeasonPicksState> {
+export class AllSeasonPicks extends DentedLotusComponentBase<AllSeasonPicksProps, AllSeasonPicksState> {
     constructor(props: AllSeasonPicksProps) {
         super(props);
         this.state = {

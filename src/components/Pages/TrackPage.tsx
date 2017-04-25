@@ -1,8 +1,7 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import {DentedLotusComponentBase, DentedLotusProps, React,ReactDOM} from "../../DefaultImports"; 
 import { TrackModel } from "../../../common/models/Track";
 
-export interface TrackProps {
+export interface TrackProps extends DentedLotusProps {
     track: TrackModel;
     small: boolean;
 }
@@ -11,7 +10,7 @@ export interface TrackState {
     small: boolean;
 }
 
-export class TrackPage extends React.Component<TrackProps, TrackState> {
+export class TrackPage extends DentedLotusComponentBase<TrackProps, TrackState> {
     track: TrackModel;
 
     constructor(props: TrackProps) {

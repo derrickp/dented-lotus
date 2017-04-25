@@ -1,9 +1,8 @@
-import * as React from "react";
-
 import { RaceModel } from "../../../../common/models/Race";
 import { DriverModel } from "../../../../common/models/Driver";
 import { TeamModel } from "../../../../common/models/Team";
 import { PredictionResponse } from "../../../../common/responses/PredictionResponse";
+import {DentedLotusComponentBase, DentedLotusProps, React} from "../../../DefaultImports"; 
 
 import TextField from "material-ui/TextField";
 import RaisedButton from 'material-ui/RaisedButton';
@@ -11,7 +10,7 @@ import LinearProgress from 'material-ui/LinearProgress';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 
-export interface GeneralAdminProps {
+export interface GeneralAdminProps extends DentedLotusProps {
     callEndpoint: (urlFragment: string, body: string) => Promise<any>;
     races: RaceModel[];
     teams: TeamModel[];
@@ -26,7 +25,7 @@ export interface GeneralAdminState {
     race: string;
 }
 
-export class GeneralAdmin extends React.Component<GeneralAdminProps, GeneralAdminState> {
+export class GeneralAdmin extends DentedLotusComponentBase<GeneralAdminProps, GeneralAdminState> {
 
     constructor(props: GeneralAdminProps) {
         super(props);

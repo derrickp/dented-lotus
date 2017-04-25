@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import { Grid, Row, Col } from "react-bootstrap";
 import TextField from "material-ui/TextField";
 import Paper from "material-ui/Paper";
@@ -12,8 +10,9 @@ import Snackbar from 'material-ui/Snackbar';
 import { User } from "../../../common/models/User";
 import { DriverModel } from "../../../common/models/Driver";
 import { TeamModel } from "../../../common/models/Team";
+import {DentedLotusComponentBase, DentedLotusProps, React,ReactDOM} from "../../DefaultImports"; 
 
-export interface ProfileProps {
+export interface ProfileProps extends DentedLotusProps {
     user: User;
     thisUser: User;
     drivers: DriverModel[];
@@ -32,7 +31,7 @@ export interface ProfileState {
     faveTeam: string;
 }
 
-export class Profile extends React.Component<ProfileProps, ProfileState> {
+export class Profile extends DentedLotusComponentBase<ProfileProps, ProfileState> {
 
     constructor(props: ProfileProps) {
         super(props);
