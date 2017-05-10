@@ -1,0 +1,22 @@
+[
+    {
+        "prediction": "top-3",
+        "final": "bottas,vettel,raikonnen"
+    },
+    {
+        "prediction": "best-radio",
+        "final": "raikonnen"
+    },
+    {
+        "prediction": "first-out",
+        "final": "grosjean,palmer"
+    },
+    {
+        "prediction": "worst-luck-team",
+        "final": "mcl"
+    },
+    {
+        "prediction": "most-points",
+        "final": "mer"
+    }
+]
