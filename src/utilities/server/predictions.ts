@@ -20,7 +20,7 @@ export function getPredictions(raceKey: string, id_token: string): Promise<Predi
 
 export function getModifiers(raceKey: string, predictionKey: string, id_token:string): Promise<ModifierResponse[]> {
     return new Promise<ModifierResponse[]>((resolve, reject) => {
-        return fetch(`/predictions/modifiers/${raceKey}/${predictionKey}`,{
+        return fetch(`${baseUrl}/predictions/modifiers/${raceKey}/${predictionKey}`,{
             method:"GET",
             headers:{
                 'Authorization':"Bearer " + id_token

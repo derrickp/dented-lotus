@@ -92,7 +92,7 @@
     "compile-less": "lessc style.less dist/style.css && echo less compile complete",
     "build": "npm run compile && npm run webpack && npm run copy-static-files && npm run compile-less",
     "bundle": "npm run build && npm run copy-misc && npm run copy-server && npm run copy-client",
-    "copy-bundle": "cpy --cwd=bundle **/*.* ../../dented-lotus --parents && cpy .prod.gitignore ../dented-lotus --rename=.gitignore",
+    "copy-bundle": "cpy --cwd=bundle **/*.* ../../dented-lotus-deploy --parents && cpy .prod.gitignore ../dented-lotus-deploy --rename=.gitignore",
     "copy-client": "cpy --cwd=dist ./**/*.* ../bundle/dist --parents",
     "copy-misc": "cpy package.prod.json bundle --rename=package.json",
     "copy-server": "cpy app/**/*.js app/**/*.sqlite common/**/*.js bundle --parents && cpy ./app.js bundle",

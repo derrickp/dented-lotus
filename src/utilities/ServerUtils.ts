@@ -6,9 +6,9 @@ import { RaceResponse } from "../../common/responses/RaceResponse";
 import { BlogResponse } from "../../common/responses/BlogResponse"; 
 
 export let baseUrl = `${window.location.origin}`;
-// if (baseUrl.indexOf(":8080") == -1) {
-//     baseUrl += ":8080";
-// }
+if (baseUrl.indexOf(":8080") < 0) {
+    baseUrl += ":8080";
+}
 
 /**
  * 
