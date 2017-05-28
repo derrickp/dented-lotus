@@ -1,0 +1,42 @@
+[
+    {
+        "choice": "sau",
+        "modifier": 1.0
+    },
+    {
+        "choice": "wil",
+        "modifier": 1.0
+    },
+    {
+        "choice": "fer",
+        "modifier": 1.0
+    },
+    {
+        "choice": "mcl",
+        "modifier": 1.0
+    },
+    {
+        "choice": "haa",
+        "modifier": 1.0
+    },
+    {
+        "choice": "mer",
+        "modifier": 1.0
+    },
+    {
+        "choice": "tor",
+        "modifier": 1.0
+    },
+    {
+        "choice": "red",
+        "modifier": 1.0
+    },
+    {
+        "choice": "for",
+        "modifier": 1.0
+    },
+    {
+        "choice": "ren",
+        "modifier": 1.0
+    }
+]

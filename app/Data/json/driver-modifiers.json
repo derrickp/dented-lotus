@@ -1,0 +1,82 @@
+[
+    {
+        "choice": "hamilton",
+        "modifier": 1.0
+    },
+    {
+        "choice": "bottas",
+        "modifier": 1.0
+    },
+    {
+        "choice": "vettel",
+        "modifier": 1.0
+    },
+    {
+        "choice": "raikonnen",
+        "modifier": 1.0
+    },
+    {
+        "choice": "ericsson",
+        "modifier": 1.0
+    },
+    {
+        "choice": "wehrlein",
+        "modifier": 1.0
+    },
+    {
+        "choice": "stroll",
+        "modifier": 1.0
+    },
+    {
+        "choice": "verstappen",
+        "modifier": 1.0
+    },
+    {
+        "choice": "ricciardo",
+        "modifier": 1.0
+    },
+    {
+        "choice": "massa",
+        "modifier": 1.0
+    },
+    {
+        "choice": "perez",
+        "modifier": 1.0
+    },
+    {
+        "choice": "ocon",
+        "modifier": 1.0
+    },
+    {
+        "choice": "vandoorne",
+        "modifier": 1.0
+    },
+    {
+        "choice": "sainz",
+        "modifier": 1.0
+    },
+    {
+        "choice": "kvyat",
+        "modifier": 1.0
+    },
+    {
+        "choice": "magnussen",
+        "modifier": 1.0
+    },
+    {
+        "choice": "grosjean",
+        "modifier": 1.0
+    },
+    {
+        "choice": "palmer",
+        "modifier": 1.0
+    },
+    {
+        "choice": "alonso",
+        "modifier": 1.0
+    },
+    {
+        "choice": "hulkenberg",
+        "modifier": 1.0
+    }
+]

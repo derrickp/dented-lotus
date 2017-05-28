@@ -1,0 +1,18 @@
+[
+    {
+        "prediction": "first-out",
+        "value": 100
+    },
+    {
+        "prediction": "most-positions-gained",
+        "value": 200
+    },
+    {
+        "prediction": "biggest-surprise-team-edition",
+        "value": 150
+    },
+    {
+        "prediction": "fastest-lap",
+        "value": 100
+    }
+]
