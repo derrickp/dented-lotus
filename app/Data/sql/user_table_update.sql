@@ -1,5 +1,5 @@
---ALTER TABLE users ADD COLUMN numcorrectpicks INTEGER;
---ALTER TABLE users ADD COLUMN positionchange INTEGER;
+ALTER TABLE users ADD COLUMN numcorrectpicks INTEGER;
+ALTER TABLE users ADD COLUMN positionchange INTEGER;
 ALTER TABLE users ADD COLUMN position INTEGER;
 
 drop view if exists full_user_vw;
