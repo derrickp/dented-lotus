@@ -28,10 +28,10 @@ export function UserScoreboard(props: UserScoreboardProps) {
     for (let i = 0; i < sorted.length; i++) {
         const user = sorted[i];
         let icon: JSX.Element;
-        if (user.positionChange > 0) {
+        if (user.positionChange < 0) {
             icon = <NavigationArrowDropUp viewBox={"0 0 24 16"} style={{width: "30px"}} color={green500}></NavigationArrowDropUp>;
         }
-        else if (user.positionChange < 0) {
+        else if (user.positionChange > 0) {
             icon = <NavigationArrowDropDown viewBox={"0 0 24 16"} style={{width: "30px"}} color={red500}></NavigationArrowDropDown>;
         }
         else {

@@ -1,0 +1,22 @@
+[
+    {
+        "prediction": "fastest-pit",
+        "final": "hamilton"
+    },
+    {
+        "prediction": "fastest-lap",
+        "final": "hamilton"
+    },
+    {
+        "prediction": "most-exciting-driver",
+        "final": "vettel"
+    },
+    {
+        "prediction": "most-positions-gained",
+        "final": "kvyat"
+    },
+    {
+        "prediction": "top-3",
+        "final": "hamilton,vettel,ricciardo"
+    }
+]
