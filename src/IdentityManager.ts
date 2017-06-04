@@ -30,12 +30,50 @@ export class IdentityManager {
 
     initialize(): Promise<void> {
         this._initializePromise = this._initializePromise ? this._initializePromise : new Promise<void>((resolve, reject) => {
-            const promises: Promise<void>[] = [];
-            promises.push(this._initFacebook());
-            promises.push(this._initGoogle());
-            return Promise.all(promises).then(() => {
-                resolve();
-            });
+            // First we'll initialize google
+            return this._initGoogle()
+                .then(() => {
+                    console.log("get google login");
+                    return this._getGoogleLogin();
+                })
+                // Then we'll check if they've logged in with Google
+                .then(googleUser => {
+                    if (googleUser) {
+                        this.appUser = googleUser;
+                        this.userChange();
+                    }
+                })
+                .catch((error: Error) => {
+                    console.error(error.message);
+                })
+                // Then we'll initialize Facebook
+                .then(() => {
+                    console.log("attempting to init Facebook");
+                    return this._initFacebook();
+                })
+                // If they've logged in with Google above, we're done.
+                // If they haven't, then we'll try to log them in with Facebook
+                .then(() => {
+                    if (this.appUser) {
+                        return null;
+                    }
+                    return this._getFacebookLoginStatus();
+                })
+                // If the Facebook login worked, then we set the user here
+                .then(fbUser => {
+                    if (fbUser) {
+                        this.appUser = fbUser;
+                        this.userChange();
+                    }
+                })
+                // log any errors
+                .catch((error: Error) => {
+                    console.error(error.message);
+                })
+                // resolve once it's all done
+                .then(() => {
+                    resolve();
+                });
         });
         return this._initializePromise;
     }
@@ -77,59 +115,70 @@ export class IdentityManager {
         });
     }
 
-    completeFacebookLogin(args: FB.LoginStatusResponse): Promise<void> {
-        const authPayload: AuthPayload = {
-            auth_token: args.authResponse.accessToken,
-            authType: AuthenticationTypes.FACEBOOK
-        };
-
-        return authenticate(authPayload).then(authResponse => {
-            const user = new FacebookUser(args, authResponse.user, authResponse.id_token, this.userContext);
-            this.appUser = user;
-        }).catch((error: Error) => {
-            console.error(error.message);
-            alert(error.message);
+    completeFacebookLogin(args: FB.LoginStatusResponse): Promise<FacebookUser> {
+        return new Promise<FacebookUser>((resolve, reject) => {
+            const authPayload: AuthPayload = {
+                auth_token: args.authResponse.accessToken,
+                authType: AuthenticationTypes.FACEBOOK
+            };
+            return authenticate(authPayload).then(authResponse => {
+                const user = new FacebookUser(args, authResponse.user, authResponse.id_token, this.userContext);
+                resolve(user);
+            }).catch((error: Error) => {
+                console.error(error.message);
+                alert(error.message);
+            });
         });
     }
 
     private _initFacebook(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            return this._getFacebookLoginStatus().then(response => {
+            return this._checkFB().then(() => {
                 this.haveFB = true;
                 this.fbLoaded && this.fbLoaded();
-                // If we haven't been authorized yet, then we aren't going to use Facebook to login
-                if (response.status !== "connected") {
-                    return Promise.resolve();
-                }
-                else {
-                    return this.completeFacebookLogin(response);
-                }
-            }).then(() => {
                 resolve();
+            }).catch(error => {
+                reject(error);
             });
         });
     }
 
-    private _getFacebookLoginStatus(): Promise<FB.LoginStatusResponse> {
-        return new Promise<FB.LoginStatusResponse>((resolve, reject) => {
+    private _getFacebookLoginStatus(): Promise<FacebookUser> {
+        return new Promise<FacebookUser>((resolve, reject) => {
             return this._checkFB().then(() => {
                 FB.getLoginStatus((response: FB.LoginStatusResponse) => {
-                    resolve(response);
+                    // If we haven't been authorized yet, then we aren't going to use Facebook to login
+                    if (response.status !== "connected") {
+                        resolve(null);
+                    }
+                    else {
+                        return this.completeFacebookLogin(response)
+                            .then(fbUser => {
+                                resolve(fbUser);
+                            }).catch(reject);
+                    }
                 }, true);
-            });
+            }).catch(reject);
         });
     }
 
     private _checkFB(): Promise<void> {
+        // Start a counter to make sure that we'll eventually resolve, even if we never load Facebook
+        let counter = 0;
         if (window["FB"]) {
             return Promise.resolve();
         }
         else {
             return new Promise<void>((resolve, reject) => {
                 const interval = setInterval(() => {
+                    counter++;
                     if (window["FB"]) {
                         clearInterval(interval);
                         resolve();
+                    }
+                    else if (counter > 10) {
+                        clearInterval(interval);
+                        reject(new Error("No FB loaded"));
                     }
                 }, 100);
             });
@@ -160,7 +209,22 @@ export class IdentityManager {
             return authenticate(authPayload).then(authResponse => {
                 const googleUser = new GoogleUser(response, authResponse.user, authResponse.id_token, this.userContext);
                 resolve(googleUser);
-            }).catch(reject);
+            }).catch(error => reject(error));
+        });
+    }
+
+    private _getGoogleLogin(): Promise<GoogleUser> {
+        return new Promise<GoogleUser>((resolve, reject) => {
+            const loggedIn = this._googleAuth.isSignedIn.get();
+            if (loggedIn) {
+                const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
+                return this.completeGoogleLogin(user).then(googleUser => {
+                    resolve(googleUser);
+                }).catch(error => reject(error));
+            }
+            else {
+                resolve(null);
+            }
         });
     }
 
@@ -170,17 +234,6 @@ export class IdentityManager {
                 this.googleLoaded && this.googleLoaded();
                 this._googleAuth = gapi.auth2.getAuthInstance();
                 this.haveGoogle = true;
-                const loggedIn = this._googleAuth.isSignedIn.get();
-                if (loggedIn) {
-                    const user: gapi.auth2.GoogleUser = this._googleAuth.currentUser.get();
-                    return this.completeGoogleLogin(user);
-                }
-                else {
-                    return Promise.resolve<GoogleUser>(null);
-                }
-            }).then(googleUser => {
-                this.appUser = googleUser;
-                this.userChange();
                 resolve();
             }).catch((error: Error) => {
                 console.error(error.stack);
@@ -205,15 +258,21 @@ export class IdentityManager {
     }
 
     private _checkGoogleAPI(): Promise<void> {
+        let counter = 0;
         if (window["gapi"]) {
             return Promise.resolve();
         }
         else {
             return new Promise<void>((resolve, reject) => {
                 const interval = setInterval(() => {
+                    counter++;
                     if (window["gapi"]) {
                         clearInterval(interval);
                         resolve();
+                    }
+                    else if (counter > 10) {
+                        clearInterval(interval);
+                        reject(new Error("google failed to load"));
                     }
                 }, 100);
             });

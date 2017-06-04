@@ -33,6 +33,9 @@ export class UserStore implements Store<User> {
             promises.push(this.refreshAllUsers());
             return Promise.all(promises).then(() => {
                 resolve();
+            }).catch(error => {
+                console.error(error.message);
+                reject(error);
             });
         });
         return this._initializePromise;

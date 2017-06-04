@@ -31,7 +31,7 @@ export class DriverStore implements Store<DriverModel> {
         this._initialized = this._initialized ? this._initialized : new Promise<void>((resolve, reject) => {
             return this.refresh().then(() => {
                 resolve();
-            }).catch(reject);
+            }).catch(error => reject(error));
         });
         return this._initialized;
     }

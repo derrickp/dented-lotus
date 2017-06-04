@@ -47,4 +47,6 @@ app.initialize().then(success => {
         <App />,
         dentedLotusElement
     );
+}).catch(error => {
+    alert(error.message);
 });

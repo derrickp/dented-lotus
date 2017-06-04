@@ -231,7 +231,7 @@ export class AppManager {
                 }
                 this._raceMap.set(model.key, model);
                 resolve(model);
-            });
+            }).catch(error => reject(error));
         });
     }
 
@@ -313,7 +313,7 @@ export class AppManager {
                 this.blogs = blogResponses;
                 this._publishWatches("blogs");
                 resolve();
-            });
+            }).catch(error => reject(error));
         });
     }
 
