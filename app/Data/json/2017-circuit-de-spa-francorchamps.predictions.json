@@ -1,0 +1,18 @@
+[
+    {
+        "prediction": "top-3",
+        "value": 100
+    },
+    {
+        "prediction": "fastest-pit",
+        "value": 100
+    },
+    {
+        "prediction": "first-out",
+        "value": 200
+    },
+    {
+        "prediction": "most-positions-gained",
+        "value": 100
+    }
+]
