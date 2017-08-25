@@ -1,0 +1,18 @@
+[
+    {
+        "prediction": "top-3",
+        "final": "hamilton,bottas,raikonnen"
+    },
+    {
+        "prediction": "fastest-pit",
+        "final": "massa"
+    },
+    {
+        "prediction": "biggest-surprise-team-edition",
+        "final": "red"
+    },
+    {
+        "prediction": "best-of-the-slowest",
+        "final": "hulkenberg"
+    }
+]

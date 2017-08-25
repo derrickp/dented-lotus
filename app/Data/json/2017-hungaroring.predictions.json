@@ -1,0 +1,18 @@
+[
+    {
+        "prediction": "most-exciting-team",
+        "value": 200
+    },
+    {
+        "prediction": "best-of-the-slowest",
+        "value": 400
+    },
+    {
+        "prediction": "first-out",
+        "value": 100
+    },
+    {
+        "prediction": "best-radio",
+        "value": 100
+    }
+]
