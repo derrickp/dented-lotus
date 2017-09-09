@@ -43,6 +43,7 @@ export class AllRaces extends DentedLotusComponentBase<AllRacesProps, AllRacesSt
 
     getRacePanel(race: RaceModel): JSX.Element {
         const expanded = race === this.state.expandedRace;
+        debugger;
         const dFromNow = getDurationFromNow(race.cutoff);
         const buttonText = dFromNow.duration.seconds() <= 0 ? "View Picks" : "Make Picks";
         const buttonStyle = dFromNow.duration.seconds() <= 0 ? "danger" : "primary";
