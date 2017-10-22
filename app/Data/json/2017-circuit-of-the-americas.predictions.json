@@ -1,0 +1,18 @@
+[
+    {
+        "prediction": "top-3",
+        "value": 100
+    },
+    {
+        "prediction": "fastest-lap",
+        "value": 100
+    },
+    {
+        "prediction": "first-out",
+        "value": 100
+    },
+    {
+        "prediction": "most-positions-lost",
+        "value": 200
+    }
+]
