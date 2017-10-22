@@ -28,8 +28,6 @@ export class RaceModel {
         this.key = race.key;
         if (race.raceDate) {
             this.raceDate = race.raceDate;
-            const d = getDurationFromNow(this.raceDate);
-            this.complete = d.timeRemaining <= 0;
         }
         if (race.qualiDate) this.qualiDate = race.qualiDate;
         if (race.cutoff) {
@@ -38,6 +36,8 @@ export class RaceModel {
         else {
             this.cutoff = this.raceDate;
         }
+        const d = getDurationFromNow(this.cutoff);
+        this.complete = d.timeRemaining <= 0;
         this.imageUrl = race.imageUrl;
         this._context = context;
     }
