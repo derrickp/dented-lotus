@@ -40,7 +40,7 @@ export class RaceCountdown extends React.Component<RaceCountdownProps, any>{
         if (!this.props.race) {
             return;
         }
-        const dFromNow = getDurationFromNow(this.props.race.raceDate);
+        const dFromNow = getDurationFromNow(this.props.race.cutoff);
         this.setState({ timeRemaining: dFromNow.fullDuration });
     }
     render() {
