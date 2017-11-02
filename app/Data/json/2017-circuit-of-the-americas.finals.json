@@ -1,0 +1,18 @@
+[
+    {
+        "prediction": "top-3",
+        "final": "hamilton,vettel,raikonnen"
+    },
+    {
+        "prediction": "fastest-lap",
+        "final": "vettel"
+    },
+    {
+        "prediction": "first-out",
+        "final": "hulkenberg"
+    },
+    {
+        "prediction": "most-positions-lost",
+        "final": "bottas"
+    }
+]

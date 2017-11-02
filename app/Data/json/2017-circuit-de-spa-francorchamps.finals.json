@@ -1,0 +1,18 @@
+[
+    {
+        "prediction": "top-3",
+        "final": "hamilton,vettel,ricciardo"
+    },
+    {
+        "prediction": "fastest-pit",
+        "final": "hamilton"
+    },
+    {
+        "prediction": "first-out",
+        "final": "wehrlein"
+    },
+    {
+        "prediction": "most-positions-gained",
+        "final": "massa"
+    }
+]

@@ -1,0 +1,18 @@
+[
+    {
+        "prediction": "top-3",
+        "final": "hamilton,verstappen,ricciardo"
+    },
+    {
+        "prediction": "fastest-pit",
+        "final": "verstappen"
+    },
+    {
+        "prediction": "first-out",
+        "final": "sainz"
+    },
+    {
+        "prediction": "most-positions-gained",
+        "final": "alonso"
+    }
+]
